@@ -1,8 +1,8 @@
 build:
    script:
-     - ./gradlew build
+     - cookery-service/gradlew build
 
 test:
    stage: test
    script:
-     - ./gradlew test
+     - cookery-service/gradlew test
