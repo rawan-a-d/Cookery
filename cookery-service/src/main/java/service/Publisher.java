@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Publisher {
-    private static final URI BASE_URI = URI.create("http://localhost:9090/");
+    private static final URI BASE_URI = URI.create("http://localhost:90/");
 
     public static void main(String[] args) {
 
