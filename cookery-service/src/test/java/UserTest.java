@@ -13,8 +13,10 @@ public class UserTest {
 
 		User actualUser = new User("Ranim", "ranim@gmail.com", "12345");
 
+		//assertSame(user, actualUser);
+		assertEquals(user.getName(), actualUser.getName());
+		assertEquals(user.getEmail(), actualUser.getEmail());
+		assertEquals(user.getPassword(), actualUser.getPassword());
 
-		//assertThat(actualUser).isEqualToComparingFieldByField(user);
-		assertEquals(1, 1);
 	}
 }
