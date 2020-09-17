@@ -33,4 +33,7 @@ dependencies {
     // Logging
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.+'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.+'
+
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.0.1")
+
 }
