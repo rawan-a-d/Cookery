@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataStore {
-    private List<User> users = new ArrayList<>(); // Why is this final??????????????????????
+    private List<User> users = new ArrayList<>();
 
     public DataStore() {
         User user1 = new User("Rawan", "rawan@gmail.com", "1234");
@@ -84,16 +84,4 @@ public class DataStore {
 
         return null;
     }
-
-//    public User isUserOnFile(User user){
-//        for (User u: users) {
-//            if(u.getEmail() == user.getEmail()){
-//                return u;
-//            }
-//        }
-//
-//        return null;
-//    }
-
-
 }
