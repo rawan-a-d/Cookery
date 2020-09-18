@@ -35,10 +35,4 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.+'
 
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
-
-
 }
-
-//test {
-//    useJUnitPlatform()
-//}
