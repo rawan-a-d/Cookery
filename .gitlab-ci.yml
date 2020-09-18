@@ -1,8 +1,15 @@
+stages:
+  - build
+  - test
+
 build:
-   script:
-     - cookery-service/gradlew build
+  stage: build
+  script:
+    - cd cookery-service
+    - ./gradlew build
 
 test:
-   stage: test
-   script:
-     - cookery-service/gradlew test
+  stage: test
+  script:
+    - cd cookery-service
+    - ./gradlew test

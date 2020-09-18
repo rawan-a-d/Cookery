@@ -13,10 +13,10 @@ public class DataStore {
         User user2 = new User("Ranim", "ranim@gmail.com", "12345");
         User user3 = new User("Robin", "robin@gmail.com", "123456");
         User user4 = new User("anas", "anas@gmail.com", "1234567");
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-        users.add(user4);
+        this.users.add(user1);
+        this.users.add(user2);
+        this.users.add(user3);
+        this.users.add(user4);
 
     }
 
