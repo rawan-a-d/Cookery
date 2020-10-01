@@ -1,6 +1,5 @@
 package service.resources;
 
-
 import service.model.User;
 import service.repository.DataStore;
 
@@ -15,7 +14,7 @@ public class UsersResources {
     @Context
     private UriInfo uriInfo;
 
-    private static final DataStore dataStore = new DataStore();
+    private final DataStore dataStore = DataStore.getInstance();
 
 
     @GET //GET at http://localhost:XXXX/users
