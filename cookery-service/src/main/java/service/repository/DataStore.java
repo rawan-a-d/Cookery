@@ -5,6 +5,9 @@ import service.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.sql.*;  
+
+
 public class DataStore {
     private List<User> users = new ArrayList<>();
 
@@ -17,6 +20,13 @@ public class DataStore {
         this.users.add(user2);
         this.users.add(user3);
         this.users.add(user4);
+
+        Class.forName("com.mysql.jdbc.Driver");  
+        Connection con=DriverManager.getConnection(  
+        "https://phpmyadmin.hera.fhict.nl/","dbi407847","new0991418228");  
+
+        User user5 = new User("Rawan", "rawan@gmail.com", "1234");
+
 
     }
 
