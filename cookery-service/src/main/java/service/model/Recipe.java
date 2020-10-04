@@ -1,6 +1,5 @@
 package service.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe {
@@ -17,14 +16,14 @@ public class Recipe {
 		idSeeder++;
 	}
 
-	public Recipe(String name, String image, String description, int userId) {
+	public Recipe(String name, String image, String description, int userId, List<Ingredient> ingredients) {
 		this.id = idSeeder;
 		idSeeder++;
 		this.name = name;
 		this.image = image;
 		this.description = description;
-		this.ingredients = new ArrayList<>();
 		this.userId = userId;
+		this.ingredients = ingredients;
 	}
 
 	public int getId() {

@@ -16,13 +16,21 @@ public class RecipesResources {
 
 	private final DataStore dataStore = DataStore.getInstance();
 
-	@GET //GET at http://localhost:XXXX/recipes
+
+	@GET //GET at http://localhost:XXXX/recipes?ingredient=onion OR http://localhost:XXXX/recipes
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllRecipes(){
-		List<Recipe> recipes = dataStore.getRecipes();
+	public Response getRecipeByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient){
+		List<Recipe> recipes;
+		if(ingredient.equals("all")) {
+			recipes = dataStore.getRecipes();
+		}
+		else {
+			recipes = dataStore.getRecipesBy(ingredient);
+		}
 
 		GenericEntity<List<Recipe>> entity = new GenericEntity<>(recipes){ };
 		return Response.ok(entity).build();
+
 	}
 
 	@GET //GET at http://localhost:XXXX/recipes/1
