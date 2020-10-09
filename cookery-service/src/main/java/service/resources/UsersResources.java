@@ -27,7 +27,7 @@ public class UsersResources {
         return Response.ok(entity).build();
     }
 
-    @GET
+    @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Response getUser(@PathParam("id") int id){
@@ -40,8 +40,6 @@ public class UsersResources {
             return Response.status(Response.Status.BAD_REQUEST).entity("Please provide a valid user id").build();
         }
     }
-
-    // GET RECIPES FOR A USER, http://localhost:9090/users/1/recipes
 
 
     @POST //POST at http://localhost:XXXX/users
@@ -82,7 +80,7 @@ public class UsersResources {
     }
 
 
-    @GET
+    @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
     public Response getUserRecipes(@PathParam("id") int id){
         List<Recipe> recipes = dataStore.getUserRecipes(id);
