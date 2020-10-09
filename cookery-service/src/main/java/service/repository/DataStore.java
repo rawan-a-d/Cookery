@@ -149,6 +149,17 @@ public class DataStore {
         return foundRecipes;
     }
 
+    public List<Recipe> getUserRecipes(int id){
+        List<Recipe> foundRecipes = new ArrayList<>();
+        for (Recipe recipe: recipes){
+            if(recipe.getUserId() == id){
+                foundRecipes.add(recipe);
+            }
+        }
+
+        return foundRecipes;
+    }
+
 
     private void generateDummyData() {
         User user1 = new User("Rawan", "rawan@gmail.com", "1234");
