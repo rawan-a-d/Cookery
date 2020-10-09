@@ -1,6 +1,6 @@
 package service.resources;
 
-
+import service.model.Recipe;
 import service.model.User;
 import service.repository.DataStore;
 
@@ -15,7 +15,7 @@ public class UsersResources {
     @Context
     private UriInfo uriInfo;
 
-    private static final DataStore dataStore = new DataStore();
+    private final DataStore dataStore = DataStore.getInstance();
 
 
     @GET //GET at http://localhost:XXXX/users
@@ -27,7 +27,7 @@ public class UsersResources {
         return Response.ok(entity).build();
     }
 
-    @GET
+    @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Response getUser(@PathParam("id") int id){
@@ -41,11 +41,7 @@ public class UsersResources {
         }
     }
 
-    //    {
-    //    "name" : "omar",
-    //    "email": "omar@gmail.com",
-    //    "password": "1234"
-    //}
+
     @POST //POST at http://localhost:XXXX/users
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(User user){
@@ -81,5 +77,15 @@ public class UsersResources {
     public Response deleteStudent(@PathParam("id") int id){
         dataStore.deleteUser(id);
         return Response.noContent().build();
+    }
+
+
+    @GET //GET at http://localhost:XXXX/users/2/recipes
+    @Path("{id}/recipes")
+    public Response getUserRecipes(@PathParam("id") int id){
+        List<Recipe> recipes = dataStore.getUserRecipes(id);
+
+        GenericEntity<List<Recipe>> entity = new GenericEntity<>(recipes){ };
+        return Response.ok(entity).build();
     }
 }
