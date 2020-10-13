@@ -16,6 +16,7 @@ test:
     - ./gradlew test
   dependencies:
     - build
+
 sonarqube:
   stage: sonarqube
   script:
