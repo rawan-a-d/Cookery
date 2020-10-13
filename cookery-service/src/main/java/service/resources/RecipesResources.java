@@ -28,7 +28,7 @@ public class RecipesResources {
 			recipes = dataStore.getRecipesBy(ingredient);
 		}
 
-		GenericEntity<List<Recipe>> entity = new GenericEntity<>(recipes){ };
+		GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
 		return Response.ok(entity).build();
 
 	}

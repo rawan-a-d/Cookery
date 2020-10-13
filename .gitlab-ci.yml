@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - sonarqube
 
 build:
   stage: build
@@ -15,3 +16,10 @@ test:
     - ./gradlew test
   dependencies:
     - build
+sonarqube:
+  stage: sonarqube
+  script:
+    - cd cookery-service
+    - ./gradlew sonarqube
+  dependencies:
+    - test

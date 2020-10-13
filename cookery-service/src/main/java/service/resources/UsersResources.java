@@ -23,7 +23,7 @@ public class UsersResources {
     public Response getAllUsers(){
         List<User> users = dataStore.getUsers();
 
-        GenericEntity<List<User>> entity = new GenericEntity<>(users){ };
+        GenericEntity<List<User>> entity = new GenericEntity<List<User>>(users){ };
         return Response.ok(entity).build();
     }
 
@@ -85,7 +85,7 @@ public class UsersResources {
     public Response getUserRecipes(@PathParam("id") int id){
         List<Recipe> recipes = dataStore.getUserRecipes(id);
 
-        GenericEntity<List<Recipe>> entity = new GenericEntity<>(recipes){ };
+        GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
     }
 }
