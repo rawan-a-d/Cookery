@@ -1,5 +1,6 @@
 package service.repository;
 
+import service.model.Follow;
 import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.User;
@@ -10,6 +11,7 @@ import java.util.List;
 public class DataStore {
     private List<User> users = new ArrayList<>();
     private List<Recipe> recipes = new ArrayList<>();
+    private List<Follow> follows = new ArrayList<>(); // can be added in User
 
     // singleton pattern
     private static final DataStore INSTANCE = new DataStore();
@@ -161,6 +163,35 @@ public class DataStore {
     }
 
 
+    /*------------------------------------------------------------------------Follow-----------------------------------------------------------------------------*/
+    public void follow(Follow follow) {
+        // check if already followed
+        if(!isFollowOnFile(follow)) {
+            follows.add(follow);
+        }
+    }
+
+    public void unFollow(Follow follow) {
+        if(follows.contains(follow)) {
+            follows.remove(follow);
+        }
+    }
+
+    public boolean isFollowOnFile(Follow follow) {
+        for (Follow followItem: follows) {
+            if(followItem.getFollowee().equals(follow.getFollowee()) && followItem.getFollower().equals(follow.getFollower())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+
+
+    /* Dummy data */
     private void generateDummyData() {
         User user1 = new User("Rawan", "rawan@gmail.com", "1234");
         User user2 = new User("Ranim", "ranim@gmail.com", "12345");
