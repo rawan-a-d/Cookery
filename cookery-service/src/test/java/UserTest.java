@@ -56,13 +56,4 @@ public class UserTest {
 
 		assertSame(updatedUser, user);
 	}
-
-	// Check constructor
-
-
-	// When working with db
-	// Create a user -> try to retrieve it
-	// Read a user
-	// Delete a user -> try to retrieve it
-	// Update a user -> try to retrieve it
 }

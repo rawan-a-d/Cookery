@@ -20,6 +20,13 @@ public class User {
         idSeeder++;
     }
 
+    public User(int id, String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
@@ -54,5 +61,16 @@ public class User {
 
     public static void decreaseIdSeeder() {
         idSeeder--;
+    }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

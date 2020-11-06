@@ -140,7 +140,7 @@ public class DataStore {
         List<Recipe> foundRecipes = new ArrayList<>();
         for (Recipe recipe: recipes){
             for (Ingredient i: recipe.getIngredients()){
-                if(i.getName().equals(ingredient)){
+                if(i.getIngredient().equals(ingredient)){
                     foundRecipes.add(recipe);
                 }
             }
@@ -152,9 +152,9 @@ public class DataStore {
     public List<Recipe> getUserRecipes(int id){
         List<Recipe> foundRecipes = new ArrayList<>();
         for (Recipe recipe: recipes){
-            if(recipe.getUserId() == id){
+//            if(recipe.getUserId() == id){ // fix
                 foundRecipes.add(recipe);
-            }
+           // }
         }
 
         return foundRecipes;
@@ -199,12 +199,12 @@ public class DataStore {
         recipe4Ingredients.add(new Ingredient("jar marinara sauce", 2));
 
 
-        Recipe recipe1 = new Recipe("Crab Cakes", "img.png", "Step 1\n" +
+        Recipe recipe1 = new Recipe("Crab Cakes", "https://lassie.nl/storage/images/recipe/_recipe/Pandanrijst-Thaise-Crabcakes.jpg", "Step 1\n" +
                 "In a medium bowl, whisk together egg, mayonnaise, lemon juice, red pepper flakes, tarragon, and scallions. Gently stir in crabmeat, being careful not to break up meat. Gradually mix in cracker crumbs, adding until desired consistency is achieved.\n" +
                 "\n" +
                 " Step 2\n" +
                 "Heat butter in a skillet over medium heat. Form crab mixture into 4 patties. Place patties in skillet, and cook until golden brown, about 5 to 6 minutes on each side.", 2, recipe1Ingredients);
-        Recipe recipe2 = new Recipe("Stuffed zucchini (kousa mahshi)", "img.png", "Cut off the zucchini " +
+        Recipe recipe2 = new Recipe("Stuffed zucchini (kousa mahshi)", "https://i.pinimg.com/originals/70/f0/b8/70f0b8d52d9ed3c9c84607cd79dd0065.jpg", "Cut off the zucchini " +
                 "stalks, then slice off the dried tips at the opposite ends without removing too much flesh. " +
                 "Carefully hollow out the zucchini from the stalk end by pushing and turning a manakra into the flesh. " +
                 "The tool will remove thin fingers of flesh at a time; keep hollowing until you have a generous cavity. " +
@@ -217,12 +217,12 @@ public class DataStore {
                 "\n" +
                 "Fill a large saucepan with water and add 2 tbsp salt and the tomato paste. Add the stuffed zucchini and any meatballs and bring to the boil. Simmer over low heat for about 1 hour, allowing the sauce to reduce. " +
                 "Serve the stuffed zucchini with a little of the sauce and a dollop of yoghurt.", 2, recipe2Ingredients);
-        Recipe recipe3 = new Recipe("Skillet Chicken Bulgogi", "img.png", "Step 1\n" +
+        Recipe recipe3 = new Recipe("Skillet Chicken Bulgogi", "https://i.pinimg.com/originals/65/c2/63/65c26342ad2bc80eacfd6062646355b1.jpg", "Step 1\n" +
                 "Whisk onion, soy sauce, brown sugar, garlic, sesame oil, sesame seeds, cayenne pepper, salt, and black pepper together in a bowl until marinade is smooth.\n" +
                 "\n" +
                 " Step 2\n" +
                 "Cook and stir chicken and marinade together in a large skillet over medium-high heat until chicken is cooked through, about 15 minutes.", 3, recipe3Ingredients);
-        Recipe recipe4 = new Recipe("Lasagna Flatbread\n", "img.png", "Step 1\n" +
+        Recipe recipe4 = new Recipe("Lasagna Flatbread\n", "https://static.toiimg.com/thumb/60716791.cms?imgsize=631011&width=800&height=800", "Step 1\n" +
                 "Preheat oven to 375 degrees F (190 degrees C).\n" +
                 "\n" +
                 " Step 2\n" +
@@ -237,10 +237,17 @@ public class DataStore {
                 " Step 5\n" +
                 "Bake in the preheated oven until cheese is melted and bubbly, 10 to 15 minutes.", 1, recipe4Ingredients);
 
+        Recipe recipe5 = new Recipe("Crab Cakes 2", "https://lassie.nl/storage/images/recipe/_recipe/Pandanrijst-Thaise-Crabcakes.jpg", "Step 1\n" +
+                "In a medium bowl, whisk together egg, mayonnaise, lemon juice, red pepper flakes, tarragon, and scallions. Gently stir in crabmeat, being careful not to break up meat. Gradually mix in cracker crumbs, adding until desired consistency is achieved.\n" +
+                "\n" +
+                " Step 2\n" +
+                "Heat butter in a skillet over medium heat. Form crab mixture into 4 patties. Place patties in skillet, and cook until golden brown, about 5 to 6 minutes on each side.", 2, recipe1Ingredients);
         recipes.add(recipe1);
         recipes.add(recipe2);
         recipes.add(recipe3);
         recipes.add(recipe4);
+        recipes.add(recipe5);
+
     }
 
 }

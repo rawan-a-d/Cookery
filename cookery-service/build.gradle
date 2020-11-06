@@ -36,4 +36,10 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.+'
 
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+
+
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.14.Final'// leave this version. It does not work with higher versions!
+    // SQL database driver
+    compile 'mysql:mysql-connector-java:5.1.23'
+    runtime 'mysql:mysql-connector-java:5.1.23'
 }

@@ -1,5 +1,6 @@
 package service.resources;
 
+import service.Controller;
 import service.model.Recipe;
 import service.model.User;
 import service.repository.DataStore;
@@ -21,7 +22,10 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(){
-        List<User> users = dataStore.getUsers();
+//        List<User> users = dataStore.getUsers();
+        Controller controller = new Controller();
+
+        List<User> users = controller.getUsers();
 
         GenericEntity<List<User>> entity = new GenericEntity<List<User>>(users){ };
         return Response.ok(entity).build();
@@ -31,7 +35,11 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Response getUser(@PathParam("id") int id){
-        User user = dataStore.getUser(id);
+//        User user = dataStore.getUser(id);
+
+        Controller controller = new Controller();
+
+        User user = controller.getUser(id);
 
         if(user != null){
             return Response.ok(user).build(); // Status ok 200, return user
@@ -45,7 +53,10 @@ public class UsersResources {
     @POST //POST at http://localhost:XXXX/users
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(User user){
-        boolean result = dataStore.addUser(user);
+//        boolean result = dataStore.addUser(user);
+
+        Controller controller = new Controller();
+        boolean result = controller.createUser(user);
 
         if(result){ // Successful
             String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
@@ -62,7 +73,10 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Response updateUser(@PathParam("id") int id, User user){
-        boolean result = dataStore.updateUser(id, user);
+//        boolean result = dataStore.updateUser(id, user);
+
+        Controller controller = new Controller();
+        boolean result = controller.updateUser(id, user);
 
         if(result) { // Successful
             return Response.noContent().build();
@@ -74,8 +88,11 @@ public class UsersResources {
 
     @DELETE //DELETE at http://localhost:XXXX/users/3
     @Path("{id}")
-    public Response deleteStudent(@PathParam("id") int id){
-        dataStore.deleteUser(id);
+    public Response deleteUser(@PathParam("id") int id){
+//        dataStore.deleteUser(id);
+        Controller controller = new Controller();
+        controller.deleteRecipe(id);
+
         return Response.noContent().build();
     }
 
@@ -83,7 +100,9 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
     public Response getUserRecipes(@PathParam("id") int id){
-        List<Recipe> recipes = dataStore.getUserRecipes(id);
+//        List<Recipe> recipes = dataStore.getUserRecipes(id);
+        Controller controller = new Controller();
+        List<Recipe> recipes = controller.getRecipes(id);
 
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
