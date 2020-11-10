@@ -88,4 +88,5 @@ public class UsersResources {
         GenericEntity<List<Recipe>> entity = new GenericEntity<>(recipes){ };
         return Response.ok(entity).build();
     }
+
 }
