@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'org.sonarqube' version '3.0'
 }
 
 group 'com.cookery'
@@ -39,4 +40,9 @@ dependencies {
     // JSON Web Token
     implementation 'com.auth0:java-jwt:3.11.0'
 
+
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.14.Final'// leave this version. It does not work with higher versions!
+    // SQL database driver
+    compile 'mysql:mysql-connector-java:5.1.23'
+    runtime 'mysql:mysql-connector-java:5.1.23'
 }

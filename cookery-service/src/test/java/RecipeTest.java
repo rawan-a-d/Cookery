@@ -40,7 +40,7 @@ public class RecipeTest {
 		ingredients.add(new Ingredient("sesame oil", 2));
 		ingredients.add(new Ingredient("sesame seeds", 1));
 
-		Recipe expectedRecipe = new Recipe("Skillet Chicken Bulgogi", "img.png", "Step 1\n" +
+		Recipe expectedRecipe = new Recipe("Skillet Chicken Bulgogi", "https://i.pinimg.com/originals/65/c2/63/65c26342ad2bc80eacfd6062646355b1.jpg", "Step 1\n" +
 				"Whisk onion, soy sauce, brown sugar, garlic, sesame oil, sesame seeds, cayenne pepper, salt, and black pepper together in a bowl until marinade is smooth.\n" +
 				"\n" +
 				" Step 2\n" +
