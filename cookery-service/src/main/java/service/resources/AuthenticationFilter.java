@@ -1,5 +1,8 @@
 package service.resources;
 
+import service.Controller;
+import service.model.User;
+
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -27,6 +30,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     // requestContext contains information about the HTTP request message
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        System.out.println("IN Auth Filter");
         // here you will perform AUTHENTICATION and AUTHORIZATION
         /* if you want to abort this HTTP request, you do this:
 
@@ -96,6 +100,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         //Check if username and password are valid (e.g., database)
         //If not valid: abort with UNAUTHORIZED and stop
         if (!isValidUser(username, password)) {
+            System.out.println("HOHO");
             Response response = Response.status(Response.Status.UNAUTHORIZED).
                     entity("Invalid username and/or password.").build();
             requestContext.abortWith(response);
@@ -125,10 +130,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     // Is the user valid??
-    private boolean isValidUser(String username, String password) {
-        if (username.equals("Rawan") && password.equals("1234")) {
+    private boolean isValidUser(String email, String password) {
+        Controller controller = new Controller();
+
+        User user = controller.authenticate(email, password);
+
+        System.out.println("USER " + user);
+
+        if(user != null) {
+            System.out.println("CORRECT");
             return true;
         }
+        System.out.println("NOT CORRECT");
 
         return false;
     }

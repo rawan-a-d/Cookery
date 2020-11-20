@@ -38,7 +38,7 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 
     // JSON Web Token
-    implementation 'com.auth0:java-jwt:3.11.0'
+//    implementation 'com.auth0:java-jwt:3.11.0'
 
 
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.14.Final'// leave this version. It does not work with higher versions!

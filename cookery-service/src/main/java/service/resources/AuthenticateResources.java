@@ -1,44 +1,38 @@
 package service.resources;
 
-import com.auth0.jwt.exceptions.JWTCreationException;
+import service.Controller;
+import service.model.User;
 
-import javax.ws.rs.HeaderParam;
+import javax.annotation.security.PermitAll;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Base64;
+import java.util.StringTokenizer;
 
 @Path("authenticate")
 public class AuthenticateResources {
-
-    // api/authenticate
-    // post request
-    // get the email and password
-    // check if they are correct
-    // Send a response back with JSON Token
-    // otherwise, response 400 bad request with nothing in it
     @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @PermitAll
+    public Response authenticate(String credentials) {
+        StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
+        String email = tokenizer.nextToken();
+        String password = tokenizer.nextToken();
 
-//    @Path("authenticate")
-    public Response authenticate(@HeaderParam("Authorization") String auth ) {
-        try {
+        Controller controller = new Controller();
 
-            System.out.println("AUTH");
-            System.out.println(auth);
+        User user = controller.authenticate(email, password);
 
-            String credentials2 = new String(Base64.getDecoder().decode(auth.getBytes()));
-            System.out.println("DECODED");
-            System.out.println(credentials2);
+        if(user != null) {
 
             return Response.ok().build();
         }
-        catch (JWTCreationException exception) {
-            return Response.status(401).build();
+        else {
+            return Response.status(Response.Status.UNAUTHORIZED).
+                    entity("Invalid username and/or password.").build();
         }
-
-
     }
 
 

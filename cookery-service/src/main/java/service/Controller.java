@@ -2,6 +2,7 @@ package service;
 
 import service.model.Recipe;
 import service.model.User;
+import service.repository.AuthenticationRepository;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
 import service.repository.UsersRepository;
@@ -182,6 +183,22 @@ public class Controller {
 		catch (CookeryDatabaseException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+
+	/*---------------------------------------------------------------- Authenticate ----------------------------------------------------------------------*/
+	public User authenticate(String email, String password) {
+		AuthenticationRepository authenticationRepository = new AuthenticationRepository();
+
+		User user = null;
+		try {
+			 user = authenticationRepository.authenticate(email, password);
+		}
+		catch (CookeryDatabaseException ex) {
+			ex.printStackTrace();
+		}
+
+		return user;
 	}
 
 }
