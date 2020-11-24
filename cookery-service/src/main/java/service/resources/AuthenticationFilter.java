@@ -1,5 +1,6 @@
 package service.resources;
 
+import io.jsonwebtoken.Claims;
 import service.Controller;
 import service.model.User;
 
@@ -13,9 +14,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class AuthenticationFilter implements ContainerRequestFilter {
+
 
 
     /**
@@ -26,11 +31,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
      */
     @Context
     private ResourceInfo resourceInfo;
+    User user = null;
+
 
     // requestContext contains information about the HTTP request message
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        System.out.println("IN Auth Filter");
         // here you will perform AUTHENTICATION and AUTHORIZATION
         /* if you want to abort this HTTP request, you do this:
 
@@ -57,6 +63,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // if access is allowed for all -> do not check anything further : access is approved for all
         // if you want all logged in users to be able to access this route (add this check at the end of the class)
         if (method.isAnnotationPresent(PermitAll.class)) {
+            System.out.println("Permit all");
             return;
         }
 
@@ -69,7 +76,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 
         final String AUTHORIZATION_PROPERTY = "Authorization"; // property were interested in in the header
-        final String AUTHENTICATION_SCHEME = "Basic"; // the scheme (value starts with Basic)
+        final String AUTHENTICATION_SCHEME = "Bearer"; // the scheme (value starts with Basic)
 
         //Get request headers
         final MultivaluedMap<String, String> headers = requestContext.getHeaders(); // headers list
@@ -79,33 +86,41 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
         //If no authorization information present: abort with UNAUTHORIZED and stop
         if (authorization == null || authorization.isEmpty()) {
+            System.out.println("Auth is empty or null");
             Response response = Response.status(Response.Status.UNAUTHORIZED).
                     entity("Missing username and/or password.").build();
             requestContext.abortWith(response); // inform the client it's aborted with the above content
             return;
         }
 
+        System.out.println("Found auth");
+
+
         //Get encoded username and password
         final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
 
-        //Decode username and password into one string
-        String credentials = new String(Base64.getDecoder().decode(encodedCredentials.getBytes()));
-
-        //Split username and password tokens in credentials
-        final StringTokenizer tokenizer = new StringTokenizer(credentials, ":"); // username:password
-        final String username = tokenizer.nextToken();
-        final String password = tokenizer.nextToken();
-
-
-        //Check if username and password are valid (e.g., database)
-        //If not valid: abort with UNAUTHORIZED and stop
-        if (!isValidUser(username, password)) {
-            System.out.println("HOHO");
+        if(encodedCredentials.length() == 0) {
+            System.out.println("NO CREDENTIALS");
             Response response = Response.status(Response.Status.UNAUTHORIZED).
-                    entity("Invalid username and/or password.").build();
+                    entity("Username and password are required").build();
             requestContext.abortWith(response);
             return;
         }
+
+
+        // Validate token
+        Claims token = null;
+        try {
+            token = Controller.decodeJWT(encodedCredentials);
+        }
+        catch (Exception exception){
+            //Invalid signature/claims
+            Response response = Response.status(Response.Status.UNAUTHORIZED).
+                    entity("Token is invalid " + exception.getMessage()).build();
+            requestContext.abortWith(response);
+            return;
+        }
+
 
 
         /* here you do
@@ -119,7 +134,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             /* isUserAllowed : implement this method to check if this user has any of the roles in the rolesSet
             if not isUserAllowed abort the requestContext with FORBIDDEN response*/
-            if (!isUserAllowed(username, rolesSet)) {
+            if (!isUserAllowed(rolesSet, Boolean.parseBoolean(token.get("admin").toString()))) {
                 Response response = Response.status(Response.Status.FORBIDDEN).build();
                 requestContext.abortWith(response);
                 return;
@@ -129,34 +144,19 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     }
 
-    // Is the user valid??
-    private boolean isValidUser(String email, String password) {
-        Controller controller = new Controller();
-
-        User user = controller.authenticate(email, password);
-
-        System.out.println("USER " + user);
-
-        if(user != null) {
-            System.out.println("CORRECT");
-            return true;
-        }
-        System.out.println("NOT CORRECT");
-
-        return false;
-    }
 
     // Check user's role
-    private boolean isUserAllowed(String username, Set<String> rolesSet) {
+    private boolean isUserAllowed(Set<String> rolesSet, boolean isAdmin) {
         // iterate over the roles and compare it with the user's role
         // the role of the user can be retrieved as follows:
         // 1. When validating, we save the user object
         // 2. Select the user object here and check the role
 
-        // NOT COMPLETE
-        if(rolesSet.contains("admin") || rolesSet.contains("user")) {
+        if((rolesSet.contains("admin") && isAdmin) || (rolesSet.contains("user") && !isAdmin)) {
+            System.out.println("User allowed");
             return true;
         }
+        System.out.println("User not allowed");
 
         return false;
     }

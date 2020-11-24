@@ -67,6 +67,33 @@ public class UsersRepository extends JDBCRepository  {
 		}
 	}
 
+	public int getUserId(int recipeId) throws CookeryDatabaseException {
+		Connection connection = super.getDatabaseConnection();
+		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
+
+		try {
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setInt(1, recipeId);
+			ResultSet resultSet = statement.executeQuery();
+
+			if(!resultSet.next()) {
+				connection.close();
+				throw new CookeryDatabaseException("User with recipe id " + recipeId + " cannot be found");
+			}
+			else {
+				int id = resultSet.getInt("id");
+
+				connection.close();
+
+				return id;
+			}
+
+		}
+		catch (SQLException throwable) {
+			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
+		}
+	}
+
 
 	public boolean createUser(User user) throws CookeryDatabaseException {
 		Connection connection = super.getDatabaseConnection();
@@ -131,44 +158,6 @@ public class UsersRepository extends JDBCRepository  {
 		}
 		catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
-		}
-	}
-
-	public void addToFavourite(int userId, int recipeId) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
-		String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (?, ?)";
-
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
-			statement.setInt(1, userId);
-			statement.setInt(2, recipeId);
-
-			statement.executeUpdate();
-
-			connection.commit();
-			connection.close();
-		}
-		catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot insert favourite into the database", throwable);
-		}
-	}
-
-	public void removeFromFavourite(int userId, int recipeId) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
-		String sql = "DELETE FROM user_favourite_recipe WHERE user_id = ? AND recipe_id = ?";
-
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
-			statement.setInt(1, userId);
-			statement.setInt(2, recipeId);
-
-			statement.executeUpdate();
-
-			connection.commit();
-			connection.close();
-		}
-		catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot delete favourite from the database", throwable);
 		}
 	}
 }

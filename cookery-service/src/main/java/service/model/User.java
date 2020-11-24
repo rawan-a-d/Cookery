@@ -9,6 +9,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private Role role;
     private List<Recipe> favouriteRecipes;
 
     public User() {
@@ -20,6 +21,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = Role.user;
         this.id = idSeeder;
         idSeeder++;
     }
@@ -28,9 +30,20 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = Role.user;
         this.id = id;
         this.favouriteRecipes = new ArrayList<>();
     }
+
+    public User(int id, String name, String email, String password, Role role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.id = id;
+        this.favouriteRecipes = new ArrayList<>();
+    }
+
 
     public int getId() {
         return id;
@@ -64,6 +77,14 @@ public class User {
         this.password = password;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public static void decreaseIdSeeder() {
         idSeeder--;
     }
@@ -83,6 +104,8 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", role=" + role +
+                ", favouriteRecipes=" + favouriteRecipes +
                 '}';
     }
 }

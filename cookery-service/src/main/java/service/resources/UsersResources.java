@@ -24,7 +24,6 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"admin"})
     public Response getAllUsers(){
-//        List<User> users = dataStore.getUsers();
         Controller controller = new Controller();
 
         List<User> users = controller.getUsers();
@@ -36,10 +35,8 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    @RolesAllowed({"admin"})
+    @RolesAllowed({"user", "admin"})
     public Response getUser(@PathParam("id") int id){
-//        User user = dataStore.getUser(id);
-
         Controller controller = new Controller();
 
         User user = controller.getUser(id);
@@ -57,8 +54,6 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"})
     public Response addUser(User user){
-//        boolean result = dataStore.addUser(user);
-
         Controller controller = new Controller();
         boolean result = controller.createUser(user);
 
@@ -76,9 +71,8 @@ public class UsersResources {
     @PUT //PUT at http://localhost:XXXX/users/3
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
+    @RolesAllowed({"user", "admin"})
     public Response updateUser(@PathParam("id") int id, User user){
-//        boolean result = dataStore.updateUser(id, user);
-
         Controller controller = new Controller();
         boolean result = controller.updateUser(id, user);
 
@@ -94,7 +88,6 @@ public class UsersResources {
     @Path("{id}")
     @RolesAllowed({"admin"})
     public Response deleteUser(@PathParam("id") int id){
-//        dataStore.deleteUser(id);
         Controller controller = new Controller();
         controller.deleteRecipe(id);
 
@@ -104,12 +97,11 @@ public class UsersResources {
 
     @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
-//    @PermitAll
-    @RolesAllowed({"user", "admin"})
-    public Response getUserRecipes(@PathParam("id") int id){
-//        List<Recipe> recipes = dataStore.getUserRecipes(id);
+    public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){ // GET RECIPES BASED ON URL OR Authorization Header????????????????
         Controller controller = new Controller();
-        List<Recipe> recipes = controller.getRecipes(id);
+        int userId = controller.getIdInToken(auth);
+
+        List<Recipe> recipes = controller.getRecipes(userId);
 
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
