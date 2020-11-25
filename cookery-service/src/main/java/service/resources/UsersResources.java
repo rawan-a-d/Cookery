@@ -1,6 +1,7 @@
 package service.resources;
 
 import service.Controller;
+import service.model.Favourite;
 import service.model.Recipe;
 import service.model.User;
 import service.repository.DataStore;
@@ -106,5 +107,54 @@ public class UsersResources {
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
     }
+
+
+    @POST
+    @Path("{id}/favourites")
+    public Response addFavourite(@PathParam("id") int id, Favourite favourite) {
+        Controller controller = new Controller();
+        boolean result = controller.addFavourite(favourite);
+
+        if(result){ // Successful
+            String url = uriInfo.getAbsolutePath() + "/" + favourite.getRecipeId();// url of the created user
+            URI uri = URI.create(url);
+            return Response.created(uri).build();
+        }
+        else {
+            String entity = "User with id " + favourite.getRecipeId() + " already marked recipe with id " + favourite.getRecipeId() + " as favourite";
+            return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
+        }
+    }
+
+
+    @DELETE
+    @Path("{id}/favourites/{favouriteId}")
+    public Response deleteFavourite(@PathParam("id") int id, @PathParam("favouriteId") int favouriteId) {
+        Controller controller = new Controller();
+        controller.removeFavourite(favouriteId);
+
+        return Response.noContent().build();
+    }
+
+    @GET //GET at http://localhost:XXXX/users
+    @Path("{id}/favourites")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllFavourites(@HeaderParam("Authorization") String auth){
+        Controller controller = new Controller();
+
+//        System.out.println("FAOVU");
+
+        int userId = controller.getIdInToken(auth); // id in token
+
+        List<Recipe> recipes = controller.getFavourites(userId);
+
+        GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
+        return Response.ok(entity).build();
+    }
+
+
+
+
+
 
 }

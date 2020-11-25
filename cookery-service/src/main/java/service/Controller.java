@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import service.model.Favourite;
 import service.model.Recipe;
 import service.model.Role;
 import service.model.User;
@@ -306,5 +307,46 @@ public class Controller {
 //
 //		return isOwner;
 //	}
+
+
+	public boolean addFavourite(Favourite favourite) {
+		UsersRepository usersRepository = new UsersRepository();
+
+		try {
+			return usersRepository.addFavourite(favourite);
+		}
+		catch (CookeryDatabaseException ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+
+
+	public void removeFavourite(int favouriteId) {
+		UsersRepository usersRepository = new UsersRepository();
+
+		try {
+			 usersRepository.removeFavourite(favouriteId);
+		}
+		catch (CookeryDatabaseException ex) {
+			ex.printStackTrace();
+//			return false;
+		}
+	}
+
+
+	public List<Recipe> getFavourites(int userId) {
+		UsersRepository usersRepository = new UsersRepository();
+
+		List<Recipe> recipes;
+		try {
+			recipes = usersRepository.getFavourites(userId);
+			return recipes;
+		}
+		catch (CookeryDatabaseException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
 
 }
