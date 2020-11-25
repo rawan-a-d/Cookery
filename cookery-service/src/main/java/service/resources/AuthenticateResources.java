@@ -29,8 +29,34 @@ public class AuthenticateResources {
 
             String token = controller.generateAuthToken(user);
 
-            System.out.println("Decoded JWT");
-            System.out.println(controller.decodeJWT(token));
+//            System.out.println("Decoded JWT");
+//            System.out.println(controller.decodeJWT(token));
+
+            return Response.ok(token).build();
+        }
+        else {
+            return Response.status(Response.Status.UNAUTHORIZED).
+                    entity("Invalid username and/or password.").build();
+        }
+    }
+
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @Path("register")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response register(User user) {
+        Controller controller = new Controller();
+
+        System.out.println("User " + user);
+
+        boolean result = controller.createUser(user);
+
+        if(result) {
+            String token = controller.generateAuthToken(user);
+
+            System.out.println("TOKEN " + token);
 
             return Response.ok(token).build();
         }

@@ -31,9 +31,7 @@ public class Controller {
 		List<Recipe> recipes;
 		try {
 			recipes = recipesRepository.getRecipes();
-//			for (Recipe recipe: recipes) {
-//				System.out.println("\t" + recipe);
-//			}
+
 			return recipes;
 		}
 		catch (CookeryDatabaseException ex) {
@@ -131,9 +129,6 @@ public class Controller {
 		List<User> users;
 		try {
 			users = usersRepository.getUsers();
-//			for (Recipe recipe: recipes) {
-//				System.out.println("\t" + recipe);
-//			}
 			return users;
 		}
 		catch (CookeryDatabaseException ex) {
@@ -211,6 +206,18 @@ public class Controller {
 		}
 
 		return user;
+	}
+
+	public boolean register(User user) {
+		UsersRepository usersRepository = new UsersRepository();
+
+		try {
+			return usersRepository.createUser(user);
+		}
+		catch (CookeryDatabaseException ex) {
+			ex.printStackTrace();
+			return false;
+		}
 	}
 
 

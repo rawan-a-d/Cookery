@@ -1,6 +1,7 @@
 package service.repository;
 
 
+import service.model.Role;
 import service.model.User;
 
 import java.sql.*;
@@ -97,13 +98,17 @@ public class UsersRepository extends JDBCRepository  {
 
 	public boolean createUser(User user) throws CookeryDatabaseException {
 		Connection connection = super.getDatabaseConnection();
-		String sql = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
+			if(user.getRole() == null) {
+				user.setRole(Role.user);
+			}
+			statement.setString(4, user.getRole().toString());
 
 			statement.executeUpdate();
 

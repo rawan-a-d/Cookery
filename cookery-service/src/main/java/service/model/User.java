@@ -1,8 +1,5 @@
 package service.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class User {
     private int id;
     private static int idSeeder = 0;
@@ -10,7 +7,6 @@ public class User {
     private String email;
     private String password;
     private Role role;
-    private List<Recipe> favouriteRecipes;
 
     public User() {
         this.id = idSeeder;
@@ -32,7 +28,6 @@ public class User {
         this.password = password;
         this.role = Role.user;
         this.id = id;
-        this.favouriteRecipes = new ArrayList<>();
     }
 
     public User(int id, String name, String email, String password, Role role) {
@@ -41,7 +36,6 @@ public class User {
         this.password = password;
         this.role = role;
         this.id = id;
-        this.favouriteRecipes = new ArrayList<>();
     }
 
 
@@ -89,14 +83,6 @@ public class User {
         idSeeder--;
     }
 
-    public List<Recipe> getFavouriteRecipes() {
-        return favouriteRecipes;
-    }
-
-    public void setFavouriteRecipes(List<Recipe> favouriteRecipes) {
-        this.favouriteRecipes = favouriteRecipes;
-    }
-
     @Override
     public String toString() {
         return "User{" +
@@ -105,7 +91,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +
-                ", favouriteRecipes=" + favouriteRecipes +
                 '}';
     }
 }
