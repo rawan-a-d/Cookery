@@ -91,7 +91,9 @@ public class RecipesRepository extends JDBCRepository {
                 Ingredient ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
 
                 // Add ingredient to recipes
-                recipe.addIngredient(ingredient);
+                if(recipe != null) {
+                    recipe.addIngredient(ingredient);
+                }
             }
 
             connection.commit();
