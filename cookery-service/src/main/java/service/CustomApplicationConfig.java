@@ -19,10 +19,7 @@ public class CustomApplicationConfig extends ResourceConfig
 
         register(CorsFilter.class);
 
-        // register AuthenticationFilter
         register(AuthenticationFilter.class);
-
-//        register(SecureFilter.class);
     }
 }
 

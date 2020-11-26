@@ -1,6 +1,5 @@
 package service.resources;
 
-import service.Controller;
 import service.controller.AuthController;
 import service.controller.UsersController;
 import service.model.Credentials;
@@ -26,8 +25,6 @@ public class AuthResources {
     @PermitAll
     @Produces(MediaType.TEXT_PLAIN)
     public Response authenticate(Credentials credentials) {
-        Controller controller = new Controller();
-
         User user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
@@ -52,10 +49,6 @@ public class AuthResources {
     @Path("register")
     @Produces(MediaType.TEXT_PLAIN)
     public Response register(User user) {
-        Controller controller = new Controller();
-
-        System.out.println("User " + user);
-
         boolean result = usersController.createUser(user);
 
         if(result) {
