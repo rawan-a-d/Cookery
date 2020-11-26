@@ -100,6 +100,10 @@ public class RecipesController {
             ex.printStackTrace();
             return false;
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public void createRecipe(Recipe recipe) {
@@ -109,6 +113,9 @@ public class RecipesController {
             recipesRepository.createRecipe(recipe);
         }
         catch (CookeryDatabaseException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
     }
