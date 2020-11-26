@@ -15,8 +15,7 @@ public class RecipesRepository extends JDBCRepository {
 
         String sql = "SELECT * FROM recipe WHERE id = ?";
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -53,8 +52,7 @@ public class RecipesRepository extends JDBCRepository {
                 "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id`" +
                 "ORDER BY recipe.id";
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
 
             int lastId = -1;
@@ -111,8 +109,7 @@ public class RecipesRepository extends JDBCRepository {
         Connection connection = super.getDatabaseConnection();
         String sql = "SELECT * from recipe WHERE user_id = ?";
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -153,8 +150,7 @@ public class RecipesRepository extends JDBCRepository {
                 "INNER JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
                 "AND ufr.user_id = ?";
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -194,8 +190,7 @@ public class RecipesRepository extends JDBCRepository {
 
         String sql = "SELECT * FROM ingredient WHERE ingredinet = ?";
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, ingredient);
 
             ResultSet resultSet = statement.executeQuery();
@@ -432,8 +427,7 @@ public class RecipesRepository extends JDBCRepository {
 
         List<Ingredient> ingredients = new ArrayList<>();
 
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, recipeId);
             ResultSet resultSet = statement.executeQuery();

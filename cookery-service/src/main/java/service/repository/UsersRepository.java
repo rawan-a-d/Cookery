@@ -44,8 +44,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "SELECT * FROM user WHERE id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 
@@ -71,8 +70,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, recipeId);
 			ResultSet resultSet = statement.executeQuery();
 
@@ -97,8 +95,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
@@ -122,8 +119,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "DELETE FROM user WHERE id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, id);
 			statement.executeUpdate();
 
@@ -141,8 +137,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "UPDATE user SET name = ?, email = ?, password = ? WHERE id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
@@ -170,8 +165,7 @@ public class UsersRepository extends JDBCRepository {
 
 		String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (?, ?)";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, userId);
 			statement.setInt(2, favourite.getId());
 
@@ -192,8 +186,7 @@ public class UsersRepository extends JDBCRepository {
 
 		System.out.println("TRYING TO DELETE " + favouriteId);
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, favouriteId);
 
 			statement.executeUpdate();
@@ -209,8 +202,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "SELECT * FROM user_favourite_recipe WHERE user_id = ? AND recipe_id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, userId);
 			statement.setInt(2, favourite.getId());
 
@@ -239,8 +231,7 @@ public class UsersRepository extends JDBCRepository {
 				"LEFT JOIN recipe ON ufr.recipe_id = recipe.id " +
 				"WHERE ufr.user_id = ?";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, userId);
 
 			ResultSet resultSet = statement.executeQuery();
@@ -278,8 +269,7 @@ public class UsersRepository extends JDBCRepository {
 				"AND ufr.user_id = ? " +
 				"ORDER BY recipe.id";
 
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, userId);
 
 			ResultSet resultSet = statement.executeQuery();
