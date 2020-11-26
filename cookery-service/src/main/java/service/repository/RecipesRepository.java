@@ -246,15 +246,18 @@ public class RecipesRepository extends JDBCRepository {
 //
 //    }
 
-    public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException {
+    public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
         Connection connection = super.getDatabaseConnection();
 
+        PreparedStatement stmt = null;
+        PreparedStatement createStmt = null;
+        PreparedStatement updateStmt = null;
+        PreparedStatement deleteStmt = null;
         try {
             if(recipe != null) {
-                PreparedStatement stmt;
-                PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)"); // batch
-                PreparedStatement updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
-                PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
+                createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)"); // batch
+                updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
+                deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
 
 
                 // Update recipe
@@ -337,22 +340,29 @@ public class RecipesRepository extends JDBCRepository {
                 return true;
             }
 
-            connection.close();
             return false;
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
         }
+        finally {
+            stmt.close();
+            deleteStmt.close();
+            updateStmt.close();
+            createStmt.close();
+            connection.close();
+        }
     }
 
 
-    public boolean deleteRecipe(int id) throws CookeryDatabaseException {
+    public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException {
         Connection connection = super.getDatabaseConnection();
 
+        PreparedStatement statement = null;
         try {
             String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
 
-            PreparedStatement statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             statement.executeUpdate();
 
@@ -363,12 +373,15 @@ public class RecipesRepository extends JDBCRepository {
             statement.executeUpdate();
 
             connection.commit();
-            connection.close();
 
             return true;
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+        }
+        finally {
+            statement.close();
+            connection.close();
         }
 
     }
@@ -378,8 +391,9 @@ public class RecipesRepository extends JDBCRepository {
 
         String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
 
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, recipe.getName());
             preparedStatement.setString(2, recipe.getDescription());
             preparedStatement.setString(3, recipe.getImage());

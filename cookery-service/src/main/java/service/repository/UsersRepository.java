@@ -18,8 +18,7 @@ public class UsersRepository extends JDBCRepository {
 		Connection connection = super.getDatabaseConnection();
 		String sql = "SELECT * FROM user";
 
-		try {
-			Statement statement = connection.createStatement();
+		try (Statement statement = connection.createStatement()) {
 			ResultSet resultSet = statement.executeQuery(sql);
 			while (resultSet.next()) {
 				int id = resultSet.getInt("id");
