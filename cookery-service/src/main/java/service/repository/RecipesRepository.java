@@ -482,6 +482,7 @@ public class RecipesRepository extends JDBCRepository {
                 preparedStatement.executeBatch();
 
                 connection.commit();
+                preparedStatement.close();
                 connection.close();
             }
             else {
@@ -496,8 +497,12 @@ public class RecipesRepository extends JDBCRepository {
             System.out.println("Exception " + ex);
         }
         finally {
-            preparedStatement.close();
-            connection.close();
+            if(preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
         }
     }
 
