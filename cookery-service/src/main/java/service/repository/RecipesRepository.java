@@ -496,12 +496,8 @@ public class RecipesRepository extends JDBCRepository {
             System.out.println("Exception " + ex);
         }
         finally {
-            if(preparedStatement != null) {
-                preparedStatement.close();
-            }
-            if(connection != null) {
-                connection.close();
-            }
+            preparedStatement.close();
+            connection.close();
         }
     }
 
