@@ -246,18 +246,15 @@ public class RecipesRepository extends JDBCRepository {
 //
 //    }
 
-    public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
+    public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException {
         Connection connection = super.getDatabaseConnection();
 
-        PreparedStatement stmt = null;
-        PreparedStatement createStmt = null;
-        PreparedStatement updateStmt = null;
-        PreparedStatement deleteStmt = null;
         try {
             if(recipe != null) {
-                createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)"); // batch
-                updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
-                deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
+                PreparedStatement stmt;
+                PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)"); // batch
+                PreparedStatement updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
+                PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
 
 
                 // Update recipe
@@ -340,17 +337,11 @@ public class RecipesRepository extends JDBCRepository {
                 return true;
             }
 
+            connection.close();
             return false;
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
-        }
-        finally {
-            stmt.close();
-            deleteStmt.close();
-            updateStmt.close();
-            createStmt.close();
-            connection.close();
         }
     }
 

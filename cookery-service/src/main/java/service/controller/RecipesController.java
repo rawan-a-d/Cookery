@@ -5,6 +5,7 @@ import service.model.Recipe;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class RecipesController {
@@ -119,6 +120,9 @@ public class RecipesController {
             recipesRepository.deleteRecipe(id);
         }
         catch (CookeryDatabaseException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
     }
