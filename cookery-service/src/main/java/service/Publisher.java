@@ -27,11 +27,6 @@ public class Publisher {
                 System.out.println(getOperation);
             }
 
-            Controller controller = new Controller();
-
-//            controller.showUser(1);
-
-            controller.getRecipes();
 
         } catch (IOException ex) {
             Logger.getLogger(Publisher.class.getName()).log(Level.SEVERE, null, ex);

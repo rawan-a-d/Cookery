@@ -22,6 +22,12 @@ public class User {
         idSeeder++;
     }
 
+    public User(int id, String name) {
+        this.name = name;
+        this.id = id;
+    }
+
+
     public User(int id, String name, String email, String password) {
         this.name = name;
         this.email = email;

@@ -1,10 +1,11 @@
 package service.resources;
 
-import service.Controller;
-import service.model.Favourite;
+import service.controller.AuthController;
+import service.controller.RecipesController;
+import service.controller.UsersController;
+import service.model.DTO.RecipeDTO;
 import service.model.Recipe;
 import service.model.User;
-import service.repository.DataStore;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -18,16 +19,17 @@ public class UsersResources {
     @Context
     private UriInfo uriInfo;
 
-    private final DataStore dataStore = DataStore.getInstance();
+//    private final DataStore dataStore = DataStore.getInstance();
+    private final UsersController usersController = new UsersController();
+    private final RecipesController recipesController = new RecipesController();
+    private final AuthController authController = new AuthController();
 
 
     @GET //GET at http://localhost:XXXX/users
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"admin"})
     public Response getAllUsers(){
-        Controller controller = new Controller();
-
-        List<User> users = controller.getUsers();
+        List<User> users = usersController.getUsers();
 
         GenericEntity<List<User>> entity = new GenericEntity<List<User>>(users){ };
         return Response.ok(entity).build();
@@ -38,9 +40,7 @@ public class UsersResources {
     @Path("{id}")
     @RolesAllowed({"user", "admin"})
     public Response getUser(@PathParam("id") int id){
-        Controller controller = new Controller();
-
-        User user = controller.getUser(id);
+        User user = usersController.getUser(id);
 
         if(user != null){
             return Response.ok(user).build(); // Status ok 200, return user
@@ -55,8 +55,7 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"})
     public Response addUser(User user){
-        Controller controller = new Controller();
-        boolean result = controller.createUser(user);
+        boolean result = usersController.createUser(user);
 
         if(result){ // Successful
             String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
@@ -74,8 +73,7 @@ public class UsersResources {
     @Path("{id}")
     @RolesAllowed({"user", "admin"})
     public Response updateUser(@PathParam("id") int id, User user){
-        Controller controller = new Controller();
-        boolean result = controller.updateUser(id, user);
+        boolean result = usersController.updateUser(id, user);
 
         if(result) { // Successful
             return Response.noContent().build();
@@ -89,8 +87,7 @@ public class UsersResources {
     @Path("{id}")
     @RolesAllowed({"admin"})
     public Response deleteUser(@PathParam("id") int id){
-        Controller controller = new Controller();
-        controller.deleteRecipe(id);
+        usersController.deleteUser(id);
 
         return Response.noContent().build();
     }
@@ -99,10 +96,9 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
     public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){ // GET RECIPES BASED ON URL OR Authorization Header????????????????
-        Controller controller = new Controller();
-        int userId = controller.getIdInToken(auth);
+        int userId = authController.getIdInToken(auth);
 
-        List<Recipe> recipes = controller.getRecipes(userId);
+        List<Recipe> recipes = recipesController.getRecipes(userId);
 
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
@@ -110,18 +106,20 @@ public class UsersResources {
 
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}/favourites")
-    public Response addFavourite(@PathParam("id") int id, Favourite favourite) {
-        Controller controller = new Controller();
-        boolean result = controller.addFavourite(favourite);
+    public Response addFavourite(@PathParam("id") int id, RecipeDTO favourite, @HeaderParam("Authorization") String auth) {
+        int userId = authController.getIdInToken(auth);
+
+        boolean result = usersController.addFavourite(userId, favourite);
 
         if(result){ // Successful
-            String url = uriInfo.getAbsolutePath() + "/" + favourite.getRecipeId();// url of the created user
+            String url = uriInfo.getAbsolutePath() + "/" + favourite.getId();// url of the created user
             URI uri = URI.create(url);
             return Response.created(uri).build();
         }
         else {
-            String entity = "User with id " + favourite.getRecipeId() + " already marked recipe with id " + favourite.getRecipeId() + " as favourite";
+            String entity = "User with id " + favourite.getId() + " already marked recipe with id " + favourite.getId() + " as favourite";
             return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
         }
     }
@@ -130,8 +128,7 @@ public class UsersResources {
     @DELETE
     @Path("{id}/favourites/{favouriteId}")
     public Response deleteFavourite(@PathParam("id") int id, @PathParam("favouriteId") int favouriteId) {
-        Controller controller = new Controller();
-        controller.removeFavourite(favouriteId);
+        usersController.removeFavourite(favouriteId);
 
         return Response.noContent().build();
     }
@@ -140,15 +137,13 @@ public class UsersResources {
     @Path("{id}/favourites")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFavourites(@HeaderParam("Authorization") String auth){
-        Controller controller = new Controller();
+        int userId = authController.getIdInToken(auth); // id in token
 
-//        System.out.println("FAOVU");
+//        List<Recipe> recipes = usersController.getFavourites(userId);
+        List<RecipeDTO> recipes = recipesController.getRecipesDTO(userId);
 
-        int userId = controller.getIdInToken(auth); // id in token
 
-        List<Recipe> recipes = controller.getFavourites(userId);
-
-        GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
+        GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
         return Response.ok(entity).build();
     }
 

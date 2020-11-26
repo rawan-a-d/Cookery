@@ -1,7 +1,9 @@
 package service.repository;
 
+import service.model.DTO.RecipeDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
+import service.model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -138,6 +140,53 @@ public class RecipesRepository extends JDBCRepository {
 
     }
 
+    // int id, String name, String image, User user, boolean isFavourite
+    public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException {
+        List<RecipeDTO> recipes = new ArrayList<>();
+
+        Connection connection = super.getDatabaseConnection();
+        String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
+                "user.id AS userId, user.name AS userName, " +
+                "ufr.id " +
+                "FROM recipe " +
+                "INNER JOIN USER ON recipe.user_id = user.id " +
+                "INNER JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
+                "AND ufr.user_id = ?";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()) {
+                int id = resultSet.getInt("recipeId");
+                String name = resultSet.getString("recipeName");
+                String image = resultSet.getString("recipeImage");
+                String userName = resultSet.getString("userName");
+                int favouriteId = resultSet.getInt("id");
+
+                boolean isFavourite = false;
+                if(favouriteId > 0) {
+                    isFavourite = true;
+                }
+
+                User user = new User(userId, userName);
+
+                RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
+                recipes.add(recipe);
+            }
+
+            connection.commit();
+            connection.close();
+        }
+        catch (SQLException throwable) {
+            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+        }
+        return recipes;
+
+    }
+
     public List<Recipe> getRecipes(String ingredient) throws CookeryDatabaseException {
         List<Recipe> recipes = new ArrayList<>();
 
@@ -168,6 +217,37 @@ public class RecipesRepository extends JDBCRepository {
         return recipes;
 
     }
+
+//    public List<RecipeDTO> getRecipesDTO(String ingredient) throws CookeryDatabaseException {
+//        List<Recipe> recipes = new ArrayList<>();
+//
+//        Connection connection = super.getDatabaseConnection();
+//
+//        String sql = "SELECT * FROM ingredient WHERE ingredinet = ?";
+//
+//        try {
+//            PreparedStatement statement = connection.prepareStatement(sql);
+//            statement.setString(1, ingredient);
+//
+//            ResultSet resultSet = statement.executeQuery();
+//
+//            while(resultSet.next()) {
+//                int recipeId = resultSet.getInt("recipe_id");
+//
+//                Recipe recipe = getRecipe(recipeId);
+//
+//                recipes.add(recipe);
+//            }
+//
+//            connection.commit();
+//            connection.close();
+//        }
+//        catch (SQLException throwable) {
+//            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+//        }
+//        return recipes;
+//
+//    }
 
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException {
         Connection connection = super.getDatabaseConnection();

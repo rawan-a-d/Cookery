@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AuthenticationRepository extends JDBCRepository {
+public class AuthRepository extends JDBCRepository {
     public User authenticate(String email, String password) throws CookeryDatabaseException {
         Connection connection = super.getDatabaseConnection();
         String sql = "SELECT * FROM user WHERE email = ? AND password = ?";

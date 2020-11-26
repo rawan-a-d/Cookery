@@ -1,6 +1,8 @@
 package service.resources;
 
 import service.Controller;
+import service.controller.AuthController;
+import service.controller.UsersController;
 import service.model.Credentials;
 import service.model.User;
 
@@ -13,7 +15,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("authenticate")
-public class AuthenticateResources {
+public class AuthResources {
+
+    private final UsersController usersController = new UsersController();
+    private final AuthController authController = new AuthController();
 
 
     @POST
@@ -23,11 +28,11 @@ public class AuthenticateResources {
     public Response authenticate(Credentials credentials) {
         Controller controller = new Controller();
 
-        User user = controller.authenticate(credentials.getEmail(), credentials.getPassword());
+        User user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
 
-            String token = controller.generateAuthToken(user);
+            String token = authController.generateAuthToken(user);
 
 //            System.out.println("Decoded JWT");
 //            System.out.println(controller.decodeJWT(token));
@@ -51,10 +56,10 @@ public class AuthenticateResources {
 
         System.out.println("User " + user);
 
-        boolean result = controller.createUser(user);
+        boolean result = usersController.createUser(user);
 
         if(result) {
-            String token = controller.generateAuthToken(user);
+            String token = authController.generateAuthToken(user);
 
             System.out.println("TOKEN " + token);
 

@@ -95,14 +95,6 @@ public class Recipe {
 		this.image = image;
 	}
 
-//
-//	public Image getImage() {
-//		return image;
-//	}
-//
-//	public void setImage(Image image) {
-//		this.image = image;
-//	}
 	public String getDescription() {
 		return description;
 	}
@@ -123,17 +115,6 @@ public class Recipe {
 	public void addIngredient(Ingredient ingredient) {
 		this.ingredients.add(ingredient);
 	}
-
-
-
-//	public int getUserId() {
-//		return userId;
-//	}
-//
-//	public void setUserId(int userId) {
-//		this.userId = userId;
-//	}
-
 
 	public int getUserId() {
 		return userId;

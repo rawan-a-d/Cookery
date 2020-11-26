@@ -1,7 +1,7 @@
 package service.resources;
 
 import io.jsonwebtoken.Claims;
-import service.Controller;
+import service.controller.AuthController;
 import service.model.User;
 
 import javax.annotation.security.DenyAll;
@@ -111,7 +111,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Validate token
         Claims token = null;
         try {
-            token = Controller.decodeJWT(encodedCredentials);
+            token = AuthController.decodeJWT(encodedCredentials);
         }
         catch (Exception exception){
             //Invalid signature/claims
