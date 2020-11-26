@@ -73,6 +73,19 @@ public class RecipesController {
         }
     }
 
+    public List<RecipeDTO> getFavouritesDTO(int userId) {
+        RecipesRepository recipesRepository = new RecipesRepository();
+
+        List<RecipeDTO> recipes;
+        try {
+            recipes = recipesRepository.getFavouritesDTO(userId);
+            return recipes;
+        }
+        catch (CookeryDatabaseException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
     public List<Recipe> getRecipes(String ingredient) {
         RecipesRepository recipesRepository = new RecipesRepository();

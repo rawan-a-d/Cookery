@@ -140,7 +140,7 @@ public class UsersResources {
         int userId = authController.getIdInToken(auth); // id in token
 
 //        List<Recipe> recipes = usersController.getFavourites(userId);
-        List<RecipeDTO> recipes = recipesController.getRecipesDTO(userId);
+        List<RecipeDTO> recipes = recipesController.getFavouritesDTO(userId);
 
 
         GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
