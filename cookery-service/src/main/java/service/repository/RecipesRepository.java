@@ -243,8 +243,7 @@ public class RecipesRepository extends JDBCRepository {
 
         String sql = "SELECT * FROM ingredient WHERE ingredinet = ?";
 
-        try  {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql))  {
             statement.setString(1, ingredient);
 
             ResultSet resultSet = statement.executeQuery();
@@ -301,10 +300,6 @@ public class RecipesRepository extends JDBCRepository {
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
         Connection connection = super.getDatabaseConnection();
 
-
-        //         java.util.zip.ZipFile zf =
-        //             new java.util.zip.ZipFile(zipFileName);
-        //        java.io.BufferedWriter writer =
         PreparedStatement stmt = null;
 
         try (PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
@@ -411,19 +406,16 @@ public class RecipesRepository extends JDBCRepository {
     public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException {
         Connection connection = super.getDatabaseConnection();
 
-        PreparedStatement statement = null;
-        try {
-            String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
+        String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
 
-            statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement deleteRecipeStatement = connection.prepareStatement("DELETE FROM recipe WHERE id = ?")) {
+
             statement.setInt(1, id);
             statement.executeUpdate();
 
-
-            sql = "DELETE FROM recipe WHERE id = ?";
-            statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            statement.executeUpdate();
+            deleteRecipeStatement.setInt(1, id);
+            deleteRecipeStatement.executeUpdate();
 
             connection.commit();
             connection.close();
@@ -433,15 +425,6 @@ public class RecipesRepository extends JDBCRepository {
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
         }
-        finally {
-            if(statement != null) {
-                statement.close();
-            }
-            if(connection != null) {
-                connection.close();
-            }
-        }
-
     }
 
     public void createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException {
