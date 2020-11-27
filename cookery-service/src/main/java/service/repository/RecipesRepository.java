@@ -301,17 +301,16 @@ public class RecipesRepository extends JDBCRepository {
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
         Connection connection = super.getDatabaseConnection();
 
+
+        //         java.util.zip.ZipFile zf =
+        //             new java.util.zip.ZipFile(zipFileName);
+        //        java.io.BufferedWriter writer =
         PreparedStatement stmt = null;
-        PreparedStatement createStmt = null;
-        PreparedStatement updateStmt = null;
-        PreparedStatement deleteStmt = null;
-        try {
+
+        try (PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
+            PreparedStatement updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
+            PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");) {
             if(recipe != null) {
-                createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)"); // batch
-                updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
-                deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
-
-
                 // Update recipe
                 stmt = connection.prepareStatement("UPDATE recipe SET name = ?, description = ?, image = ? WHERE id = ?");
 
@@ -399,12 +398,12 @@ public class RecipesRepository extends JDBCRepository {
             throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
         }
         finally {
-            stmt.close();
-            createStmt.close();
-            deleteStmt.close();
-            updateStmt.close();
-
-            connection.close();
+            if(!stmt.isClosed()) {
+                stmt.close();
+            }
+            if(!connection.isClosed()) {
+                connection.close();
+            }
         }
     }
 
