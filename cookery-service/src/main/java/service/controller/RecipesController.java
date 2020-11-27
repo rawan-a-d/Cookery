@@ -7,8 +7,11 @@ import service.repository.RecipesRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RecipesController {
+    private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
+
     // ---------------------------------------------------- Recipes ------------------------------------------------------------
     public List<Recipe> getRecipes() {
 
@@ -23,7 +26,7 @@ public class RecipesController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -37,7 +40,7 @@ public class RecipesController {
             return recipe;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -52,7 +55,7 @@ public class RecipesController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -68,7 +71,7 @@ public class RecipesController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -82,7 +85,7 @@ public class RecipesController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -97,7 +100,7 @@ public class RecipesController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -110,11 +113,11 @@ public class RecipesController {
             return recipesRepository.updateRecipe(id, recipe);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
-        catch (SQLException e) {
-            e.printStackTrace();
+        catch (SQLException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
     }
@@ -125,11 +128,11 @@ public class RecipesController {
         try {
             recipesRepository.createRecipe(recipe);
         }
-        catch (CookeryDatabaseException e) {
-            e.printStackTrace();
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
-        catch (SQLException e) {
-            e.printStackTrace();
+        catch (SQLException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
@@ -139,11 +142,11 @@ public class RecipesController {
         try {
             recipesRepository.deleteRecipe(id);
         }
-        catch (CookeryDatabaseException e) {
-            e.printStackTrace();
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
-        catch (SQLException e) {
-            e.printStackTrace();
+        catch (SQLException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
