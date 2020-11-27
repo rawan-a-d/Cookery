@@ -17,92 +17,61 @@ public class RecipesController {
 
         RecipesRepository recipesRepository = new RecipesRepository();
 
-
-        System.out.println("Recipes:");
-        List<Recipe> recipes;
+        List<Recipe> recipes = null;
         try {
             recipes = recipesRepository.getRecipes();
-
-            return recipes;
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return null;
         }
+        return recipes;
     }
 
     public Recipe getRecipe(int id) {
         RecipesRepository recipesRepository = new RecipesRepository();
 
-        Recipe recipe;
+        Recipe recipe = null;
         try {
             recipe = recipesRepository.getRecipe(id);
-            return recipe;
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return null;
         }
+        return recipe;
     }
 
     public List<Recipe> getRecipes(int userId) {
         RecipesRepository recipesRepository = new RecipesRepository();
 
-        System.out.println("Recipes:");
-        List<Recipe> recipes;
+        List<Recipe> recipes = null;
         try {
             recipes = recipesRepository.getRecipes(userId);
-            return recipes;
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return null;
         }
+        return recipes;
     }
 
-
-    public List<RecipeDTO> getRecipesDTO(int userId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
-
-        System.out.println("Recipes:");
-        List<RecipeDTO> recipes;
-        try {
-            recipes = recipesRepository.getRecipesDTO(userId);
-            return recipes;
-        }
-        catch (CookeryDatabaseException ex) {
-            LOGGER.info(ex.getMessage()); // Compliant
-            return null;
-        }
-    }
 
     public List<RecipeDTO> getFavouritesDTO(int userId) {
         RecipesRepository recipesRepository = new RecipesRepository();
+        System.out.println("GETTING FAVOURITES con");
 
-        List<RecipeDTO> recipes;
+        List<RecipeDTO> recipes = null;
         try {
             recipes = recipesRepository.getFavouritesDTO(userId);
-            return recipes;
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return null;
+            System.out.println(ex.getMessage());
+
         }
-    }
-
-    public List<Recipe> getRecipes(String ingredient) {
-        RecipesRepository recipesRepository = new RecipesRepository();
-
-        List<Recipe> recipes;
-        try {
-            recipes = recipesRepository.getRecipes(ingredient);
-
-            return recipes;
-        }
-        catch (CookeryDatabaseException ex) {
+        catch (Exception ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return null;
+            System.out.println(ex.getMessage());
         }
+        return recipes;
     }
 
 
@@ -114,12 +83,11 @@ public class RecipesController {
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return false;
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return false;
         }
+        return false;
     }
 
     public void createRecipe(Recipe recipe) {
@@ -147,6 +115,61 @@ public class RecipesController {
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
+        }
+    }
+
+    public List<RecipeDTO> getRecipesDTO(int userId) {
+        RecipesRepository recipesRepository = new RecipesRepository();
+
+        List<RecipeDTO> recipes;
+        try {
+            recipes = recipesRepository.getRecipesDTO(userId);
+            return recipes;
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
+        }
+    }
+
+
+
+    public boolean addFavourite(int userId, RecipeDTO favourite) {
+        RecipesRepository recipesRepository = new RecipesRepository();
+
+        try {
+            return recipesRepository.addFavourite(userId, favourite);
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return false;
+        }
+    }
+
+
+    public void removeFavourite(int favouriteId) {
+        RecipesRepository recipesRepository = new RecipesRepository();
+
+        try {
+            recipesRepository.removeFavourite(favouriteId);
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+    }
+
+
+    public List<Recipe> getFavourites(int userId) {
+        RecipesRepository recipesRepository = new RecipesRepository();
+
+        List<Recipe> recipes;
+        try {
+            recipes = recipesRepository.getFavourites(userId);
+            return recipes;
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
         }
     }
 

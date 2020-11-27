@@ -52,4 +52,6 @@ dependencies {
     // SQL database driver
     compile 'mysql:mysql-connector-java:5.1.23'
     runtime 'mysql:mysql-connector-java:5.1.23'
+
+    testCompile "org.mockito:mockito-core:2.+"
 }

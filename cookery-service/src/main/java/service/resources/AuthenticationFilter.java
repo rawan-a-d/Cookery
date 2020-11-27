@@ -99,19 +99,21 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         //Get encoded username and password
         final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
 
-        if(encodedCredentials.length() == 0) {
-            System.out.println("NO CREDENTIALS");
-            Response response = Response.status(Response.Status.UNAUTHORIZED).
-                    entity("Username and password are required").build();
-            requestContext.abortWith(response);
-            return;
-        }
+//        if(encodedCredentials.length() == 0) {
+//            System.out.println("NO CREDENTIALS");
+//            Response response = Response.status(Response.Status.UNAUTHORIZED).
+//                    entity("Username and password are required").build();
+//            requestContext.abortWith(response);
+//            return;
+//        }
 
 
         // Validate token
         Claims token = null;
         try {
+            System.out.println("Decoding token");
             token = AuthController.decodeJWT(encodedCredentials);
+            System.out.println(token);
         }
         catch (Exception exception){
             //Invalid signature/claims
@@ -135,9 +137,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             /* isUserAllowed : implement this method to check if this user has any of the roles in the rolesSet
             if not isUserAllowed abort the requestContext with FORBIDDEN response*/
             if (!isUserAllowed(rolesSet, Boolean.parseBoolean(token.get("admin").toString()))) {
+                System.out.println("User not valid");
                 Response response = Response.status(Response.Status.FORBIDDEN).build();
                 requestContext.abortWith(response);
                 return;
+            }
+            else {
+                System.out.println("VALID USER HOHO");
             }
         }
 

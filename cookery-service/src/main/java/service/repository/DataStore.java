@@ -154,9 +154,9 @@ public class DataStore {
     public List<Recipe> getUserRecipes(int id){
         List<Recipe> foundRecipes = new ArrayList<>();
         for (Recipe recipe: recipes){
-//            if(recipe.getUserId() == id){ // fix
+            if(recipe.getUserId() == id){ // fix
                 foundRecipes.add(recipe);
-           // }
+            }
         }
 
         return foundRecipes;

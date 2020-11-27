@@ -2,17 +2,13 @@ package service.model;
 
 public class Ingredient {
 	private int id;
+	private static int idSeeder = 0;
 	private String ingredient;
 	private int amount;
-	// ADDED
-//	private int recipeId;
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "RECIPE_ID_FK")
-//	private Recipe recipe;
-//	private Recipe recipe;
 
 	public Ingredient() {
-
+		this.id = idSeeder;
+		idSeeder++;
 	}
 
 	public Ingredient(String name, int amount) {

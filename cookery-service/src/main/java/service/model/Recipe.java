@@ -8,12 +8,10 @@ public class Recipe {
 	private static int idSeeder = 0;
 	private String name;
 	private String image;
-//	private File image;
 	private String description;
 	private List<Ingredient> ingredients;
 	private int userId;
 
-//	private User user;
 
 	public Recipe() {
 		this.id = idSeeder;
@@ -29,16 +27,6 @@ public class Recipe {
 		this.userId = userId;
 		this.ingredients = ingredients;
 	}
-
-//	public Recipe(String name, String image, String description, List<Ingredient> ingredients, int userId) {
-//		this.id = idSeeder;
-//		idSeeder++;
-//		this.name = name;
-//		this.image = image;
-//		this.description = description;
-//		this.userId = userId;
-//		this.ingredients = ingredients;
-//	}
 
 	public Recipe(int id, String name, String image, String description, int userId) {
 		this.id = id;
@@ -57,19 +45,6 @@ public class Recipe {
 		this.userId = userId;
 		this.ingredients = ingredients;
 	}
-
-//	public Recipe(String name, File image, String description, int userId, List<Ingredient> ingredients) {
-//		this.id = idSeeder;
-//		idSeeder++;
-//		this.name = name;
-//		this.image = image;
-//		this.description = description;
-//		this.userId = userId;
-//		this.ingredients = ingredients;
-//
-//		System.out.println("image");
-//		System.out.println(this.image);
-//	}
 
 	public int getId() {
 		return id;

@@ -1,8 +1,6 @@
 package service.repository;
 
 
-import service.model.DTO.RecipeDTO;
-import service.model.Recipe;
 import service.model.Role;
 import service.model.User;
 
@@ -77,7 +75,7 @@ public class UsersRepository extends JDBCRepository {
 				connection.close();
 				throw new CookeryDatabaseException("User with recipe id " + recipeId + " cannot be found");
 			} else {
-				int id = resultSet.getInt("id");
+				int id = resultSet.getInt("user_id");
 
 				connection.close();
 
@@ -152,151 +150,6 @@ public class UsersRepository extends JDBCRepository {
 		} catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
 		}
-	}
-
-	/*------------------------------------------------ Favourites ------------------------------------------------------*/
-	public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
-
-		if (alreadyFavourite(userId, favourite)) {
-			return false;
-		}
-
-		String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (?, ?)";
-
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setInt(1, userId);
-			statement.setInt(2, favourite.getId());
-
-			statement.executeUpdate();
-
-			connection.commit();
-			connection.close();
-
-			return true;
-		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot add favourite into the database", throwable);
-		}
-	}
-
-	public void removeFavourite(int favouriteId) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
-		String sql = "DELETE FROM user_favourite_recipe WHERE id = ?";
-
-		System.out.println("TRYING TO DELETE " + favouriteId);
-
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setInt(1, favouriteId);
-
-			statement.executeUpdate();
-
-			connection.commit();
-			connection.close();
-		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot delete favourite from the database", throwable);
-		}
-	}
-
-	public boolean alreadyFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
-		String sql = "SELECT * FROM user_favourite_recipe WHERE user_id = ? AND recipe_id = ?";
-
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setInt(1, userId);
-			statement.setInt(2, favourite.getId());
-
-			ResultSet resultSet = statement.executeQuery();
-
-			if (!resultSet.next()) {
-				connection.close();
-				return false;
-			} else {
-				connection.close();
-
-				return true;
-			}
-		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read favourite from the database", throwable);
-		}
-	}
-
-
-	public List<Recipe> getFavourites(int userId) throws CookeryDatabaseException {
-		List<Recipe> recipes = new ArrayList<>();
-
-		Connection connection = super.getDatabaseConnection();
-		String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.description AS recipeDescription, recipe.image AS recipeImage, ufr.* " +
-				"FROM user_favourite_recipe AS ufr " +
-				"LEFT JOIN recipe ON ufr.recipe_id = recipe.id " +
-				"WHERE ufr.user_id = ?";
-
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setInt(1, userId);
-
-			ResultSet resultSet = statement.executeQuery();
-
-			while (resultSet.next()) {
-				int id = resultSet.getInt("recipeId");
-				String name = resultSet.getString("recipeName");
-				String description = resultSet.getString("recipeDescription");
-				String image = resultSet.getString("recipeImage");
-
-				Recipe recipe = new Recipe(id, name, image, description, userId);
-				recipes.add(recipe);
-			}
-
-			connection.close();
-		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read favourites from the database.", throwable);
-		}
-
-		return recipes;
-	}
-
-
-	public List<RecipeDTO> getFavouritesDTO(int userId) throws CookeryDatabaseException {
-		List<RecipeDTO> recipes = new ArrayList<>();
-
-		Connection connection = super.getDatabaseConnection();
-
-		String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
-				"       user.id AS userId, user.name AS userName, " +
-				"       ufr.id " +
-				"FROM  user_favourite_recipe AS ufr " +
-				"LEFT JOIN recipe ufr ON recipe.id = ufr.recipe_id " +
-				"LEFT JOIN USER ON recipe.user_id = user.id " +
-				"AND ufr.user_id = ? " +
-				"ORDER BY recipe.id";
-
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setInt(1, userId);
-
-			ResultSet resultSet = statement.executeQuery();
-
-			while (resultSet.next()) {
-				int id = resultSet.getInt("recipeId");
-				String name = resultSet.getString("recipeName");
-				String image = resultSet.getString("recipeImage");
-				String userName = resultSet.getString("userName");
-				int favouriteId = resultSet.getInt("id");
-
-				boolean isFavourite = false;
-				if(favouriteId > 0) {
-					isFavourite = true;
-				}
-
-				User user = new User(userId, userName);
-
-				RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
-				recipes.add(recipe);
-			}
-
-			connection.close();
-		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read favourites from the database.", throwable);
-		}
-
-		return recipes;
 	}
 
 
