@@ -45,8 +45,6 @@ public class RecipesResources {
 		if(ingredient.equals("all")) {
 //			recipes = controller.getRecipes();
 			recipes = usersController.getRecipesDTO(userId);
-			System.out.println("RECIPES HOME ");
-			System.out.println(recipes);
 		}
 
 		GenericEntity<List<RecipeDTO>> entity = new GenericEntity<>(recipes){ };

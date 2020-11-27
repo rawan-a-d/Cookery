@@ -1,5 +1,7 @@
 package service.controller;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import service.model.DTO.RecipeDTO;
 import service.model.Recipe;
 import service.model.User;
@@ -8,10 +10,14 @@ import service.repository.RecipesRepository;
 import service.repository.UsersRepository;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class UsersController {
+    private final static Logger LOGGER = Logger.getLogger(UsersController.class.getName());
+
     //	------------------------------------------------------------------------ Users ------------------------------------------------------------------------------
     public List<User> getUsers() {
+
         UsersRepository usersRepository = new UsersRepository();
 
         List<User> users;
@@ -20,7 +26,8 @@ public class UsersController {
             return users;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
+
             return null;
         }
     }
@@ -38,7 +45,7 @@ public class UsersController {
             return user;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -51,7 +58,7 @@ public class UsersController {
             return usersRepository.createUser(user);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
     }
@@ -64,7 +71,7 @@ public class UsersController {
             return usersRepository.updateUser(id, user);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
     }
@@ -76,7 +83,7 @@ public class UsersController {
             usersRepository.deleteUser(id);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
@@ -89,7 +96,7 @@ public class UsersController {
             id = usersRepository.getUserId(recipeId);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
         }
 
         return id;
@@ -113,7 +120,7 @@ public class UsersController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
@@ -128,7 +135,7 @@ public class UsersController {
             return usersRepository.addFavourite(userId, favourite);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
     }
@@ -141,8 +148,7 @@ public class UsersController {
             usersRepository.removeFavourite(favouriteId);
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
-//			return false;
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
@@ -156,7 +162,7 @@ public class UsersController {
             return recipes;
         }
         catch (CookeryDatabaseException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
     }
