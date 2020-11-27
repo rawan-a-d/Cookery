@@ -272,7 +272,7 @@ public class DataStore {
                 "In a medium bowl, whisk together egg, mayonnaise, lemon juice, red pepper flakes, tarragon, and scallions. Gently stir in crabmeat, being careful not to break up meat. Gradually mix in cracker crumbs, adding until desired consistency is achieved.\n" +
                 "\n" +
                 " Step 2\n" +
-                "Heat butter in a skillet over medium heat. Form crab mixture into 4 patties. Place patties in skillet, and cook until golden brown, about 5 to 6 minutes on each side.", 2, recipe1Ingredients);
+                "Heat butter in a skillet over medium heat. Form crab mixture into 4 patties. Place patties in skillet, and cook until golden brown, about 5 to 6 minutes on each side.", 2, new ArrayList<>());
         recipes.add(recipe1);
         recipes.add(recipe2);
         recipes.add(recipe3);
