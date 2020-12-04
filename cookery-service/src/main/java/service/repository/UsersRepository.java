@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsersRepository extends JDBCRepository {
+	public UsersRepository() {
+	}
 
 	public List<User> getUsers() throws CookeryDatabaseException {
 		List<User> users = new ArrayList<>();
@@ -47,7 +49,7 @@ public class UsersRepository extends JDBCRepository {
 
 			if (!resultSet.next()) {
 				connection.close();
-				throw new CookeryDatabaseException("User wuth id " + id + " cannot be found");
+				throw new CookeryDatabaseException("User with id " + id + " cannot be found");
 			} else {
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");

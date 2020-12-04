@@ -2,21 +2,23 @@ package service.controller;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+
 import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class UsersController {
     private final static Logger LOGGER = Logger.getLogger(UsersController.class.getName());
 
+    @Inject
+    UsersRepository usersRepository;
+
     //	------------------------------------------------------------------------ Users ------------------------------------------------------------------------------
     public List<User> getUsers() {
-
-        UsersRepository usersRepository = new UsersRepository();
-
         List<User> users;
         try {
             users = usersRepository.getUsers();
@@ -31,8 +33,6 @@ public class UsersController {
 
 
     public User getUser(int id) {
-        UsersRepository usersRepository = new UsersRepository();
-
         User user;
         try {
             user = usersRepository.getUser(id);
@@ -46,8 +46,6 @@ public class UsersController {
 
 
     public boolean createUser(User user) {
-        UsersRepository usersRepository = new UsersRepository();
-
         try {
             return usersRepository.createUser(user);
         }
@@ -59,8 +57,6 @@ public class UsersController {
 
 
     public boolean updateUser(int id, User user) {
-        UsersRepository usersRepository = new UsersRepository();
-
         try {
             return usersRepository.updateUser(id, user);
         }
@@ -70,14 +66,13 @@ public class UsersController {
         }
     }
 
-    public void deleteUser(int id) {
-        UsersRepository usersRepository = new UsersRepository();
-
+    public boolean deleteUser(int id) {
         try {
-            usersRepository.deleteUser(id);
+            return usersRepository.deleteUser(id);
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
+            return false;
         }
     }
 
