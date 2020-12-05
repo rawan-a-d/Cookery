@@ -7,6 +7,7 @@ import service.model.DTO.RecipeDTO;
 import service.model.Recipe;
 import service.model.User;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -26,7 +27,8 @@ public class UsersResources {
 
     @GET //GET at http://localhost:XXXX/users
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"admin"})
+//    @RolesAllowed({"admin"})
+    @PermitAll
     public Response getAllUsers(){
         List<User> users = usersController.getUsers();
 

@@ -36,7 +36,7 @@ public class AuthRepository extends JDBCRepository {
             }
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot delete favourite from the database", throwable);
+            throw new CookeryDatabaseException("Cannot authenticate user", throwable);
         }
     }
 

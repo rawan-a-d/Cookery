@@ -51,7 +51,6 @@ class UsersControllerTest {
     }
 
 
-
     @Test
     public void getUser() throws CookeryDatabaseException {
         when(usersRepository.getUser(1)).thenReturn(

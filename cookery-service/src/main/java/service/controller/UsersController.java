@@ -29,6 +29,11 @@ public class UsersController {
 
             return null;
         }
+        catch (Exception ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
+
+        }
     }
 
 

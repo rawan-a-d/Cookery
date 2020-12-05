@@ -4,30 +4,41 @@ package service.repository;
 import service.model.Role;
 import service.model.User;
 
+import javax.inject.Inject;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersRepository extends JDBCRepository {
-	public UsersRepository() {
-	}
+public class UsersRepository {
+//	public Connection getConnection() throws CookeryDatabaseException {
+//		Connection connection = super.getDatabaseConnection();
+//		return connection;
+//	}
+	@Inject
+	JDBCRepository jdbcRepository;
 
 	public List<User> getUsers() throws CookeryDatabaseException {
 		List<User> users = new ArrayList<>();
 
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user";
+
 
 		try (Statement statement = connection.createStatement()) {
 			ResultSet resultSet = statement.executeQuery(sql);
+
 			while (resultSet.next()) {
 				int id = resultSet.getInt("id");
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
 				String password = resultSet.getString("password");
+				Role role = Role.valueOf(resultSet.getString("role"));
 
-				User user = new User(id, name, email, password);
+
+				User user = new User(id, name, email, password, role);
 				users.add(user);
+				System.out.println("User " + user);
+
 			}
 
 			connection.close();
@@ -40,10 +51,11 @@ public class UsersRepository extends JDBCRepository {
 
 
 	public User getUser(int id) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user WHERE id = ?";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 
@@ -54,10 +66,11 @@ public class UsersRepository extends JDBCRepository {
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
 				String password = resultSet.getString("password");
+				Role role = Role.valueOf(resultSet.getString("role"));
 
 				connection.close();
 
-				return new User(id, name, email, password);
+				return new User(id, name, email, password, role);
 			}
 
 		} catch (SQLException throwable) {
@@ -66,7 +79,7 @@ public class UsersRepository extends JDBCRepository {
 	}
 
 	public int getUserId(int recipeId) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -91,7 +104,7 @@ public class UsersRepository extends JDBCRepository {
 
 
 	public boolean createUser(User user) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -110,12 +123,12 @@ public class UsersRepository extends JDBCRepository {
 
 			return true;
 		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
+			throw new CookeryDatabaseException("Cannot create user in the database", throwable);
 		}
 	}
 
 	public boolean deleteUser(int id) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "DELETE FROM user WHERE id = ?";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -128,12 +141,12 @@ public class UsersRepository extends JDBCRepository {
 			return true;
 
 		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
+			throw new CookeryDatabaseException("Cannot delete user in the database", throwable);
 		}
 	}
 
 	public boolean updateUser(int id, User user) throws CookeryDatabaseException {
-		Connection connection = super.getDatabaseConnection();
+		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "UPDATE user SET name = ?, email = ?, password = ? WHERE id = ?";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -142,17 +155,19 @@ public class UsersRepository extends JDBCRepository {
 			statement.setString(3, user.getPassword());
 			statement.setInt(4, id);
 
-			statement.executeUpdate();
+			int affected = statement.executeUpdate();
 
+			if(affected <= 0) {
+				connection.close();
+				throw new CookeryDatabaseException("User was not found");
+			}
 			connection.commit();
 			connection.close();
 
 			return true;
 
 		} catch (SQLException throwable) {
-			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
+			throw new CookeryDatabaseException("Cannot update user in the database", throwable);
 		}
 	}
-
-
 }
