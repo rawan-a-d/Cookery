@@ -2,6 +2,8 @@ package service.model.DTO;
 
 import service.model.User;
 
+import java.util.Objects;
+
 public class RecipeDTO {
     private int id;
     private static int idSeeder = 0;
@@ -12,6 +14,19 @@ public class RecipeDTO {
     private boolean isFavourite;
 
     public RecipeDTO() {
+    }
+
+
+    public RecipeDTO(int id, User user) {
+        this.id = id;
+        this.user = user;
+    }
+
+    public RecipeDTO(int id, String name, String image, User user) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.user = user;
     }
 
     public RecipeDTO(int id, String name, String image, User user, int favouriteId, boolean isFavourite) {
@@ -89,5 +104,24 @@ public class RecipeDTO {
                 ", favouriteId=" + favouriteId +
                 ", isFavourite=" + isFavourite +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RecipeDTO recipeDTO = (RecipeDTO) o;
+        return id == recipeDTO.id &&
+                favouriteId == recipeDTO.favouriteId &&
+                isFavourite == recipeDTO.isFavourite &&
+                Objects.equals(name, recipeDTO.name) &&
+                Objects.equals(image, recipeDTO.image) &&
+                Objects.equals(user, recipeDTO.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, image, user, favouriteId, isFavourite);
     }
 }

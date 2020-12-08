@@ -30,6 +30,11 @@ class UsersControllerTest {
 
     @Test
     public void getUsers() throws CookeryDatabaseException {
+            List<User> expectedUsers = Arrays.asList(
+                    new User(1, "Anas", "anas@gmail.com", "1234", Role.user),
+                    new User(2, "Beatrice", "beatrice@gmail.com", "1234", Role.admin)
+            );
+
             when(usersRepository.getUsers()).thenReturn(
                     Arrays.asList(
                             new User(1, "Anas", "anas@gmail.com", "1234", Role.user),
@@ -37,17 +42,10 @@ class UsersControllerTest {
                     )
             );
 
-            List<User> users = usersController.getUsers();
+            List<User> actualUsers = usersController.getUsers();
 
-            assertEquals(1, users.get(0).getId());
-            assertEquals("Anas", users.get(0).getName());
-            assertEquals("anas@gmail.com", users.get(0).getEmail());
-
-            assertEquals(2, users.get(1).getId());
-            assertEquals("Beatrice", users.get(1).getName());
-            assertEquals("beatrice@gmail.com", users.get(1).getEmail());
-
-            assertEquals(2, users.size());
+            assertEquals(expectedUsers, actualUsers);
+            assertEquals(expectedUsers.size(), actualUsers.size());
     }
 
 

@@ -4,18 +4,21 @@ package service.repository;
 import service.model.Role;
 import service.model.User;
 
-import javax.inject.Inject;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersRepository {
+public class UsersRepository extends JDBCRepository{
 //	public Connection getConnection() throws CookeryDatabaseException {
 //		Connection connection = super.getDatabaseConnection();
 //		return connection;
 //	}
-	@Inject
+//	@Inject
 	JDBCRepository jdbcRepository;
+
+	public UsersRepository() {
+		this.jdbcRepository = new JDBCRepository();
+	}
 
 	public List<User> getUsers() throws CookeryDatabaseException {
 		List<User> users = new ArrayList<>();
@@ -51,7 +54,9 @@ public class UsersRepository {
 
 
 	public User getUser(int id) throws CookeryDatabaseException {
+
 		Connection connection = jdbcRepository.getDatabaseConnection();
+
 		String sql = "SELECT * FROM user WHERE id = ?";
 
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -70,7 +75,10 @@ public class UsersRepository {
 
 				connection.close();
 
-				return new User(id, name, email, password, role);
+				User user = new User(id, name, email, password, role);
+
+				return user;
+
 			}
 
 		} catch (SQLException throwable) {
@@ -130,8 +138,44 @@ public class UsersRepository {
 	public boolean deleteUser(int id) throws CookeryDatabaseException {
 		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "DELETE FROM user WHERE id = ?";
+		String deleteRecipesSql = "DELETE FROM recipe WHERE id = ?";
+		String deleteIngredientsSql = "DELETE FROM ingredient WHERE recipe_id = ?";
+		String deleteFavouritesSql = "DELETE FROM user_favourite_recipe WHERE user_id = ?";
+		String deleteFavouritesByOtherSql = "DELETE FROM user_favourite_recipe WHERE recipe_id = ?";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+		try (PreparedStatement statement = connection.prepareStatement(sql);
+			PreparedStatement deleteRecipesStatement = connection.prepareStatement(deleteRecipesSql);
+			PreparedStatement deleteIngredientsStatement = connection.prepareStatement(deleteIngredientsSql);
+			PreparedStatement deleteFavouritesStatement = connection.prepareStatement(deleteFavouritesSql);
+			PreparedStatement deleteFavouritesByOtherStatement = connection.prepareStatement(deleteFavouritesByOtherSql)) {
+
+
+			// Get all recipes
+			String recipesSql = "SELECT id, user_id FROM recipe WHERE user_id = ?";
+			PreparedStatement recipesStatement = connection.prepareStatement(recipesSql);
+			recipesStatement.setInt(1, id);
+			ResultSet resultSet = recipesStatement.executeQuery();
+
+			while (resultSet.next()) {
+				int recipeId = resultSet.getInt("id");
+
+				// delete favourites
+				deleteFavouritesStatement.setInt(1, id);
+				deleteFavouritesStatement.executeUpdate();
+
+				deleteFavouritesByOtherStatement.setInt(1, recipeId);
+				deleteFavouritesByOtherStatement.executeUpdate();
+
+				// delete ingredients
+				deleteIngredientsStatement.setInt(1, recipeId);
+				deleteIngredientsStatement.executeUpdate();
+
+				// delete recipe
+				deleteRecipesStatement.setInt(1, recipeId);
+				deleteRecipesStatement.executeUpdate();
+			}
+
+			// delete user
 			statement.setInt(1, id);
 			statement.executeUpdate();
 

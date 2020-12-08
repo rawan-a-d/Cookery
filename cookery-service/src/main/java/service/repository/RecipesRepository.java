@@ -9,33 +9,59 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecipesRepository extends JDBCRepository {
-    public Recipe getRecipe(int id) throws CookeryDatabaseException {
-        Connection connection = super.getDatabaseConnection();
+public class RecipesRepository {
 
-        String sql = "SELECT * FROM recipe WHERE id = ?";
+//    @Inject
+    JDBCRepository jdbcRepository;
+
+    public RecipesRepository() {
+        this.jdbcRepository = new JDBCRepository();
+    }
+
+    public Recipe getRecipe(int id) throws CookeryDatabaseException {
+        Connection connection = jdbcRepository.getDatabaseConnection();
+
+        String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
+                                "FROM `recipe` " +
+                                "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id` " +
+                                "WHERE recipe.id = ?";
+
+        Recipe recipe = null;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
 
-            if(!resultSet.next()) {
+            if(!resultSet.isBeforeFirst()) {
                 connection.close();
-                throw new CookeryDatabaseException("User with user id " + id + " cannot be found");
+                throw new CookeryDatabaseException("Recipe with recipe id " + id + " cannot be found");
             }
             else {
-                String name = resultSet.getString("name");
-                String description = resultSet.getString("description");
-                String image = resultSet.getString("image");
-                int userId = resultSet.getInt("user_id");
+                while(resultSet.next()) {
 
+                    if(recipe == null) {
+                        String name = resultSet.getString("name");
+                        String description = resultSet.getString("description");
+                        String image = resultSet.getString("image");
+                        int userId = resultSet.getInt("user_id");
+
+                        recipe = new Recipe(id, name, image, description, userId);
+                    }
+
+                    // Gather ingredients
+                    int ingredientId = resultSet.getInt("ingredient_id");
+                    String ingredientName = resultSet.getString("ingredient");
+                    int ingredientAmount = resultSet.getInt("amount");
+
+                    Ingredient ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
+                    recipe.addIngredient(ingredient);
+                }
+
+                connection.commit();
                 connection.close();
 
-                // GET INGREDIENTS
-                List<Ingredient> ingredients = getIngredients(id);
-
-                return new Recipe(id, name, image, description, ingredients, userId);
+                return recipe;
             }
         }
         catch (SQLException throwable) {
@@ -46,7 +72,7 @@ public class RecipesRepository extends JDBCRepository {
     public List<Recipe> getRecipes() throws CookeryDatabaseException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
+        Connection connection = jdbcRepository.getDatabaseConnection();
         String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
                 "FROM `recipe` " +
                 "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id`" +
@@ -56,13 +82,11 @@ public class RecipesRepository extends JDBCRepository {
             ResultSet resultSet = statement.executeQuery();
 
             int lastId = -1;
-            List<Ingredient> ingredients = new ArrayList<>();
-            String name = null;
-            String description = null;
-            String image = null;
-            int userId = -1;
+            String name;
+            String description;
+            String image;
+            int userId;
             Recipe recipe = null;
-
 
             while(resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -79,8 +103,6 @@ public class RecipesRepository extends JDBCRepository {
                     recipes.add(recipe);
 
                     lastId = id;
-
-                    ingredients = new ArrayList<>();
                 }
 
                 // Gather ingredients
@@ -88,10 +110,13 @@ public class RecipesRepository extends JDBCRepository {
                 String ingredientName = resultSet.getString("ingredient");
                 int ingredientAmount = resultSet.getInt("amount");
 
-                Ingredient ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
+                Ingredient ingredient = null;
+                if(ingredientName != null && ingredientId != 0) {
+                    ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
+                }
 
-                // Add ingredient to recipes
-                if(recipe != null) {
+                // Add ingredient to recipe
+                if(recipe != null && ingredient != null) {
                     recipe.addIngredient(ingredient);
                 }
             }
@@ -100,7 +125,7 @@ public class RecipesRepository extends JDBCRepository {
             connection.close();
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
         }
         return recipes;
     }
@@ -108,56 +133,87 @@ public class RecipesRepository extends JDBCRepository {
     public List<Recipe> getRecipes(int userId) throws CookeryDatabaseException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
-        String sql = "SELECT * from recipe WHERE user_id = ?";
+        Connection connection = jdbcRepository.getDatabaseConnection();
+        String sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
+                "from recipe " +
+                "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id` " +
+                "WHERE user_id = ? " +
+                "ORDER BY recipe.id";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
-
             ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String description = resultSet.getString("description");
-                String image = resultSet.getString("image");
+            if(!resultSet.isBeforeFirst()) {
+                connection.close();
+                throw new CookeryDatabaseException("User with user id " + userId + " cannot be found");
+            }
+            else {
+                int lastId = -1;
+                String name;
+                String description;
+                String image;
+                Recipe recipe = null;
 
-                // GET INGREDIENTS
-                List<Ingredient> ingredients = getIngredients(id);
+                while(resultSet.next()) {
+                    int id = resultSet.getInt("id");
 
-                Recipe recipe = new Recipe(id, name, image, description, ingredients, userId);
-                recipes.add(recipe);
+                    if(id != lastId) { // new recipe
+                        // create new recipe
+                        name = resultSet.getString("name");
+                        description = resultSet.getString("description");
+                        image = resultSet.getString("image");
+
+                        recipe = new Recipe(id, name, image, description, userId);
+
+                        recipes.add(recipe);
+
+                        lastId = id;
+                    }
+
+                    // Gather ingredients
+                    int ingredientId = resultSet.getInt("ingredient_id");
+                    String ingredientName = resultSet.getString("ingredient");
+                    int ingredientAmount = resultSet.getInt("amount");
+
+                    Ingredient ingredient = null;
+                    if(ingredientName != null && ingredientId != 0) {
+                        ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
+                    }
+
+                    // Add ingredient to recipe
+                    if(recipe != null && ingredient != null) {
+                        recipe.addIngredient(ingredient);
+                    }
+                }
             }
 
             connection.commit();
             connection.close();
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
         }
+
         return recipes;
 
     }
 
-    // int id, String name, String image, User user, boolean isFavourite
     public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException {
         List<RecipeDTO> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
+        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
                 "user.id AS userId, user.name AS userName, " +
                 "ufr.id " +
                 "FROM recipe " +
                 "LEFT JOIN USER ON recipe.user_id = user.id " +
-                "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id ";
-        if(userId >= 0) {
-            sql += "AND ufr.user_id = ?";
-        }
+                "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
+                "AND ufr.user_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            if(userId >= 0) {
-                statement.setInt(1, userId);
-            }
+            statement.setInt(1, userId);
+
             ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
@@ -166,13 +222,14 @@ public class RecipesRepository extends JDBCRepository {
                 String image = resultSet.getString("recipeImage");
                 String userName = resultSet.getString("userName");
                 int favouriteId = resultSet.getInt("id");
+                int creatorId = resultSet.getInt("userId");
 
                 boolean isFavourite = false;
                 if(favouriteId > 0) {
                     isFavourite = true;
                 }
 
-                User user = new User(userId, userName);
+                User user = new User(creatorId, userName);
 
                 RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
                 recipes.add(recipe);
@@ -182,7 +239,7 @@ public class RecipesRepository extends JDBCRepository {
             connection.close();
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
         }
         return recipes;
 
@@ -191,19 +248,25 @@ public class RecipesRepository extends JDBCRepository {
     public List<Recipe> getRecipes(String ingredient) throws CookeryDatabaseException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
+        Connection connection = jdbcRepository.getDatabaseConnection();
 
-        String sql = "SELECT * FROM ingredient WHERE ingredinet = ?";
+        String sql = "SELECT ingredient.*, recipe.name, recipe.description, recipe.image, recipe.user_id FROM ingredient " +
+                "LEFT JOIN recipe on recipe.id = ingredient.recipe_id " +
+                "WHERE ingredient = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql))  {
             statement.setString(1, ingredient);
 
             ResultSet resultSet = statement.executeQuery();
-
             while(resultSet.next()) {
                 int recipeId = resultSet.getInt("recipe_id");
 
-                Recipe recipe = getRecipe(recipeId);
+                String recipeName = resultSet.getString("name");
+                String recipeDescription = resultSet.getString("description");
+                String recipeImage = resultSet.getString("image");
+                int userId = resultSet.getInt("user_id");
+
+                Recipe recipe = new Recipe(recipeId, recipeName, recipeImage, recipeDescription, userId);
 
                 recipes.add(recipe);
             }
@@ -212,51 +275,20 @@ public class RecipesRepository extends JDBCRepository {
             connection.close();
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
         }
         return recipes;
-
     }
 
-//    public List<RecipeDTO> getRecipesDTO(String ingredient) throws CookeryDatabaseException {
-//        List<Recipe> recipes = new ArrayList<>();
-//
-//        Connection connection = super.getDatabaseConnection();
-//
-//        String sql = "SELECT * FROM ingredient WHERE ingredinet = ?";
-//
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(sql);
-//            statement.setString(1, ingredient);
-//
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while(resultSet.next()) {
-//                int recipeId = resultSet.getInt("recipe_id");
-//
-//                Recipe recipe = getRecipe(recipeId);
-//
-//                recipes.add(recipe);
-//            }
-//
-//            connection.commit();
-//            connection.close();
-//        }
-//        catch (SQLException throwable) {
-//            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
-//        }
-//        return recipes;
-//
-//    }
-
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
-        Connection connection = super.getDatabaseConnection();
 
         PreparedStatement stmt = null;
 
-        try (PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+            PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
             PreparedStatement updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
-            PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");) {
+            PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
+            PreparedStatement getIngredients = connection.prepareStatement("SELECT * FROM ingredient WHERE recipe_id = ?")) {
             if(recipe != null) {
                 // Update recipe
                 stmt = connection.prepareStatement("UPDATE recipe SET name = ?, description = ?, image = ? WHERE id = ?");
@@ -270,8 +302,22 @@ public class RecipesRepository extends JDBCRepository {
 
                 // Compare ingredients
                 List<Ingredient> ingredients = recipe.getIngredients();
-                List<Ingredient> DBIngredients = getIngredients(id);
+                List<Ingredient> DBIngredients = new ArrayList<>();;
 
+                getIngredients.setInt(1, id);
+                ResultSet resultSet = getIngredients.executeQuery();
+
+                while(resultSet.next()) {
+                    int ingredientId = resultSet.getInt("id");
+                    String name = resultSet.getString("ingredient");
+                    int amount = resultSet.getInt("amount");
+
+                    Ingredient ingredient = new Ingredient(ingredientId, name, amount);
+
+                    DBIngredients.add(ingredient);
+                }
+
+                // **************************************************** delete and update are similar
                 // Check if an ingredient is deleted
                 boolean isDeleted = true;
                 for (Ingredient DBIngredient: DBIngredients) {
@@ -286,12 +332,9 @@ public class RecipesRepository extends JDBCRepository {
                     }
 
                     if(isDeleted) {
-                        System.out.println("DbIngredient Id " + DBIngredient.getId());
                         // Delete ingredient
                         deleteStmt.setInt(1, DBIngredient.getId());
                         deleteStmt.setInt(2, id);
-
-                        System.out.println("Trying to delete " + DBIngredient.getId());
 
                         deleteStmt.addBatch();
                     }
@@ -305,10 +348,10 @@ public class RecipesRepository extends JDBCRepository {
                     stmt.setInt(1, ingredients.get(i).getId());
                     stmt.setInt(2, recipe.getId());
 
-                    ResultSet resultSet = stmt.executeQuery();
+                    ResultSet resultSetIngredients = stmt.executeQuery();
 
                     // new ingredient
-                    if(!resultSet.next()) {
+                    if(!resultSetIngredients.next()) {
                         // Create ingredient
                         createStmt.setString(1, ingredients.get(i).getIngredient());
                         createStmt.setInt(2, ingredients.get(i).getAmount());
@@ -338,29 +381,24 @@ public class RecipesRepository extends JDBCRepository {
                 return true;
             }
 
-            connection.close();
+//            connection.close();
             return false;
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot update recipe in the database.", throwable);
         }
         finally {
             if(!stmt.isClosed()) {
                 stmt.close();
-            }
-            if(!connection.isClosed()) {
-                connection.close();
             }
         }
     }
 
 
     public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException {
-        Connection connection = super.getDatabaseConnection();
+        Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
-
-        System.out.println("DELETING REPOSITORY " + id);
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
              PreparedStatement deleteFavourites = connection.prepareStatement("DELETE FROM user_favourite_recipe WHERE recipe_id = ?");
@@ -373,20 +411,24 @@ public class RecipesRepository extends JDBCRepository {
             deleteFavourites.executeUpdate();
 
             deleteRecipeStatement.setInt(1, id);
-            deleteRecipeStatement.executeUpdate();
+            int affected = deleteRecipeStatement.executeUpdate();
 
             connection.commit();
             connection.close();
 
+            if(affected <= 0) { // Not success
+                throw new CookeryDatabaseException("User was not found");
+            }
+
             return true;
         }
         catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+            throw new CookeryDatabaseException("Cannot delete recipe from the database.", throwable);
         }
     }
 
-    public void createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException {
-        Connection connection = super.getDatabaseConnection();
+    public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException {
+        Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
 
@@ -424,6 +466,8 @@ public class RecipesRepository extends JDBCRepository {
                 connection.commit();
                 preparedStatement.close();
                 connection.close();
+
+                return true;
             }
             else {
                 throw new CookeryDatabaseException("Cannot get the id of the new recipe.");
@@ -444,57 +488,28 @@ public class RecipesRepository extends JDBCRepository {
                 connection.close();
             }
         }
-    }
-
-
-    private List<Ingredient> getIngredients(int recipeId) throws CookeryDatabaseException {
-        Connection connection = super.getDatabaseConnection();
-
-        String sql = "SELECT * FROM ingredient WHERE recipe_id = ?";
-
-        List<Ingredient> ingredients = new ArrayList<>();
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, recipeId);
-            ResultSet resultSet = statement.executeQuery();
-
-
-            while(resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("ingredient");
-                int amount = resultSet.getInt("amount");
-
-                Ingredient ingredient = new Ingredient(id, name, amount);
-                ingredients.add(ingredient);
-            }
-
-            connection.commit();
-            connection.close();
-
-        }
-        catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read recipe from the database", throwable);
-        }
-        return ingredients;
+        return false;
     }
 
 
     /*------------------------------------------------ Favourites ------------------------------------------------------*/
-    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException {
-        Connection connection = super.getDatabaseConnection();
+    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, SQLException {
+        Connection connection = jdbcRepository.getDatabaseConnection();
 
-        if (alreadyFavourite(userId, favourite)) {
-            return false;
-        }
-
-        String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (?, ?)";
+        String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) " +
+                "SELECT ?, ? Where not exists( SELECT user_id, recipe_id FROM user_favourite_recipe " +
+                "WHERE user_id = ? AND recipe_id = ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             statement.setInt(2, favourite.getId());
+            statement.setInt(3, userId);
+            statement.setInt(4, favourite.getId());
+            int affected = statement.executeUpdate();
 
-            statement.executeUpdate();
+            if(affected <= 0) {
+                throw new CookeryDatabaseException("Cannot add favourite into the database");
+            }
 
             connection.commit();
             connection.close();
@@ -503,46 +518,37 @@ public class RecipesRepository extends JDBCRepository {
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot add favourite into the database", throwable);
         }
+        finally {
+            if(!connection.isClosed()) {
+                connection.close();
+            }
+        }
     }
 
-    public void removeFavourite(int favouriteId) throws CookeryDatabaseException {
-        Connection connection = super.getDatabaseConnection();
+    public boolean removeFavourite(int favouriteId) throws CookeryDatabaseException, SQLException {
+        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "DELETE FROM user_favourite_recipe WHERE id = ?";
-
-        System.out.println("TRYING TO DELETE " + favouriteId);
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, favouriteId);
 
-            statement.executeUpdate();
+            int affected = statement.executeUpdate();
 
             connection.commit();
-            connection.close();
+
+            if(affected <= 0) {
+                throw new CookeryDatabaseException("Cannot delete favourite from the database");
+            }
+
+            return true;
+
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot delete favourite from the database", throwable);
         }
-    }
-
-    public boolean alreadyFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException {
-        Connection connection = super.getDatabaseConnection();
-        String sql = "SELECT * FROM user_favourite_recipe WHERE user_id = ? AND recipe_id = ?";
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, userId);
-            statement.setInt(2, favourite.getId());
-
-            ResultSet resultSet = statement.executeQuery();
-
-            if (!resultSet.next()) {
+        finally {
+            if(!connection.isClosed()) {
                 connection.close();
-                return false;
-            } else {
-                connection.close();
-
-                return true;
             }
-        } catch (SQLException throwable) {
-            throw new CookeryDatabaseException("Cannot read favourite from the database", throwable);
         }
     }
 
@@ -550,8 +556,8 @@ public class RecipesRepository extends JDBCRepository {
     public List<Recipe> getFavourites(int userId) throws CookeryDatabaseException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
-        String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.description AS recipeDescription, recipe.image AS recipeImage, ufr.* " +
+        Connection connection = jdbcRepository.getDatabaseConnection();
+        String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.description AS recipeDescription, recipe.image AS recipeImage, recipe.user_id AS creator_id, ufr.* " +
                 "FROM user_favourite_recipe AS ufr " +
                 "LEFT JOIN recipe ON ufr.recipe_id = recipe.id " +
                 "WHERE ufr.user_id = ?";
@@ -566,8 +572,9 @@ public class RecipesRepository extends JDBCRepository {
                 String name = resultSet.getString("recipeName");
                 String description = resultSet.getString("recipeDescription");
                 String image = resultSet.getString("recipeImage");
+                int creator_id = resultSet.getInt("creator_id");
 
-                Recipe recipe = new Recipe(id, name, image, description, userId);
+                Recipe recipe = new Recipe(id, name, image, description, creator_id);
                 recipes.add(recipe);
             }
 
@@ -583,7 +590,7 @@ public class RecipesRepository extends JDBCRepository {
     public List<RecipeDTO> getFavouritesDTO(int userId) throws CookeryDatabaseException, Exception {
         List<RecipeDTO> recipes = new ArrayList<>();
 
-        Connection connection = super.getDatabaseConnection();
+        Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
                 "       user.id AS userId, user.name AS userName, " +
@@ -604,16 +611,12 @@ public class RecipesRepository extends JDBCRepository {
                 String name = resultSet.getString("recipeName");
                 String image = resultSet.getString("recipeImage");
                 String userName = resultSet.getString("userName");
-                int favouriteId = resultSet.getInt("id");
+                int creatorId = resultSet.getInt("userId");
 
-                boolean isFavourite = false;
-                if(favouriteId > 0) {
-                    isFavourite = true;
-                }
+                User user = new User(creatorId, userName);
 
-                User user = new User(userId, userName);
+                RecipeDTO recipe = new RecipeDTO(id, name, image, user);
 
-                RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
                 recipes.add(recipe);
             }
 

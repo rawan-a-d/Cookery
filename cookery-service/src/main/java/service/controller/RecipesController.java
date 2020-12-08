@@ -11,11 +11,11 @@ import java.util.logging.Logger;
 
 public class RecipesController {
     private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
+    RecipesRepository recipesRepository = new RecipesRepository();
 
     // ---------------------------------------------------- Recipes ------------------------------------------------------------
     public List<Recipe> getRecipes() {
 
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         List<Recipe> recipes = null;
         try {
@@ -28,7 +28,6 @@ public class RecipesController {
     }
 
     public Recipe getRecipe(int id) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         Recipe recipe = null;
         try {
@@ -41,7 +40,6 @@ public class RecipesController {
     }
 
     public List<Recipe> getRecipes(int userId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         List<Recipe> recipes = null;
         try {
@@ -55,8 +53,6 @@ public class RecipesController {
 
 
     public List<RecipeDTO> getFavouritesDTO(int userId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
-        System.out.println("GETTING FAVOURITES con");
 
         List<RecipeDTO> recipes = null;
         try {
@@ -76,7 +72,6 @@ public class RecipesController {
 
 
     public boolean updateRecipe(int id, Recipe recipe) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         try {
             return recipesRepository.updateRecipe(id, recipe);
@@ -91,7 +86,6 @@ public class RecipesController {
     }
 
     public void createRecipe(Recipe recipe) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         try {
             recipesRepository.createRecipe(recipe);
@@ -105,7 +99,6 @@ public class RecipesController {
     }
 
     public void deleteRecipe(int id) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         try {
             recipesRepository.deleteRecipe(id);
@@ -119,7 +112,6 @@ public class RecipesController {
     }
 
     public List<RecipeDTO> getRecipesDTO(int userId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         List<RecipeDTO> recipes;
         try {
@@ -135,12 +127,11 @@ public class RecipesController {
 
 
     public boolean addFavourite(int userId, RecipeDTO favourite) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         try {
             return recipesRepository.addFavourite(userId, favourite);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
@@ -148,19 +139,17 @@ public class RecipesController {
 
 
     public void removeFavourite(int favouriteId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         try {
             recipesRepository.removeFavourite(favouriteId);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
 
     public List<Recipe> getFavourites(int userId) {
-        RecipesRepository recipesRepository = new RecipesRepository();
 
         List<Recipe> recipes;
         try {

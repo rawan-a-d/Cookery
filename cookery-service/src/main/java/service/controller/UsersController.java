@@ -7,15 +7,14 @@ import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class UsersController {
     private final static Logger LOGGER = Logger.getLogger(UsersController.class.getName());
 
-    @Inject
-    UsersRepository usersRepository;
+//    @Inject
+    UsersRepository usersRepository = new UsersRepository();
 
     //	------------------------------------------------------------------------ Users ------------------------------------------------------------------------------
     public List<User> getUsers() {
@@ -39,6 +38,7 @@ public class UsersController {
 
     public User getUser(int id) {
         User user;
+
         try {
             user = usersRepository.getUser(id);
             return user;

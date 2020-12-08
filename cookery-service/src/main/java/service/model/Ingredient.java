@@ -1,5 +1,7 @@
 package service.model;
 
+import java.util.Objects;
+
 public class Ingredient {
 	private int id;
 	private static int idSeeder = 0;
@@ -55,6 +57,20 @@ public class Ingredient {
 				'}';
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Ingredient that = (Ingredient) o;
+		return id == that.id &&
+				amount == that.amount &&
+				Objects.equals(ingredient, that.ingredient);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, ingredient, amount);
+	}
 
 	//	public int getRecipeId() {
 //		return recipeId;

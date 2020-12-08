@@ -9,16 +9,16 @@ public class JDBCRepository {
     // db setup
     // protected
     public Connection getDatabaseConnection() throws CookeryDatabaseException {
-//        String url = "jdbc:mysql://studmysql01.fhict.local:3306/dbi407847";
-//        String username = "dbi407847";
-//        String password = "dbi407847";
+        String url = "jdbc:mysql://studmysql01.fhict.local:3306/dbi407847";
+        String username = "dbi407847";
+        String pass = "dbi407847";
 
-        String url = "jdbc:mysql://localhost:3306/schema_cookery";
-        String username = "root";
-        String password = "";
+//        String url = "jdbc:mysql://localhost:3306/schema_cookery";
+//        String username = "root";
+//        String pass = "";
 
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Connection connection = DriverManager.getConnection(url, username, pass);
 
 
             System.out.println("Connection JDBC " + connection);

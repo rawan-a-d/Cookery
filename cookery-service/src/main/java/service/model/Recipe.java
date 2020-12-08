@@ -2,6 +2,7 @@ package service.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Recipe {
 	private int id;
@@ -114,5 +115,23 @@ public class Recipe {
 				", ingredients=" + ingredients +
 				", userId=" + userId +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Recipe recipe = (Recipe) o;
+		return id == recipe.id &&
+				userId == recipe.userId &&
+				Objects.equals(name, recipe.name) &&
+				Objects.equals(image, recipe.image) &&
+				Objects.equals(description, recipe.description) &&
+				Objects.equals(ingredients, recipe.ingredients);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, image, description, ingredients, userId);
 	}
 }

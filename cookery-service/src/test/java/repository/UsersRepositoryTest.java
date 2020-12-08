@@ -43,32 +43,24 @@ public class UsersRepositoryTest {
 //                DriverManager.getConnection("jdbc:h2:mem:test_mem", "root", "")
 //                DriverManager.getConnection("jdbc:h2:mem:test_mem;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false", "", "") // select * from SCHEMA_COOKERY.recipe;
 //                DriverManager.getConnection("jdbc:h2:mem:;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false") // select * from SCHEMA_COOKERY.recipe;
-
+        // jdbc:h2:mem:~/test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
         );
+
+        System.out.println("JDBC " + jdbcRepository.getDatabaseConnection());
 
         repository.JDBCRepository.generateData();
     }
 
     @Test
     public void getUsers() throws CookeryDatabaseException, SQLException, ClassNotFoundException {
-
-
-        System.out.println("HOHO "+ jdbcRepository.getDatabaseConnection());
-
-
         List<User> users = usersRepository.getUsers();
 
-
-        System.out.println("USERS " + users);
         List<User> actualUsers = Arrays.asList(
                 new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin),
                 new User(2, "Anas", "anas@gmail.com", "1234", Role.user),
                 new User(3, "Omar", "omar@gmail.com", "1234", Role.admin),
                 new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user)
         );
-        System.out.println("USERS " + actualUsers);
-
-        System.out.println(users.get(0));
 
         assertEquals(4, users.size());
 
@@ -81,16 +73,12 @@ public class UsersRepositoryTest {
 
         User actualUser = usersRepository.getUser(1);
 
-        System.out.println(expectedUser);
-        System.out.println(actualUser);
-
         assertEquals(expectedUser, actualUser);
     }
 
 
     @Test
     public void getUser_invalidId_throwsException() {
-
         assertThrows(CookeryDatabaseException.class, () -> {
             usersRepository.getUser(6);
         });
@@ -119,11 +107,7 @@ public class UsersRepositoryTest {
 
         boolean result = usersRepository.updateUser(1, expectedUser);
 
-        // retrieve user
-//        User actualUser = usersRepository.getUser(1);
-
         assertTrue(result);
-//        assertEquals(expectedUser, actualUser);
     }
 
     @Test
