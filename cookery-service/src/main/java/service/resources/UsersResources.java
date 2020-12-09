@@ -40,6 +40,7 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @RolesAllowed({"user", "admin"})
+//    @PermitAll
     public Response getUser(@PathParam("id") int id){
         User user = usersController.getUser(id);
 

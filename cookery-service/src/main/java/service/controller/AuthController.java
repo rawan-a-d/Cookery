@@ -21,12 +21,11 @@ public class AuthController {
     private final static Logger LOGGER = Logger.getLogger(AuthController.class.getName());
 
     private static String secretKey = "oeRaYY7Wo24sDqKSX3IM9ASGmdGPmkTd9jo1QTy4b7P9Ze5_9hKolVX8xNrQDcNRfVEdTZNOuOyqEGhXEbdJI-ZQ19k_o9MI0y3eZN2lp9jow55FfXMiINEdt1XR85VipRLSOkT6kSpzs2x-jbLDiz9iFVzkd81YKxMgPA7VfZeQUm4n-mOmnWMaVX30zGFU4L3oPBctYKkl4dYfqYWqRNfrgPJVi5DGFjywgxx0ASEiJHtV72paI3fDR2XwlSkyhhmY-ICjCRmsJN4fX1pdoL8a18-aQrvyu4j0Os6dVPYIoPvvY0SAZtWYKHfM15g7A3HD4cVREf9cUsprCRK93w";
-
+    AuthRepository authRepository = new AuthRepository();
+    UsersRepository usersRepository = new UsersRepository();
 
     /*---------------------------------------------------------------- Authenticate ----------------------------------------------------------------------*/
     public User authenticate(String email, String password) {
-        AuthRepository authRepository = new AuthRepository();
-
         User user = null;
         try {
             user = authRepository.authenticate(email, password);
@@ -39,8 +38,6 @@ public class AuthController {
     }
 
     public boolean register(User user) {
-        UsersRepository usersRepository = new UsersRepository();
-
         try {
             return usersRepository.createUser(user);
         }

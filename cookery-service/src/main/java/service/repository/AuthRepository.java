@@ -9,11 +9,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AuthRepository extends JDBCRepository {
+public class AuthRepository {
+    JDBCRepository jdbcRepository;
+
+    public AuthRepository() {
+        this.jdbcRepository = new JDBCRepository();
+    }
+
     public User authenticate(String email, String password) throws CookeryDatabaseException, URISyntaxException {
         String sql = "SELECT * FROM user WHERE email = ? AND password = ?";
 
-        try (Connection connection = super.getDatabaseConnection();
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
             statement.setString(2, password);
