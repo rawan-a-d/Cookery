@@ -61,12 +61,10 @@ public class RecipesController {
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            System.out.println(ex.getMessage());
 
         }
         catch (Exception ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            System.out.println(ex.getMessage());
         }
         return recipes;
     }
@@ -96,8 +94,9 @@ public class RecipesController {
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        }
+        catch (URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 
@@ -111,8 +110,9 @@ public class RecipesController {
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        }
+        catch (URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
         }
     }
 

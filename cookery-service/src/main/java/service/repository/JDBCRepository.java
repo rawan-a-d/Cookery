@@ -1,5 +1,7 @@
 package service.repository;
 
+import service.controller.RecipesController;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,8 +13,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class JDBCRepository {
+    private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
 
     // db setup
     // protected
@@ -42,10 +46,10 @@ public class JDBCRepository {
             throw new IllegalStateException("JDBC driver failed to connect to the database " + url + " " + username + " " + pass + ".", ex);
         }
         catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
         }
         catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.info(ex.getMessage()); // Compliant
         }
 
         return connection;

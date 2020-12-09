@@ -1,5 +1,6 @@
 package service.repository;
 
+import service.controller.RecipesController;
 import service.model.DTO.RecipeDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
@@ -9,10 +10,12 @@ import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RecipesRepository {
+    private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
 
-//    @Inject
+    //    @Inject
     JDBCRepository jdbcRepository;
 
     public RecipesRepository() {
@@ -479,7 +482,7 @@ public class RecipesRepository {
             throw new CookeryDatabaseException("Cannot create new recipe.", throwable);
         }
         catch (Exception ex) {
-            System.out.println("Exception " + ex);
+            LOGGER.info(ex.getMessage()); // Compliant
         }
         finally {
             if(!preparedStatement.isClosed()) {

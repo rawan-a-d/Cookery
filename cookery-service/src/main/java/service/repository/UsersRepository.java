@@ -41,8 +41,6 @@ public class UsersRepository extends JDBCRepository{
 
 				User user = new User(id, name, email, password, role);
 				users.add(user);
-				System.out.println("User " + user);
-
 			}
 
 			connection.close();
