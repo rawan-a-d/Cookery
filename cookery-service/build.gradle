@@ -53,7 +53,7 @@ sonarqube {
         property 'sonar.projectName', 'cookery-service'
         property 'sonar.projectKey', 'com.cookery:cookery-service'
         property 'sonar.core.codeCoveragePlugin', 'jacoco'
-        property 'sonar.coverage.jacoco.xmlReportPaths', '${project.buildDir}/reports/jacoco.xml'
+        property 'sonar.coverage.jacoco.xmlReportPaths', '${project.buildDir}/customJacocoReportDir/test/jacocoTestReport.xml'
     }
 }
 
