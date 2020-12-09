@@ -42,7 +42,7 @@ jacoco {
 // Configuring test task
 jacocoTestReport {
     reports {
-        xml.enabled false
+        xml.enabled true
         csv.enabled false
         html.destination file("${buildDir}/jacocoHtml")
     }
