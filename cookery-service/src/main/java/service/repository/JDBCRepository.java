@@ -16,7 +16,7 @@ public class JDBCRepository {
 
     // db setup
     // protected
-    public Connection getDatabaseConnection() throws CookeryDatabaseException, URISyntaxException {
+    public Connection getDatabaseConnection() throws URISyntaxException {
         // Get configuration
         URL res = getClass().getClassLoader().getResource("app.properties");
         File configFile = Paths.get(res.toURI()).toFile();
@@ -26,8 +26,7 @@ public class JDBCRepository {
         String pass = "";
         Connection connection = null;
 
-        try {
-            FileReader reader = new FileReader(configFile);
+        try(FileReader reader = new FileReader(configFile)) {
             Properties properties = new Properties();
             properties.load(reader);
 
@@ -43,10 +42,10 @@ public class JDBCRepository {
             throw new IllegalStateException("JDBC driver failed to connect to the database " + url + " " + username + " " + pass + ".", ex);
         }
         catch (FileNotFoundException ex) {
-            System.out.println("File was not found " + ex);
+            ex.printStackTrace();
         }
-        catch (IOException e) {
-            e.printStackTrace();
+        catch (IOException ex) {
+            ex.printStackTrace();
         }
 
         return connection;
