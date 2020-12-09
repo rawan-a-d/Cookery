@@ -41,10 +41,21 @@ public class RecipesController {
     }
 
     public List<Recipe> getRecipes(int userId) {
-
         List<Recipe> recipes = null;
         try {
             recipes = recipesRepository.getRecipes(userId);
+        }
+        catch (CookeryDatabaseException | URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+        return recipes;
+    }
+
+
+    public List<Recipe> getRecipes(String ingredient) {
+        List<Recipe> recipes = null;
+        try {
+            recipes = recipesRepository.getRecipes(ingredient);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
@@ -84,10 +95,10 @@ public class RecipesController {
         return false;
     }
 
-    public void createRecipe(Recipe recipe) {
-
+    public boolean createRecipe(Recipe recipe) {
+        boolean result = false;
         try {
-            recipesRepository.createRecipe(recipe);
+            result = recipesRepository.createRecipe(recipe);
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
@@ -98,12 +109,13 @@ public class RecipesController {
         catch (URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
+        return result;
     }
 
-    public void deleteRecipe(int id) {
-
+    public boolean deleteRecipe(int id) {
+        boolean result = false;
         try {
-            recipesRepository.deleteRecipe(id);
+            result = recipesRepository.deleteRecipe(id);
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
@@ -114,6 +126,8 @@ public class RecipesController {
         catch (URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
+
+        return result;
     }
 
     public List<RecipeDTO> getRecipesDTO(int userId) {
@@ -143,14 +157,16 @@ public class RecipesController {
     }
 
 
-    public void removeFavourite(int favouriteId) {
-
+    public boolean removeFavourite(int favouriteId) {
+        boolean result = false;
         try {
-            recipesRepository.removeFavourite(favouriteId);
+            result = recipesRepository.removeFavourite(favouriteId);
         }
         catch (CookeryDatabaseException | SQLException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
+
+        return result;
     }
 
 
