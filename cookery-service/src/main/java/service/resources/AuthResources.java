@@ -28,11 +28,7 @@ public class AuthResources {
         User user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
-
             String token = authController.generateAuthToken(user);
-
-//            System.out.println("Decoded JWT");
-//            System.out.println(controller.decodeJWT(token));
 
             return Response.ok(token).build();
         }
@@ -53,8 +49,6 @@ public class AuthResources {
 
         if(result) {
             String token = authController.generateAuthToken(user);
-
-            System.out.println("TOKEN " + token);
 
             return Response.ok(token).build();
         }

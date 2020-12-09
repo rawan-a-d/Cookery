@@ -39,13 +39,10 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-//    @RolesAllowed({"user", "admin"})
-    @PermitAll
+    @RolesAllowed({"user", "admin"})
     public Response getUser(@PathParam("id") int id){
-        System.out.println("PLease get user " + id);
         User user = usersController.getUser(id);
 
-        System.out.println("Resource user" + user);
         if(user != null){
             return Response.ok(user).build(); // Status ok 200, return user
         }
@@ -144,8 +141,6 @@ public class UsersResources {
     @RolesAllowed({"user", "admin"})
     public Response getAllFavourites(@HeaderParam("Authorization") String auth){
         int userId = authController.getIdInToken(auth); // id in token
-
-        System.out.println("GETTING FAVOURITES " + userId);
 
         List<RecipeDTO> recipes = recipesController.getFavouritesDTO(userId);
 

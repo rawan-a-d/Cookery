@@ -102,15 +102,9 @@ public class RecipesResources {
 		int userId = authController.getIdInToken(auth); // id in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
-		System.out.println(userId);
-		System.out.println(ownerId + " of recipe " + id);
-
-
 		if(userId != ownerId) {
 			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 		}
-
-		System.out.println("DELETING ROUTE ");
 
 		recipesController.deleteRecipe(id);
 

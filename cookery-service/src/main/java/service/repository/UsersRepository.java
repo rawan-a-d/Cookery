@@ -125,18 +125,18 @@ public class UsersRepository extends JDBCRepository{
 		String deleteIngredientsSql = "DELETE FROM ingredient WHERE recipe_id = ?";
 		String deleteFavouritesSql = "DELETE FROM user_favourite_recipe WHERE user_id = ?";
 		String deleteFavouritesByOtherSql = "DELETE FROM user_favourite_recipe WHERE recipe_id = ?";
+		String recipesSql = "SELECT id, user_id FROM recipe WHERE user_id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql);
 			PreparedStatement deleteRecipesStatement = connection.prepareStatement(deleteRecipesSql);
 			PreparedStatement deleteIngredientsStatement = connection.prepareStatement(deleteIngredientsSql);
 			PreparedStatement deleteFavouritesStatement = connection.prepareStatement(deleteFavouritesSql);
-			PreparedStatement deleteFavouritesByOtherStatement = connection.prepareStatement(deleteFavouritesByOtherSql)) {
+			PreparedStatement deleteFavouritesByOtherStatement = connection.prepareStatement(deleteFavouritesByOtherSql);
+			 PreparedStatement recipesStatement = connection.prepareStatement(recipesSql);) {
 
 
 			// Get all recipes
-			String recipesSql = "SELECT id, user_id FROM recipe WHERE user_id = ?";
-			PreparedStatement recipesStatement = connection.prepareStatement(recipesSql);
 			recipesStatement.setInt(1, id);
 			ResultSet resultSet = recipesStatement.executeQuery();
 

@@ -2,7 +2,6 @@ package service.resources;
 
 import io.jsonwebtoken.Claims;
 import service.controller.AuthController;
-import service.model.User;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -31,8 +30,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
      */
     @Context
     private ResourceInfo resourceInfo;
-    User user = null;
-
 
     // requestContext contains information about the HTTP request message
     @Override
@@ -63,7 +60,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // if access is allowed for all -> do not check anything further : access is approved for all
         // if you want all logged in users to be able to access this route (add this check at the end of the class)
         if (method.isAnnotationPresent(PermitAll.class)) {
-            System.out.println("Permit all");
             return;
         }
 
@@ -86,34 +82,20 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
         //If no authorization information present: abort with UNAUTHORIZED and stop
         if (authorization == null || authorization.isEmpty()) {
-            System.out.println("Auth is empty or null");
             Response response = Response.status(Response.Status.UNAUTHORIZED).
                     entity("Missing username and/or password.").build();
             requestContext.abortWith(response); // inform the client it's aborted with the above content
             return;
         }
 
-        System.out.println("Found auth");
-
-
         //Get encoded username and password
         final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
-
-//        if(encodedCredentials.length() == 0) {
-//            System.out.println("NO CREDENTIALS");
-//            Response response = Response.status(Response.Status.UNAUTHORIZED).
-//                    entity("Username and password are required").build();
-//            requestContext.abortWith(response);
-//            return;
-//        }
 
 
         // Validate token
         Claims token = null;
         try {
-            System.out.println("Decoding token");
             token = AuthController.decodeJWT(encodedCredentials);
-            System.out.println(token);
         }
         catch (Exception exception){
             //Invalid signature/claims
@@ -137,13 +119,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             /* isUserAllowed : implement this method to check if this user has any of the roles in the rolesSet
             if not isUserAllowed abort the requestContext with FORBIDDEN response*/
             if (!isUserAllowed(rolesSet, Boolean.parseBoolean(token.get("admin").toString()))) {
-                System.out.println("User not valid");
                 Response response = Response.status(Response.Status.FORBIDDEN).build();
                 requestContext.abortWith(response);
                 return;
-            }
-            else {
-                System.out.println("VALID USER HOHO");
             }
         }
 
@@ -159,10 +137,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // 2. Select the user object here and check the role
 
         if((rolesSet.contains("admin") && isAdmin) || (rolesSet.contains("user") && !isAdmin)) {
-            System.out.println("User allowed");
             return true;
         }
-        System.out.println("User not allowed");
 
         return false;
     }
