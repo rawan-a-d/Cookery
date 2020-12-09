@@ -28,7 +28,7 @@ public class AuthResources {
         User user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
-            String token = authController.generateAuthToken(user);
+            String token = AuthController.generateAuthToken(user);
 
             return Response.ok(token).build();
         }
@@ -48,7 +48,7 @@ public class AuthResources {
         boolean result = usersController.createUser(user);
 
         if(result) {
-            String token = authController.generateAuthToken(user);
+            String token = AuthController.generateAuthToken(user);
 
             return Response.ok(token).build();
         }
