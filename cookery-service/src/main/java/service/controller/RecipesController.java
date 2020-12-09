@@ -5,6 +5,7 @@ import service.model.Recipe;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
 
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,7 +22,7 @@ public class RecipesController {
         try {
             recipes = recipesRepository.getRecipes();
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
         return recipes;
@@ -33,7 +34,7 @@ public class RecipesController {
         try {
             recipe = recipesRepository.getRecipe(id);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
         return recipe;
@@ -45,7 +46,7 @@ public class RecipesController {
         try {
             recipes = recipesRepository.getRecipes(userId);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
         return recipes;
@@ -95,6 +96,8 @@ public class RecipesController {
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 
@@ -108,6 +111,8 @@ public class RecipesController {
         }
         catch (SQLException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 
@@ -118,7 +123,7 @@ public class RecipesController {
             recipes = recipesRepository.getRecipesDTO(userId);
             return recipes;
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
@@ -131,7 +136,7 @@ public class RecipesController {
         try {
             return recipesRepository.addFavourite(userId, favourite);
         }
-        catch (CookeryDatabaseException | SQLException ex) {
+        catch (CookeryDatabaseException | SQLException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
@@ -143,7 +148,7 @@ public class RecipesController {
         try {
             recipesRepository.removeFavourite(favouriteId);
         }
-        catch (CookeryDatabaseException | SQLException ex) {
+        catch (CookeryDatabaseException | SQLException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
     }
@@ -156,7 +161,7 @@ public class RecipesController {
             recipes = recipesRepository.getFavourites(userId);
             return recipes;
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }

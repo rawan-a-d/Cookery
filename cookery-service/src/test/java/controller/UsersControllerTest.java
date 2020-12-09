@@ -11,6 +11,7 @@ import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
 
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +30,7 @@ class UsersControllerTest {
     UsersRepository usersRepository;
 
     @Test
-    public void getUsers() throws CookeryDatabaseException {
+    public void getUsers() throws CookeryDatabaseException, URISyntaxException {
             List<User> expectedUsers = Arrays.asList(
                     new User(1, "Anas", "anas@gmail.com", "1234", Role.user),
                     new User(2, "Beatrice", "beatrice@gmail.com", "1234", Role.admin)
@@ -50,7 +51,7 @@ class UsersControllerTest {
 
 
     @Test
-    public void getUser() throws CookeryDatabaseException {
+    public void getUser() throws CookeryDatabaseException, URISyntaxException {
         when(usersRepository.getUser(1)).thenReturn(
                 new User(1, "Anas", "anas@gmail.com", "1234", Role.user)
         );
@@ -64,7 +65,7 @@ class UsersControllerTest {
     }
 
     @Test
-    public void getUser_invalidId_returnNull() throws CookeryDatabaseException {
+    public void getUser_invalidId_returnNull() throws CookeryDatabaseException, URISyntaxException {
         when(usersRepository.getUser(4)).thenReturn(
                 null
         );
@@ -76,7 +77,7 @@ class UsersControllerTest {
 
 
     @Test
-    public void createUser() throws CookeryDatabaseException {
+    public void createUser() throws CookeryDatabaseException, URISyntaxException {
         User user = new User(1, "Omar", "omar@gmail.com", "1234", Role.user);
         when(usersRepository.createUser(user)).thenReturn(true);
 
@@ -85,7 +86,7 @@ class UsersControllerTest {
 
 
     @Test
-    public void updateUser() throws CookeryDatabaseException {
+    public void updateUser() throws CookeryDatabaseException, URISyntaxException {
         User user = new User(1, "Omar", "omar@gmail.com", "1234", Role.user);
         when(usersRepository.updateUser(1, user)).thenReturn(true);
 
@@ -94,7 +95,7 @@ class UsersControllerTest {
 
 
     @Test
-    public void deleteUser() throws CookeryDatabaseException {
+    public void deleteUser() throws CookeryDatabaseException, URISyntaxException {
         when(usersRepository.deleteUser(1)).thenReturn(true);
 
         assertTrue(usersController.deleteUser(1));

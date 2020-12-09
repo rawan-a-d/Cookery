@@ -4,6 +4,7 @@ package service.repository;
 import service.model.Role;
 import service.model.User;
 
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class UsersRepository extends JDBCRepository{
 		this.jdbcRepository = new JDBCRepository();
 	}
 
-	public List<User> getUsers() throws CookeryDatabaseException {
+	public List<User> getUsers() throws CookeryDatabaseException, URISyntaxException {
 		List<User> users = new ArrayList<>();
 
 		Connection connection = jdbcRepository.getDatabaseConnection();
@@ -53,7 +54,7 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 
-	public User getUser(int id) throws CookeryDatabaseException {
+	public User getUser(int id) throws CookeryDatabaseException, URISyntaxException {
 
 		Connection connection = jdbcRepository.getDatabaseConnection();
 
@@ -86,7 +87,7 @@ public class UsersRepository extends JDBCRepository{
 		}
 	}
 
-	public int getUserId(int recipeId) throws CookeryDatabaseException {
+	public int getUserId(int recipeId) throws CookeryDatabaseException, URISyntaxException {
 		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
 
@@ -111,7 +112,7 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 
-	public boolean createUser(User user) throws CookeryDatabaseException {
+	public boolean createUser(User user) throws CookeryDatabaseException, URISyntaxException {
 		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
@@ -135,7 +136,7 @@ public class UsersRepository extends JDBCRepository{
 		}
 	}
 
-	public boolean deleteUser(int id) throws CookeryDatabaseException {
+	public boolean deleteUser(int id) throws CookeryDatabaseException, URISyntaxException {
 		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "DELETE FROM user WHERE id = ?";
 		String deleteRecipesSql = "DELETE FROM recipe WHERE id = ?";
@@ -189,7 +190,7 @@ public class UsersRepository extends JDBCRepository{
 		}
 	}
 
-	public boolean updateUser(int id, User user) throws CookeryDatabaseException {
+	public boolean updateUser(int id, User user) throws CookeryDatabaseException, URISyntaxException {
 		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "UPDATE user SET name = ?, email = ?, password = ? WHERE id = ?";
 

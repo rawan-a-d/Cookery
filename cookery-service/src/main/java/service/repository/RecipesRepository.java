@@ -5,6 +5,7 @@ import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.User;
 
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class RecipesRepository {
         this.jdbcRepository = new JDBCRepository();
     }
 
-    public Recipe getRecipe(int id) throws CookeryDatabaseException {
+    public Recipe getRecipe(int id) throws CookeryDatabaseException, URISyntaxException {
         Connection connection = jdbcRepository.getDatabaseConnection();
 
         String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
@@ -69,7 +70,7 @@ public class RecipesRepository {
         }
     }
 
-    public List<Recipe> getRecipes() throws CookeryDatabaseException {
+    public List<Recipe> getRecipes() throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
         Connection connection = jdbcRepository.getDatabaseConnection();
@@ -130,7 +131,7 @@ public class RecipesRepository {
         return recipes;
     }
 
-    public List<Recipe> getRecipes(int userId) throws CookeryDatabaseException {
+    public List<Recipe> getRecipes(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
         Connection connection = jdbcRepository.getDatabaseConnection();
@@ -199,7 +200,7 @@ public class RecipesRepository {
 
     }
 
-    public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException {
+    public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> recipes = new ArrayList<>();
 
         Connection connection = jdbcRepository.getDatabaseConnection();
@@ -245,7 +246,7 @@ public class RecipesRepository {
 
     }
 
-    public List<Recipe> getRecipes(String ingredient) throws CookeryDatabaseException {
+    public List<Recipe> getRecipes(String ingredient) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
         Connection connection = jdbcRepository.getDatabaseConnection();
@@ -384,7 +385,7 @@ public class RecipesRepository {
 //            connection.close();
             return false;
         }
-        catch (SQLException throwable) {
+        catch (SQLException | URISyntaxException throwable) {
             throw new CookeryDatabaseException("Cannot update recipe in the database.", throwable);
         }
         finally {
@@ -395,7 +396,7 @@ public class RecipesRepository {
     }
 
 
-    public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException {
+    public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException, URISyntaxException {
         Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
@@ -427,7 +428,7 @@ public class RecipesRepository {
         }
     }
 
-    public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException {
+    public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException, URISyntaxException {
         Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
@@ -493,7 +494,7 @@ public class RecipesRepository {
 
 
     /*------------------------------------------------ Favourites ------------------------------------------------------*/
-    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, SQLException {
+    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, SQLException, URISyntaxException {
         Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) " +
@@ -525,7 +526,7 @@ public class RecipesRepository {
         }
     }
 
-    public boolean removeFavourite(int favouriteId) throws CookeryDatabaseException, SQLException {
+    public boolean removeFavourite(int favouriteId) throws CookeryDatabaseException, SQLException, URISyntaxException {
         Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "DELETE FROM user_favourite_recipe WHERE id = ?";
 
@@ -553,7 +554,7 @@ public class RecipesRepository {
     }
 
 
-    public List<Recipe> getFavourites(int userId) throws CookeryDatabaseException {
+    public List<Recipe> getFavourites(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
         Connection connection = jdbcRepository.getDatabaseConnection();

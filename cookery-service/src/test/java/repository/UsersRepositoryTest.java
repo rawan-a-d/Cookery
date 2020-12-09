@@ -12,6 +12,7 @@ import service.repository.CookeryDatabaseException;
 import service.repository.JDBCRepository;
 import service.repository.UsersRepository;
 
+import java.net.URISyntaxException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public class UsersRepositoryTest {
     UsersRepository usersRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException, ClassNotFoundException, CookeryDatabaseException {
+    public void setUp() throws SQLException, ClassNotFoundException, CookeryDatabaseException, URISyntaxException {
 
         Class.forName ("org.h2.Driver");
 
@@ -52,7 +53,7 @@ public class UsersRepositoryTest {
     }
 
     @Test
-    public void getUsers() throws CookeryDatabaseException, SQLException, ClassNotFoundException {
+    public void getUsers() throws CookeryDatabaseException, SQLException, ClassNotFoundException, URISyntaxException {
         List<User> users = usersRepository.getUsers();
 
         List<User> actualUsers = Arrays.asList(
@@ -68,7 +69,7 @@ public class UsersRepositoryTest {
     }
 
     @Test
-    public void getUser() throws CookeryDatabaseException {
+    public void getUser() throws CookeryDatabaseException, URISyntaxException {
         User expectedUser = new User(1,"Rawan", "rawan@gmail.com", "1234", Role.admin);
 
         User actualUser = usersRepository.getUser(1);
@@ -86,7 +87,7 @@ public class UsersRepositoryTest {
 
 
     @Test
-    public void createUser() throws CookeryDatabaseException {
+    public void createUser() throws CookeryDatabaseException, URISyntaxException {
         boolean result = usersRepository.createUser(new User("Beatrice", "beatrice@gmail.com", "1234"));
 
         assertTrue(result);
@@ -94,7 +95,7 @@ public class UsersRepositoryTest {
 
 
     @Test
-    public void deleteUser() throws CookeryDatabaseException {
+    public void deleteUser() throws CookeryDatabaseException, URISyntaxException {
         boolean result = usersRepository.deleteUser(1);
 
         assertTrue(result);
@@ -102,7 +103,7 @@ public class UsersRepositoryTest {
 
 
     @Test
-    public void updateUser() throws CookeryDatabaseException {
+    public void updateUser() throws CookeryDatabaseException, URISyntaxException {
         User expectedUser = new User(1, "Rawan", "rawan.ad@gmail.com", "1234", Role.admin);
 
         boolean result = usersRepository.updateUser(1, expectedUser);

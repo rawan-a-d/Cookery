@@ -13,6 +13,7 @@ import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
 
+import java.net.URISyntaxException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class RecipesRepositoryTest {
     RecipesRepository recipesRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException, ClassNotFoundException, CookeryDatabaseException {
+    public void setUp() throws SQLException, ClassNotFoundException, CookeryDatabaseException, URISyntaxException {
 
         Class.forName ("org.h2.Driver");
 
@@ -44,7 +45,7 @@ public class RecipesRepositoryTest {
     }
 
     @Test
-    public void getRecipes() throws CookeryDatabaseException {
+    public void getRecipes() throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> expectedRecipes = Arrays.asList(
                 new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
                         Arrays.asList(
@@ -70,7 +71,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void getRecipesByIngredient() throws CookeryDatabaseException {
+    public void getRecipesByIngredient() throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> expectedRecipes = Arrays.asList(
                 new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc", 1),
                 new Recipe(4, "recipe 4", "recipe 4 image","recipe 4 desc", 3)
@@ -84,13 +85,13 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void getRecipesByIngredient_notFound_returnsEmptyArray() throws CookeryDatabaseException {
+    public void getRecipesByIngredient_notFound_returnsEmptyArray() throws CookeryDatabaseException, URISyntaxException {
         assertEquals(0, recipesRepository.getRecipes("tomato sauce").size());
     }
 
 
     @Test
-    public void getRecipesOfUser() throws CookeryDatabaseException {
+    public void getRecipesOfUser() throws CookeryDatabaseException, URISyntaxException {
         // returns all recipes, specify which of them are favourites
         List<Recipe> expectedRecipes =  Arrays.asList(
                 new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
@@ -120,7 +121,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void getRecipesDTO() throws CookeryDatabaseException {
+    public void getRecipesDTO() throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(1, "recipe 1", "recipe 1 image",
                         new User(1, "Rawan")),
@@ -139,7 +140,7 @@ public class RecipesRepositoryTest {
     }
 
     @Test
-    public void getRecipesDTO_invalidId_returnsAll() throws CookeryDatabaseException {
+    public void getRecipesDTO_invalidId_returnsAll() throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(1, "recipe 1", "recipe 1 image",
                         new User(1, "Rawan")),
@@ -159,7 +160,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void getRecipe() throws CookeryDatabaseException {
+    public void getRecipe() throws CookeryDatabaseException, URISyntaxException {
         Recipe expectedRecipe = new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
                         Arrays.asList(
                                 new Ingredient(1, "onion", 2),
@@ -181,7 +182,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void deleteRecipe() throws SQLException, CookeryDatabaseException {
+    public void deleteRecipe() throws SQLException, CookeryDatabaseException, URISyntaxException {
         boolean result = recipesRepository.deleteRecipe(1);
 
         assertTrue(result);
@@ -211,7 +212,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void createRecipe() throws SQLException, CookeryDatabaseException {
+    public void createRecipe() throws SQLException, CookeryDatabaseException, URISyntaxException {
         // 	public Recipe(String name, String image, String description, int userId, List<Ingredient> ingredients) {
         Recipe newRecipe = new Recipe("recipe 5", "recipe 5 image", "recipe 5 desc", 3,
                 Arrays.asList(
@@ -226,7 +227,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void getFavourites() throws CookeryDatabaseException {
+    public void getFavourites() throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> expectedRecipes =  Arrays.asList(
                 new Recipe(2, "recipe 2", "recipe 2 image", "recipe 2 desc", 1),
                 new Recipe(3, "recipe 3", "recipe 3 image", "recipe 3 desc", 2)
@@ -255,7 +256,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void addFavourite() throws CookeryDatabaseException, SQLException {
+    public void addFavourite() throws CookeryDatabaseException, SQLException, URISyntaxException {
         RecipeDTO recipe = new RecipeDTO(4, new User(4, "Raneem"));
 
         boolean result = recipesRepository.addFavourite(4, recipe);
@@ -285,7 +286,7 @@ public class RecipesRepositoryTest {
 
 
     @Test
-    public void removeFavourite() throws CookeryDatabaseException, SQLException {
+    public void removeFavourite() throws CookeryDatabaseException, SQLException, URISyntaxException {
         boolean result = recipesRepository.removeFavourite(2);
 
         assertTrue(result);

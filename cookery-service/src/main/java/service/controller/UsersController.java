@@ -7,6 +7,7 @@ import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -43,7 +44,7 @@ public class UsersController {
             user = usersRepository.getUser(id);
             return user;
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return null;
         }
@@ -54,7 +55,7 @@ public class UsersController {
         try {
             return usersRepository.createUser(user);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
@@ -65,7 +66,7 @@ public class UsersController {
         try {
             return usersRepository.updateUser(id, user);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
@@ -75,7 +76,7 @@ public class UsersController {
         try {
             return usersRepository.deleteUser(id);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
@@ -89,7 +90,7 @@ public class UsersController {
         try {
             id = usersRepository.getUserId(recipeId);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
 

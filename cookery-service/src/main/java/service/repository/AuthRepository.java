@@ -3,13 +3,14 @@ package service.repository;
 import service.model.Role;
 import service.model.User;
 
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AuthRepository extends JDBCRepository {
-    public User authenticate(String email, String password) throws CookeryDatabaseException {
+    public User authenticate(String email, String password) throws CookeryDatabaseException, URISyntaxException {
         Connection connection = super.getDatabaseConnection();
         String sql = "SELECT * FROM user WHERE email = ? AND password = ?";
 

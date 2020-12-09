@@ -12,6 +12,7 @@ import service.repository.UsersRepository;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
+import java.net.URISyntaxException;
 import java.security.Key;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -30,7 +31,7 @@ public class AuthController {
         try {
             user = authRepository.authenticate(email, password);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
 
@@ -43,7 +44,7 @@ public class AuthController {
         try {
             return usersRepository.createUser(user);
         }
-        catch (CookeryDatabaseException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }
