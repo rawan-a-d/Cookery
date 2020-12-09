@@ -103,12 +103,6 @@ public class RecipesController {
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
-        catch (SQLException ex) {
-            LOGGER.info(ex.getMessage()); // Compliant
-        }
-        catch (URISyntaxException ex) {
-            LOGGER.info(ex.getMessage()); // Compliant
-        }
         return result;
     }
 

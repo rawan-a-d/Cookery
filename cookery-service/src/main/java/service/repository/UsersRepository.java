@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsersRepository extends JDBCRepository{
-//	public Connection getConnection() throws CookeryDatabaseException {
-//		Connection connection = super.getDatabaseConnection();
-//		return connection;
-//	}
+
 //	@Inject
 	JDBCRepository jdbcRepository;
 
@@ -24,11 +21,10 @@ public class UsersRepository extends JDBCRepository{
 	public List<User> getUsers() throws CookeryDatabaseException, URISyntaxException {
 		List<User> users = new ArrayList<>();
 
-		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user";
 
-
-		try (Statement statement = connection.createStatement()) {
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 Statement statement = connection.createStatement()) {
 			ResultSet resultSet = statement.executeQuery(sql);
 
 			while (resultSet.next()) {
@@ -43,7 +39,6 @@ public class UsersRepository extends JDBCRepository{
 				users.add(user);
 			}
 
-			connection.close();
 		} catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
 		}
@@ -53,18 +48,15 @@ public class UsersRepository extends JDBCRepository{
 
 
 	public User getUser(int id) throws CookeryDatabaseException, URISyntaxException {
-
-		Connection connection = jdbcRepository.getDatabaseConnection();
-
 		String sql = "SELECT * FROM user WHERE id = ?";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 
 			if (!resultSet.next()) {
-				connection.close();
 				throw new CookeryDatabaseException("User with id " + id + " cannot be found");
 			} else {
 				String name = resultSet.getString("name");
@@ -72,12 +64,9 @@ public class UsersRepository extends JDBCRepository{
 				String password = resultSet.getString("password");
 				Role role = Role.valueOf(resultSet.getString("role"));
 
-				connection.close();
-
 				User user = new User(id, name, email, password, role);
 
 				return user;
-
 			}
 
 		} catch (SQLException throwable) {
@@ -86,20 +75,17 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public int getUserId(int recipeId) throws CookeryDatabaseException, URISyntaxException {
-		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, recipeId);
 			ResultSet resultSet = statement.executeQuery();
 
 			if (!resultSet.next()) {
-				connection.close();
 				throw new CookeryDatabaseException("User with recipe id " + recipeId + " cannot be found");
 			} else {
 				int id = resultSet.getInt("user_id");
-
-				connection.close();
 
 				return id;
 			}
@@ -111,10 +97,10 @@ public class UsersRepository extends JDBCRepository{
 
 
 	public boolean createUser(User user) throws CookeryDatabaseException, URISyntaxException {
-		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
@@ -126,7 +112,6 @@ public class UsersRepository extends JDBCRepository{
 			statement.executeUpdate();
 
 			connection.commit();
-			connection.close();
 
 			return true;
 		} catch (SQLException throwable) {
@@ -135,14 +120,14 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public boolean deleteUser(int id) throws CookeryDatabaseException, URISyntaxException {
-		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "DELETE FROM user WHERE id = ?";
 		String deleteRecipesSql = "DELETE FROM recipe WHERE id = ?";
 		String deleteIngredientsSql = "DELETE FROM ingredient WHERE recipe_id = ?";
 		String deleteFavouritesSql = "DELETE FROM user_favourite_recipe WHERE user_id = ?";
 		String deleteFavouritesByOtherSql = "DELETE FROM user_favourite_recipe WHERE recipe_id = ?";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql);
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql);
 			PreparedStatement deleteRecipesStatement = connection.prepareStatement(deleteRecipesSql);
 			PreparedStatement deleteIngredientsStatement = connection.prepareStatement(deleteIngredientsSql);
 			PreparedStatement deleteFavouritesStatement = connection.prepareStatement(deleteFavouritesSql);
@@ -179,7 +164,6 @@ public class UsersRepository extends JDBCRepository{
 			statement.executeUpdate();
 
 			connection.commit();
-			connection.close();
 
 			return true;
 
@@ -189,10 +173,10 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public boolean updateUser(int id, User user) throws CookeryDatabaseException, URISyntaxException {
-		Connection connection = jdbcRepository.getDatabaseConnection();
 		String sql = "UPDATE user SET name = ?, email = ?, password = ? WHERE id = ?";
 
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
@@ -205,7 +189,6 @@ public class UsersRepository extends JDBCRepository{
 				throw new CookeryDatabaseException("User was not found");
 			}
 			connection.commit();
-			connection.close();
 
 			return true;
 

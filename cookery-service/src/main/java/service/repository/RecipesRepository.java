@@ -23,7 +23,6 @@ public class RecipesRepository {
     }
 
     public Recipe getRecipe(int id) throws CookeryDatabaseException, URISyntaxException {
-        Connection connection = jdbcRepository.getDatabaseConnection();
 
         String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
                                 "FROM `recipe` " +
@@ -32,7 +31,8 @@ public class RecipesRepository {
 
         Recipe recipe = null;
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -63,7 +63,6 @@ public class RecipesRepository {
                 }
 
                 connection.commit();
-                connection.close();
 
                 return recipe;
             }
@@ -76,13 +75,13 @@ public class RecipesRepository {
     public List<Recipe> getRecipes() throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
         String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
                 "FROM `recipe` " +
                 "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id`" +
                 "ORDER BY recipe.id";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
 
             int lastId = -1;
@@ -126,7 +125,6 @@ public class RecipesRepository {
             }
 
             connection.commit();
-            connection.close();
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
@@ -137,14 +135,14 @@ public class RecipesRepository {
     public List<Recipe> getRecipes(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
                 "from recipe " +
                 "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id` " +
                 "WHERE user_id = ? " +
                 "ORDER BY recipe.id";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
@@ -193,7 +191,6 @@ public class RecipesRepository {
             }
 
             connection.commit();
-            connection.close();
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
@@ -206,7 +203,6 @@ public class RecipesRepository {
     public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
                 "user.id AS userId, user.name AS userName, " +
                 "ufr.id " +
@@ -215,7 +211,8 @@ public class RecipesRepository {
                 "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
                 "AND ufr.user_id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -240,7 +237,6 @@ public class RecipesRepository {
             }
 
             connection.commit();
-            connection.close();
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
@@ -252,13 +248,13 @@ public class RecipesRepository {
     public List<Recipe> getRecipes(String ingredient) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
 
         String sql = "SELECT ingredient.*, recipe.name, recipe.description, recipe.image, recipe.user_id FROM ingredient " +
                 "LEFT JOIN recipe on recipe.id = ingredient.recipe_id " +
                 "WHERE ingredient = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql))  {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql))  {
             statement.setString(1, ingredient);
 
             ResultSet resultSet = statement.executeQuery();
@@ -276,7 +272,6 @@ public class RecipesRepository {
             }
 
             connection.commit();
-            connection.close();
         }
         catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read recipes from the database.", throwable);
@@ -286,16 +281,15 @@ public class RecipesRepository {
 
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
 
-        PreparedStatement stmt = null;
-
         try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement stmt = connection.prepareStatement("UPDATE recipe SET name = ?, description = ?, image = ? WHERE id = ?");
             PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
             PreparedStatement updateStmt = connection.prepareStatement("UPDATE ingredient SET ingredient = ?, amount = ? WHERE id = ? && recipe_id = ?");
             PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM ingredient WHERE id = ? AND recipe_id = ?");
-            PreparedStatement getIngredients = connection.prepareStatement("SELECT * FROM ingredient WHERE recipe_id = ?")) {
+            PreparedStatement getIngredients = connection.prepareStatement("SELECT * FROM ingredient WHERE recipe_id = ?");
+            PreparedStatement getIngredientsInRecipe = connection.prepareStatement("SELECT * FROM ingredient WHERE id = ? AND recipe_id = ?")) {
             if(recipe != null) {
                 // Update recipe
-                stmt = connection.prepareStatement("UPDATE recipe SET name = ?, description = ?, image = ? WHERE id = ?");
 
                 stmt.setString(1, recipe.getName());
                 stmt.setString(2, recipe.getDescription());
@@ -346,13 +340,10 @@ public class RecipesRepository {
 
 
                 for (int i = 0; i < ingredients.size(); i++) {
-                    String sql = "SELECT * FROM ingredient WHERE id = ? AND recipe_id = ?";
+                    getIngredientsInRecipe.setInt(1, ingredients.get(i).getId());
+                    getIngredientsInRecipe.setInt(2, recipe.getId());
 
-                    stmt = connection.prepareStatement(sql);
-                    stmt.setInt(1, ingredients.get(i).getId());
-                    stmt.setInt(2, recipe.getId());
-
-                    ResultSet resultSetIngredients = stmt.executeQuery();
+                    ResultSet resultSetIngredients = getIngredientsInRecipe.executeQuery();
 
                     // new ingredient
                     if(!resultSetIngredients.next()) {
@@ -385,26 +376,19 @@ public class RecipesRepository {
                 return true;
             }
 
-//            connection.close();
             return false;
         }
         catch (SQLException | URISyntaxException throwable) {
             throw new CookeryDatabaseException("Cannot update recipe in the database.", throwable);
         }
-        finally {
-            if(!stmt.isClosed()) {
-                stmt.close();
-            }
-        }
     }
 
 
     public boolean deleteRecipe(int id) throws CookeryDatabaseException, SQLException, URISyntaxException {
-        Connection connection = jdbcRepository.getDatabaseConnection();
-
         String sql = "DELETE FROM ingredient WHERE recipe_id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
              PreparedStatement deleteFavourites = connection.prepareStatement("DELETE FROM user_favourite_recipe WHERE recipe_id = ?");
             PreparedStatement deleteRecipeStatement = connection.prepareStatement("DELETE FROM recipe WHERE id = ?")) {
 
@@ -418,7 +402,6 @@ public class RecipesRepository {
             int affected = deleteRecipeStatement.executeUpdate();
 
             connection.commit();
-            connection.close();
 
             if(affected <= 0) { // Not success
                 throw new CookeryDatabaseException("User was not found");
@@ -431,14 +414,14 @@ public class RecipesRepository {
         }
     }
 
-    public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException, SQLException, URISyntaxException {
-        Connection connection = jdbcRepository.getDatabaseConnection();
+    public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException {
 
         String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
 
-        PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement preparedStatementIngredient = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
+        ) {
             preparedStatement.setString(1, recipe.getName());
             preparedStatement.setString(2, recipe.getDescription());
             preparedStatement.setString(3, recipe.getImage());
@@ -454,22 +437,17 @@ public class RecipesRepository {
 
                 List<Ingredient> ingredients = recipe.getIngredients();
 
-                preparedStatement = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
 
                 for(Ingredient ingredient: ingredients) {
-                    preparedStatement.setString(1, ingredient.getIngredient());
-                    preparedStatement.setInt(2, ingredient.getAmount());
-                    preparedStatement.setInt(3, recipeId);
+                    preparedStatementIngredient.setString(1, ingredient.getIngredient());
+                    preparedStatementIngredient.setInt(2, ingredient.getAmount());
+                    preparedStatementIngredient.setInt(3, recipeId);
 
-                    preparedStatement.addBatch();
-                    preparedStatement.clearParameters();
+                    preparedStatementIngredient.addBatch();
+                    preparedStatementIngredient.clearParameters();
                 }
 
-                preparedStatement.executeBatch();
-
-                connection.commit();
-                preparedStatement.close();
-                connection.close();
+                preparedStatementIngredient.executeBatch();
 
                 return true;
             }
@@ -484,27 +462,18 @@ public class RecipesRepository {
         catch (Exception ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
-        finally {
-            if(!preparedStatement.isClosed()) {
-                preparedStatement.close();
-            }
-            if(!connection.isClosed()) {
-                connection.close();
-            }
-        }
         return false;
     }
 
 
     /*------------------------------------------------ Favourites ------------------------------------------------------*/
     public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, SQLException, URISyntaxException {
-        Connection connection = jdbcRepository.getDatabaseConnection();
-
         String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) " +
                 "SELECT ?, ? Where not exists( SELECT user_id, recipe_id FROM user_favourite_recipe " +
                 "WHERE user_id = ? AND recipe_id = ?)";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             statement.setInt(2, favourite.getId());
             statement.setInt(3, userId);
@@ -516,24 +485,18 @@ public class RecipesRepository {
             }
 
             connection.commit();
-            connection.close();
 
             return true;
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot add favourite into the database", throwable);
         }
-        finally {
-            if(!connection.isClosed()) {
-                connection.close();
-            }
-        }
     }
 
     public boolean removeFavourite(int favouriteId) throws CookeryDatabaseException, SQLException, URISyntaxException {
-        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "DELETE FROM user_favourite_recipe WHERE id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, favouriteId);
 
             int affected = statement.executeUpdate();
@@ -549,24 +512,19 @@ public class RecipesRepository {
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot delete favourite from the database", throwable);
         }
-        finally {
-            if(!connection.isClosed()) {
-                connection.close();
-            }
-        }
     }
 
 
     public List<Recipe> getFavourites(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<Recipe> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.description AS recipeDescription, recipe.image AS recipeImage, recipe.user_id AS creator_id, ufr.* " +
                 "FROM user_favourite_recipe AS ufr " +
                 "LEFT JOIN recipe ON ufr.recipe_id = recipe.id " +
                 "WHERE ufr.user_id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -582,7 +540,6 @@ public class RecipesRepository {
                 recipes.add(recipe);
             }
 
-            connection.close();
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read favourites from the database.", throwable);
         }
@@ -594,8 +551,6 @@ public class RecipesRepository {
     public List<RecipeDTO> getFavouritesDTO(int userId) throws CookeryDatabaseException, Exception {
         List<RecipeDTO> recipes = new ArrayList<>();
 
-        Connection connection = jdbcRepository.getDatabaseConnection();
-
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
                 "       user.id AS userId, user.name AS userName, " +
                 "       ufr.id " +
@@ -605,7 +560,8 @@ public class RecipesRepository {
                 "AND ufr.user_id = ? " +
                 "ORDER BY recipe.id";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -624,7 +580,6 @@ public class RecipesRepository {
                 recipes.add(recipe);
             }
 
-            connection.close();
         } catch (SQLException throwable) {
             throw new CookeryDatabaseException("Cannot read favourites from the database.", throwable);
         }
