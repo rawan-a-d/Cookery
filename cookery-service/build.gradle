@@ -14,16 +14,13 @@ test {
     useJUnitPlatform()
 }
 
+apply plugin: 'org.sonarqube'
+
 sonarqube {
     properties {
-//        property "sonar.projectName", "Simple Java Gradle Project"
-//        property "sonar.projectKey", "org.codehaus.sonar:example-java-gradle"
 
-//        properties["sonar.sources"] += file("$projectDir/src/main/foo.js")
-        properties["sonar.tests"] += file("$projectDir/src/test")
+        property "sonar.tests", "src/test"
 
-        properties["sonar.java.binaries"] += file("$buildDir/extraBinaries")
-        properties["sonar.java.test.binaries"] += file("$buildDir/extraTestBinaries")
     }
 }
 
