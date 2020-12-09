@@ -149,7 +149,7 @@ public class UsersResources {
 
         List<RecipeDTO> recipes = recipesController.getFavouritesDTO(userId);
 
-        GenericEntity<List<RecipeDTO>> entity = new GenericEntity<>(recipes){ };
+        GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
         return Response.ok(entity).build();
     }
 
