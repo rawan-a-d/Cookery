@@ -232,7 +232,7 @@ public class UsersResourcesTest extends JerseyTest {
         Response response = target("users/1/favourites")
                                         .request()
                                         .header("Authorization", "Bearer " + token)
-                                        .get(new GenericType<>(){});
+                                        .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
