@@ -265,15 +265,15 @@ public class RecipesResourcesTest extends JerseyTest {
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
-//    @Test
-//    public void deleteRecipe_notOwner_forbidden() {
-//        String token = AuthController.generateAuthToken(new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user));
-//
-//        Response response = target("recipes/1")
-//                .request()
-//                .header("Authorization", "Bearer " + token)
-//                .delete();
-//
-//        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
-//    }
+    @Test
+    public void deleteRecipe_notOwner_forbidden() {
+        String token = AuthController.generateAuthToken(new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user));
+
+        Response response = target("recipes/1")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .delete();
+
+        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    }
 }
