@@ -15,19 +15,21 @@ repositories {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
 //    jvmArgs '--enable-preview'
 }
 
 // https://docs.gradle.org/current/userguide/jacoco_plugin.html
 // Configuring test task
 jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
     reports {
         xml.enabled true
     }
 }
 
 // Run in terminal: gradlew build jacocoTestReport sonarqube
-
+// Run in terminal: gradlew sonarqube
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'

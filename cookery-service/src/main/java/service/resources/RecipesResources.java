@@ -38,6 +38,9 @@ public class RecipesResources {
 		if(ingredient.equals("all")) {
 			recipes = recipesController.getRecipesDTO(userId);
 		}
+//		else {
+//			recipes = recipesController.getRecipes(ingredient);
+//		}
 
 
 		GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };

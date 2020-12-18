@@ -80,6 +80,7 @@ public class UsersResourcesTest extends JerseyTest {
                 new User(3, "Omar", "omar@gmail.com", "1234", Role.admin),
                 new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user)
         );
+
         final List<User> actualUsers =  target("users").request().get(new GenericType<List<User>>(){});
         assertEquals(expectedUsers, actualUsers);
     }
