@@ -88,7 +88,6 @@ public class AuthController {
     public int getIdInToken(String auth) {
         String authenticationScheme = "Bearer"; // the scheme (value starts with Basic)
         String encodedCredentials = auth.replaceFirst(authenticationScheme + " ", ""); // remove scheme (Basic) and space
-
         Claims decodedToken = AuthController.decodeJWT(encodedCredentials);
 
         return Integer.parseInt(decodedToken.get("sub").toString());

@@ -48,6 +48,9 @@ public class UsersRepository extends JDBCRepository{
 
 
 	public User getUser(int id) throws CookeryDatabaseException, URISyntaxException {
+		System.out.println("DATA BASE");
+
+		System.out.println(jdbcRepository.getDatabaseConnection());
 		String sql = "SELECT * FROM user WHERE id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();

@@ -467,22 +467,31 @@ public class RecipesRepository {
 
 
     /*------------------------------------------------ Favourites ------------------------------------------------------*/
-    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, SQLException, URISyntaxException {
+    public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, URISyntaxException {
+        System.out.println("Add favourite");
         String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) " +
                 "SELECT ?, ? Where not exists( SELECT user_id, recipe_id FROM user_favourite_recipe " +
                 "WHERE user_id = ? AND recipe_id = ?)";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+            System.out.println("userId " + userId);
+            System.out.println("favourite " + favourite.getId());
+            System.out.println("Connection " + connection);
+            System.out.println(userId);
+            System.out.println(favourite.getId());
             statement.setInt(1, userId);
             statement.setInt(2, favourite.getId());
             statement.setInt(3, userId);
             statement.setInt(4, favourite.getId());
             int affected = statement.executeUpdate();
+            System.out.println("affected " + affected);
 
             if(affected <= 0) {
+                System.out.println("Can't add favourite");
                 throw new CookeryDatabaseException("Cannot add favourite into the database");
             }
+            System.out.println("Favourite added");
 
             connection.commit();
 

@@ -31,6 +31,8 @@ public class JDBCRepository {
         Connection connection = null;
 
         try(FileReader reader = new FileReader(configFile)) {
+            Class.forName("org.h2.Driver");
+
             Properties properties = new Properties();
             properties.load(reader);
 
@@ -50,9 +52,10 @@ public class JDBCRepository {
         }
         catch (IOException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
         return connection;
     }
-
 }

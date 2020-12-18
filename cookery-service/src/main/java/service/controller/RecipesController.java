@@ -144,7 +144,7 @@ public class RecipesController {
         try {
             return recipesRepository.addFavourite(userId, favourite);
         }
-        catch (CookeryDatabaseException | SQLException | URISyntaxException ex) {
+        catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
             return false;
         }

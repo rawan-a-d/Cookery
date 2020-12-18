@@ -6,18 +6,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class JDBCRepository {
-    public static boolean dbCreated = false;
-
     public static void generateData() {
         Connection conn = null;
         Statement stmt = null;
         String sql;
         try {
+            Class.forName ("org.h2.Driver");
+
             //STEP 1: Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection("jdbc:h2:mem:~/test");
 
-//            if(!dbCreated) {
+            System.out.println("TEST CONN "+ conn);
+
                 //STEP 2: Execute a query
                 System.out.println("Creating table in given database...");
                 stmt = conn.createStatement();
@@ -60,10 +61,6 @@ public class JDBCRepository {
                         " FOREIGN KEY (recipe_id) REFERENCES recipe( id )) ";
                 stmt.executeUpdate(sql);
 
-//                dbCreated = true;
-
-//            }
-
 
                 sql = "INSERT INTO user (name, email, password, role) VALUES ('Rawan', 'rawan@gmail.com', '1234', 'admin')";
                 stmt.executeUpdate(sql);
@@ -102,6 +99,8 @@ public class JDBCRepository {
                 stmt.executeUpdate(sql);
 
 
+                System.out.println("DONE DB");
+
 
                 // STEP 3: Clean-up environment
                 stmt.close();
@@ -118,12 +117,13 @@ public class JDBCRepository {
             //finally block used to close resources
             try{
                 if(stmt!=null) stmt.close();
-            } catch(SQLException se2) {
+            } catch(SQLException ex) {
+                ex.printStackTrace();
             } // nothing we can do
             try {
                 if(conn!=null) conn.close();
-            } catch(SQLException se){
-                se.printStackTrace();
+            } catch(SQLException ex){
+                ex.printStackTrace();
             } //end finally try
         }
     }

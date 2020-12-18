@@ -14,6 +14,7 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
 
+
 @Path("/users")
 public class UsersResources {
 
@@ -22,7 +23,7 @@ public class UsersResources {
 
     private final UsersController usersController = new UsersController();
     private final RecipesController recipesController = new RecipesController();
-    private final AuthController authController = new AuthController();
+    AuthController authController = new AuthController();
 
 
     @GET //GET at http://localhost:XXXX/users
@@ -39,8 +40,8 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    @RolesAllowed({"user", "admin"})
-//    @PermitAll
+//    @RolesAllowed({"user", "admin"})
+    @PermitAll
     public Response getUser(@PathParam("id") int id){
         User user = usersController.getUser(id);
 
@@ -97,7 +98,8 @@ public class UsersResources {
 
     @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
-    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+//    @PermitAll
     public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){ // GET RECIPES BASED ON URL OR Authorization Header????????????????
         int userId = authController.getIdInToken(auth);
 

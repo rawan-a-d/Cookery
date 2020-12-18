@@ -50,6 +50,9 @@ public class UsersRepositoryTest {
         System.out.println("JDBC " + jdbcRepository.getDatabaseConnection());
 
         repository.JDBCRepository.generateData();
+
+//        RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:data.sql", UTF8, false);
+
     }
 
     @Test
@@ -64,6 +67,8 @@ public class UsersRepositoryTest {
         );
 
         assertEquals(4, users.size());
+
+        
 
         assertArrayEquals(users.toArray(), actualUsers.toArray()); // in order to use this (equals need to be implemented in User)
     }
