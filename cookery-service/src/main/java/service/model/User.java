@@ -15,6 +15,12 @@ public class User {
         idSeeder++;
     }
 
+    public User(int id, String name, Role role) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+    }
+
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;

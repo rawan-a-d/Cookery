@@ -176,14 +176,15 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public boolean updateUser(int id, User user) throws CookeryDatabaseException, URISyntaxException {
-		String sql = "UPDATE user SET name = ?, email = ?, password = ? WHERE id = ?";
+		String sql = "UPDATE user SET name = ?, email = ?, password = ?, role = ? WHERE id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
-			statement.setInt(4, id);
+			statement.setString(4, user.getRole().toString());
+			statement.setInt(5, id);
 
 			int affected = statement.executeUpdate();
 

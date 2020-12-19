@@ -261,7 +261,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void updateRecipe_invalidId_forbidden() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new User(4, "Ranim", "ranim@gmail.com", "1234", Role.user));
 
         Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
                 Arrays.asList(

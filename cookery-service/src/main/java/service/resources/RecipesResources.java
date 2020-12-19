@@ -5,6 +5,8 @@ import service.controller.RecipesController;
 import service.controller.UsersController;
 import service.model.DTO.RecipeDTO;
 import service.model.Recipe;
+import service.model.Role;
+import service.model.User;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -21,12 +23,12 @@ public class RecipesResources {
 	private UriInfo uriInfo;
 
 	private final RecipesController recipesController = new RecipesController();
-	private final AuthController authController = new AuthController();
+//	private final AuthController authController = new AuthController();
 
 	@GET //GET at http://localhost:XXXX/recipes?ingredient=onion OR http://localhost:XXXX/recipes
 	@PermitAll
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRecipeByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
+	public Response getRecipesByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
 		List<RecipeDTO> recipes = new ArrayList<>();
 
 		System.out.println("GET Recipes route");
@@ -34,7 +36,7 @@ public class RecipesResources {
 
 		if(auth != null) { // auth exists
 			System.out.println("Found auth");
-			userId = authController.getIdInToken(auth);
+			userId = AuthController.getIdInToken(auth);
 		}
 
 		if(ingredient.equals("all")) {
@@ -70,7 +72,6 @@ public class RecipesResources {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({"user", "admin"})
 	public Response addRecipe(Recipe recipe){
-
 		recipesController.createRecipe(recipe);
 
 		String url = uriInfo.getAbsolutePath() + "/" + recipe.getId();
@@ -83,16 +84,15 @@ public class RecipesResources {
 	@Path("{id}")
 	@RolesAllowed({"user", "admin"})
 	public Response updateRecipe(@PathParam("id") int id, Recipe recipe, @HeaderParam("Authorization") String auth){
-		int userId = authController.getIdInToken(auth); // id in token
+		User user = AuthController.getUser(auth); // user in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
-		if(userId != ownerId) {
+		if(user.getId() != ownerId && user.getRole() != Role.valueOf("admin")) {
 			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 		}
 
 		boolean result = recipesController.updateRecipe(id, recipe);
 
-		System.out.println("Updating " + result);
 		if(result) {
 			return Response.noContent().build();
 		}
@@ -105,10 +105,10 @@ public class RecipesResources {
 	@Path("{id}")
 	@RolesAllowed({"user", "admin"})
 	public Response deleteRecipe(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-		int userId = authController.getIdInToken(auth); // id in token
+		User user = AuthController.getUser(auth); // user in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
-		if(userId != ownerId) {
+		if(user.getId() != ownerId && user.getRole() != Role.valueOf("admin")) {
 			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 		}
 

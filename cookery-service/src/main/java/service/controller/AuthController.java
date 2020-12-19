@@ -85,11 +85,24 @@ public class AuthController {
     }
 
 
-    public int getIdInToken(String auth) {
+    public static int getIdInToken(String auth) {
         String authenticationScheme = "Bearer"; // the scheme (value starts with Basic)
         String encodedCredentials = auth.replaceFirst(authenticationScheme + " ", ""); // remove scheme (Basic) and space
         Claims decodedToken = AuthController.decodeJWT(encodedCredentials);
 
         return Integer.parseInt(decodedToken.get("sub").toString());
+    }
+
+    public static User getUser(String auth) {
+        String authenticationScheme = "Bearer"; // the scheme (value starts with Basic)
+        String encodedCredentials = auth.replaceFirst(authenticationScheme + " ", ""); // remove scheme (Basic) and space
+        Claims decodedToken = AuthController.decodeJWT(encodedCredentials);
+
+        int id = Integer.parseInt(decodedToken.get("sub").toString());
+        String name = decodedToken.get("name").toString();
+        Role role = Boolean.parseBoolean(decodedToken.get("admin").toString()) ? Role.admin : Role.user;
+
+        User user = new User(id, name, role);
+        return user;
     }
 }
