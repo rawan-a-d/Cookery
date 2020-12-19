@@ -29,19 +29,23 @@ public class RecipesResources {
 	public Response getRecipeByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
 		List<RecipeDTO> recipes = new ArrayList<>();
 
+		System.out.println("GET Recipes route");
 		int userId = -1;
 
-		if(!auth.equals("Bearer " + null)) { // auth exists
+		if(auth != null) { // auth exists
+			System.out.println("Found auth");
 			userId = authController.getIdInToken(auth);
 		}
 
 		if(ingredient.equals("all")) {
+			System.out.println("All");
 			recipes = recipesController.getRecipesDTO(userId);
 		}
-//		else {
-//			recipes = recipesController.getRecipes(ingredient);
-//		}
+		else {
+			recipes = recipesController.getRecipes(userId, ingredient);
+		}
 
+		System.out.println("Other");
 
 		GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
 		return Response.ok(entity).build();
@@ -86,10 +90,9 @@ public class RecipesResources {
 			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 		}
 
-		boolean result;
+		boolean result = recipesController.updateRecipe(id, recipe);
 
-		result = recipesController.updateRecipe(id, recipe);
-
+		System.out.println("Updating " + result);
 		if(result) {
 			return Response.noContent().build();
 		}

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.AuthController;
+import service.model.DTO.RecipeDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.Role;
@@ -21,10 +22,12 @@ import service.resources.RecipesResources;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.DriverManager;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.glassfish.jersey.message.internal.ReaderWriter.UTF8;
 import static org.junit.Assert.assertEquals;
@@ -56,6 +59,7 @@ public class RecipesResourcesTest extends JerseyTest {
     }
 
 
+
     @Override
     protected Application configure() {
         forceSet(TestProperties.CONTAINER_PORT, "0"); // runs on available port
@@ -65,71 +69,115 @@ public class RecipesResourcesTest extends JerseyTest {
     }
 
 
+    @Test
+    public void getRecipes() {
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan")),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+        Response response = target("recipes").request().get();
 
-//    INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 1', 'recipe 1 desc', 'recipe 1 image', 1);
-//    INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 2', 'recipe 2 desc', 'recipe 2 image', 1);
-//    INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 3', 'recipe 3 desc', 'recipe 3 image', 2);
-//    INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 4', 'recipe 4 desc', 'recipe 4 image', 3);
-//    @Test
-//    public void getRecipesByIngredient() {
-//        List<Recipe> expectedRecipes =  Arrays.asList(
-//                new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
-//                        Arrays.asList(
-//                                new Ingredient(1, "onion", 2),
-//                                new Ingredient(2, "garlic", 1)
-//                        ), 1),
-//                new Recipe(2, "recipe 4", "recipe 4 image", "recipe 4 desc",
-//                        Arrays.asList(
-//                                new Ingredient(4, "onion", 5) //('onion', 5, 4)
-//                        ),1)
-//        );
-////         final List<User> actualUsers =  target("users").request().get(new GenericType<List<User>>(){});
-//        Response response = target("recipes?ingredient=onion").request().get();
-//
-//        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-//    }
-//
-//
-//    @Test
-//    public void getRecipes() {
-//        List<Recipe> expectedRecipes =  Arrays.asList(
-//                new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
-//                        Arrays.asList(
-//                                new Ingredient(1, "onion", 2),
-//                                new Ingredient(2, "garlic", 1)
-//                        ), 1),
-//                new Recipe(2, "recipe 4", "recipe 4 image", "recipe 4 desc",
-//                        Arrays.asList(
-//                                new Ingredient(4, "onion", 5) //('onion', 5, 4)
-//                        ),1)
-//        );
-////         final List<User> actualUsers =  target("users").request().get(new GenericType<List<User>>(){});
-//        Response response = target("recipes").request().get();
-//
-//        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<Recipe>>() {}));
-//        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-//    }
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
 
-//    @GET //GET at http://localhost:XXXX/recipes?ingredient=onion OR http://localhost:XXXX/recipes
-//    @PermitAll
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getRecipeByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
-//        List<RecipeDTO> recipes = new ArrayList<>();
-//
-//        int userId = -1;
-//
-//        if(!auth.equals("Bearer " + null)) { // auth exists
-//            userId = authController.getIdInToken(auth);
-//        }
-//
-//        if(ingredient.equals("all")) {
-//            recipes = recipesController.getRecipesDTO(userId);
-//        }
-//
-//
-//        GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
-//        return Response.ok(entity).build();
-//    }
+
+    @Test
+    public void getRecipes_loggedInUser_ReturnsRecipesWithFavourites() {
+        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan"), 1, true),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas"), 2, true),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+        Response response = target("recipes")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .get();
+
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void getRecipes_allIngredients() {
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan")),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+        Response response = target("recipes").queryParam("ingredient", "all").request().get();
+
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void getRecipes_allIngredients_loggedInUser() {
+        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan"), 1, true),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas"), 2, true),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+
+        Response response = target("recipes")
+                            .queryParam("ingredient", "all")
+                            .request()
+                            .header("Authorization", "Bearer " + token)
+                            .get();
+
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void getRecipes_specificIngredient() {
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+
+        Response response = target("recipes").queryParam("ingredient", "onion").request().get();
+
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+    }
+
+
+    @Test
+    public void getRecipes_specificIngredient_loggedInUser() {
+        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        List<RecipeDTO> expectedRecipes =  Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+        );
+
+        Response response = target("recipes")
+                            .queryParam("ingredient", "onion")
+                            .request()
+                            .header("Authorization", "Bearer " + token)
+                            .get();
+
+        assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+    }
+
+
+    @Test
+    public void getRecipesByIngredient_notfound_returnsEmptyList() {
+        Response response = target("recipes").queryParam("ingredient", "eggplant").request().get();
+
+        assertEquals(Arrays.asList(), response.readEntity(new GenericType<List<RecipeDTO>>() {}));
+    }
+
 
     @Test
     public void getRecipe() {
@@ -145,12 +193,14 @@ public class RecipesResourcesTest extends JerseyTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
+
     @Test
     public void getRecipe_invalidId_badRequest() {
         Response response = target("recipes/6").request().get();
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
+
 
     @Test
     public void addRecipe() {
@@ -167,25 +217,26 @@ public class RecipesResourcesTest extends JerseyTest {
     }
 
 
-//    @Test
-//    public void updateRecipe() {
-//        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
-//
-//        Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
-//                Arrays.asList(
-//                        new Ingredient(1, "onion", 2),
-//                        new Ingredient(5, "olives", 3)
-//                ), 1);
-//
-//        Entity<Recipe> recipeEntity = Entity.entity(updatedRecipe, MediaType.APPLICATION_JSON);
-//
-//        Response response = target("recipes/1")
-//                .request()
-//                .header("Authorization", "Bearer " + token)
-//                .put(recipeEntity);
-//
-//        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-//    }
+    @Test
+    public void updateRecipe() {
+        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+
+        Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
+                Arrays.asList(
+                        new Ingredient("onion", 2),
+                        new Ingredient("olives", 3)
+                ), 1);
+
+        Entity<Recipe> recipeEntity = Entity.entity(updatedRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes/1")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .put(recipeEntity);
+
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
 
     @Test
     public void updateRecipe_notOwner_forbidden() {
@@ -208,50 +259,26 @@ public class RecipesResourcesTest extends JerseyTest {
     }
 
 
-//    @Test
-//    public void updateRecipe_invalidId_notFound() {
-//        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
-//
-//        Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
-//                Arrays.asList(
-//                        new Ingredient(1, "onion", 2),
-//                        new Ingredient(5, "olives", 3)
-//                ), 1);
-//
-//        Entity<Recipe> recipeEntity = Entity.entity(updatedRecipe, MediaType.APPLICATION_JSON);
-//
-//        Response response = target("recipes/5")
-//                .request()
-//                .header("Authorization", "Bearer " + token)
-//                .put(recipeEntity);
-//
-//        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-//    }
+    @Test
+    public void updateRecipe_invalidId_forbidden() {
+        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
 
-//
-//    @PUT //PUT at http://localhost:XXXX/recipes/3
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Path("{id}")
-//    @RolesAllowed({"user", "admin"})
-//    public Response updateRecipe(@PathParam("id") int id, Recipe recipe, @HeaderParam("Authorization") String auth){
-//        int userId = authController.getIdInToken(auth); // id in token
-//        int ownerId = UsersController.getUserId(id); // id of owner of the recipe
-//
-//        if(userId != ownerId) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
-//        }
-//
-//        boolean result;
-//
-//        result = recipesController.updateRecipe(id, recipe);
-//
-//        if(result) {
-//            return Response.noContent().build();
-//        }
-//        else {
-//            return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid recipe id").build();
-//        }
-//    }
+        Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
+                Arrays.asList(
+                        new Ingredient(1, "onion", 2),
+                        new Ingredient(5, "olives", 3)
+                ), 1);
+
+        Entity<Recipe> recipeEntity = Entity.entity(updatedRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes/5")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .put(recipeEntity);
+
+        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    }
+
 
     @Test
     public void deleteRecipe() {
@@ -264,6 +291,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
+
 
     @Test
     public void deleteRecipe_notOwner_forbidden() {

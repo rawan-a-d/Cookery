@@ -77,19 +77,14 @@ public class RecipesControllerTest {
 
     @Test
     public void getRecipesByIngredient() throws CookeryDatabaseException, URISyntaxException {
-        List<Recipe> expectedRecipes = Arrays.asList(
-                new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc", 1),
-                new Recipe(4, "recipe 4", "recipe 4 image","recipe 4 desc", 3)
+        List<RecipeDTO> expectedRecipes = Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
         );
 
-        when(recipesRepository.getRecipes("onion")).thenReturn(
-                Arrays.asList(
-                        new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc", 1),
-                        new Recipe(4, "recipe 4", "recipe 4 image","recipe 4 desc", 3)
-                )
-        );
+        when(recipesRepository.getRecipes(1, "onion")).thenReturn(expectedRecipes);
 
-        List<Recipe> actualRecipes = recipesController.getRecipes("onion");
+        List<RecipeDTO> actualRecipes = recipesController.getRecipes(1, "onion");
 
         assertEquals(expectedRecipes.size(), actualRecipes.size());
         assertArrayEquals(expectedRecipes.toArray(), actualRecipes.toArray());
@@ -98,11 +93,11 @@ public class RecipesControllerTest {
 
     @Test
     public void getRecipesByIngredient_notFound_returnsEmptyArray() throws CookeryDatabaseException, URISyntaxException {
-        when(recipesRepository.getRecipes("tomato sauce")).thenReturn(
+        when(recipesRepository.getRecipes(1, "tomato sauce")).thenReturn(
                 Arrays.asList()
         );
 
-        assertEquals(0, recipesController.getRecipes("tomato sauce").size());
+        assertEquals(0, recipesController.getRecipes(1, "tomato sauce").size());
     }
 
 

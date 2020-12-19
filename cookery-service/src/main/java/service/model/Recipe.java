@@ -19,6 +19,15 @@ public class Recipe {
 		idSeeder++;
 	}
 
+	public Recipe(String name, String image, String description, int userId) {
+		this.id = idSeeder;
+		idSeeder++;
+		this.name = name;
+		this.image = image;
+		this.description = description;
+		this.userId = userId;
+	}
+
 	public Recipe(String name, String image, String description, int userId, List<Ingredient> ingredients) {
 		this.id = idSeeder;
 		idSeeder++;

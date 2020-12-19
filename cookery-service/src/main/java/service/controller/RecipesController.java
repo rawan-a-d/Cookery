@@ -52,10 +52,10 @@ public class RecipesController {
     }
 
 
-    public List<Recipe> getRecipes(String ingredient) {
-        List<Recipe> recipes = null;
+    public List<RecipeDTO> getRecipes(int userId, String ingredient) {
+        List<RecipeDTO> recipes = null;
         try {
-            recipes = recipesRepository.getRecipes(ingredient);
+            recipes = recipesRepository.getRecipes(userId, ingredient);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant

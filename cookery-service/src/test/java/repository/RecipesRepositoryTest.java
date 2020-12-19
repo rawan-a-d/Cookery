@@ -72,12 +72,12 @@ public class RecipesRepositoryTest {
 
     @Test
     public void getRecipesByIngredient() throws CookeryDatabaseException, URISyntaxException {
-        List<Recipe> expectedRecipes = Arrays.asList(
-                new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc", 1),
-                new Recipe(4, "recipe 4", "recipe 4 image","recipe 4 desc", 3)
+        List<RecipeDTO> expectedRecipes = Arrays.asList(
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
         );
 
-        List<Recipe> actualRecipes = recipesRepository.getRecipes("onion");
+        List<RecipeDTO> actualRecipes = recipesRepository.getRecipes(-1, "onion");
 
         assertEquals(expectedRecipes.size(), actualRecipes.size());
         assertArrayEquals(expectedRecipes.toArray(), actualRecipes.toArray());
@@ -86,7 +86,7 @@ public class RecipesRepositoryTest {
 
     @Test
     public void getRecipesByIngredient_notFound_returnsEmptyArray() throws CookeryDatabaseException, URISyntaxException {
-        assertEquals(0, recipesRepository.getRecipes("tomato sauce").size());
+        assertEquals(0, recipesRepository.getRecipes(1, "tomato sauce").size());
     }
 
 
