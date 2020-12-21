@@ -14,6 +14,7 @@ CREATE TABLE recipe
  name VARCHAR(255),
  description VARCHAR(255),
  image VARCHAR(255),
+ date DATE,
  user_id INTEGER,
  PRIMARY KEY ( id ),
  CONSTRAINT USER_ID_FK FOREIGN KEY (user_id)
@@ -45,10 +46,10 @@ INSERT INTO user (name, email, password, role) VALUES ('Omar', 'omar@gmail.com',
 INSERT INTO user (name, email, password, role) VALUES ('Raneem', 'raneem@gmail.com', '1234', 'user');
 
 
-INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 1', 'recipe 1 desc', 'recipe 1 image', 1);
-INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 2', 'recipe 2 desc', 'recipe 2 image', 1);
-INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 3', 'recipe 3 desc', 'recipe 3 image', 2);
-INSERT INTO recipe (name, description, image, user_id) VALUES ('recipe 4', 'recipe 4 desc', 'recipe 4 image', 3);
+INSERT INTO recipe (name, description, image, date, user_id) VALUES ('recipe 1', 'recipe 1 desc', 'recipe 1 image', '2020-02-01', 1);
+INSERT INTO recipe (name, description, image, date, user_id) VALUES ('recipe 2', 'recipe 2 desc', 'recipe 2 image', '2020-03-06', 1);
+INSERT INTO recipe (name, description, image, date, user_id) VALUES ('recipe 3', 'recipe 3 desc', 'recipe 3 image', '2020-05-20', 2);
+INSERT INTO recipe (name, description, image, date, user_id) VALUES ('recipe 4', 'recipe 4 desc', 'recipe 4 image', '2020-07-29', 3);
 
 
 INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES ('onion', 2, 1);
