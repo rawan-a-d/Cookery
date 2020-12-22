@@ -604,13 +604,13 @@ public class RecipesRepository {
         List<RecipeDTO> recipes = new ArrayList<>();
 
         String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
-                "       user.id AS userId, user.name AS userName, " +
-                "       ufr.id " +
-                "FROM  user_favourite_recipe AS ufr " +
-                "INNER JOIN recipe ON recipe.id = ufr.recipe_id " +
-                "INNER JOIN USER ON recipe.user_id = user.id " +
-                "AND ufr.user_id = ? " +
-                "ORDER BY recipe.id";
+                        "user.id AS userId, user.name AS userName, " +
+                        "ufr.id AS favouriteId " +
+                        "FROM  user_favourite_recipe AS ufr " +
+                        "INNER JOIN recipe ON recipe.id = ufr.recipe_id " +
+                        "INNER JOIN USER ON recipe.user_id = user.id " +
+                        "AND ufr.user_id = ? " +
+                        "ORDER BY recipe.id";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -624,10 +624,11 @@ public class RecipesRepository {
                 String image = resultSet.getString("recipeImage");
                 String userName = resultSet.getString("userName");
                 int creatorId = resultSet.getInt("userId");
+                int favouriteId = resultSet.getInt("favouriteId");
 
                 User user = new User(creatorId, userName);
 
-                RecipeDTO recipe = new RecipeDTO(id, name, image, user);
+                RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId);
 
                 recipes.add(recipe);
             }
