@@ -1,64 +1,34 @@
 package service.model;
 
+import java.beans.ConstructorProperties;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class User {
     private int id;
-    private static int idSeeder = 0;
     private String name;
     private String email;
     private String password;
     private Role role;
 
-    public User() {
-        this.id = idSeeder;
-        idSeeder++;
-    }
+    public User() { }
 
-    public User(int id, String name, Role role) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
-    }
-
+    @ConstructorProperties({"name", "email", "password"})
     public User(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
+        this.setName(name);
+        this.setEmail(email);
+        this.setPassword(password);
         this.role = Role.user;
-        this.id = idSeeder;
-        idSeeder++;
-    }
-
-    public User(String name, String email, String password, Role role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    public User(int id, String name) {
-        this.name = name;
-        this.id = id;
-    }
-
-
-    public User(int id, String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = Role.user;
-        this.id = id;
     }
 
     public User(int id, String name, String email, String password, Role role) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.id = id;
     }
-
 
     public int getId() {
         return id;
@@ -73,7 +43,14 @@ public class User {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if(name.length() >= 4) {
+            this.name = name;
+        }
+        else {
+            System.out.println("Invalid name");
+
+            throw new IllegalStateException("Name is invalid");
+        }
     }
 
     public String getEmail() {
@@ -81,7 +58,19 @@ public class User {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        String regex = "^[a-zA-Z0-9_!#$%&�*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(email);
+
+        if(matcher.matches()) {
+            this.email = email;
+        }
+        else {
+            System.out.println("Invalid email");
+            throw new IllegalStateException("Email is invalid");
+        }
     }
 
     public String getPassword() {
@@ -89,20 +78,31 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
-    }
+        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
 
-    public Role getRole() {
-        return role;
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(password);
+
+        if(matcher.matches()) {
+            System.out.println("Correct pass");
+            this.password = password;
+        }
+        else {
+            System.out.println("Incorrect pass");
+
+            throw new IllegalStateException("Password is invalid");
+        }
     }
 
     public void setRole(Role role) {
         this.role = role;
     }
 
-    public static void decreaseIdSeeder() {
-        idSeeder--;
+    public Role getRole() {
+        return role;
     }
+
 
     @Override
     public String toString() {

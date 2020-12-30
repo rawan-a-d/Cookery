@@ -1,7 +1,7 @@
 package service.repository;
 
+import service.model.DTO.UserDTO;
 import service.model.Role;
-import service.model.User;
 
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -16,7 +16,7 @@ public class AuthRepository {
         this.jdbcRepository = new JDBCRepository();
     }
 
-    public User authenticate(String email, String password) throws CookeryDatabaseException, URISyntaxException {
+    public UserDTO authenticate(String email, String password) throws CookeryDatabaseException, URISyntaxException {
         String sql = "SELECT * FROM user WHERE email = ? AND password = ?";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -34,12 +34,11 @@ public class AuthRepository {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String userEmail = resultSet.getString("email");
-                String userPassword = resultSet.getString("password");
                 Role role = Role.valueOf(resultSet.getString("role"));
 
                 connection.close();
 
-                return new User(id, name, userEmail, userPassword, role);
+                return new UserDTO(id, name, userEmail, role);
             }
         }
         catch (SQLException throwable) {

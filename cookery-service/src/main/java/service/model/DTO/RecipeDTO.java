@@ -1,15 +1,12 @@
 package service.model.DTO;
 
-import service.model.User;
-
 import java.util.Objects;
 
 public class RecipeDTO {
     private int id;
-    private static int idSeeder = 0;
     private String name;
     private String image;
-    private User user;
+    private UserDTO user;
     private int favouriteId;
     private boolean isFavourite;
 
@@ -17,19 +14,19 @@ public class RecipeDTO {
     }
 
 
-    public RecipeDTO(int id, User user) {
+    public RecipeDTO(int id, UserDTO user) {
         this.id = id;
         this.user = user;
     }
 
-    public RecipeDTO(int id, String name, String image, User user) {
+    public RecipeDTO(int id, String name, String image, UserDTO user) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.user = user;
     }
 
-    public RecipeDTO(int id, String name, String image, User user, int favouriteId) {
+    public RecipeDTO(int id, String name, String image, UserDTO user, int favouriteId) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -37,7 +34,7 @@ public class RecipeDTO {
         this.favouriteId = favouriteId;
     }
 
-    public RecipeDTO(int id, String name, String image, User user, int favouriteId, boolean isFavourite) {
+    public RecipeDTO(int id, String name, String image, UserDTO user, int favouriteId, boolean isFavourite) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -52,14 +49,6 @@ public class RecipeDTO {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public static int getIdSeeder() {
-        return idSeeder;
-    }
-
-    public static void setIdSeeder(int idSeeder) {
-        RecipeDTO.idSeeder = idSeeder;
     }
 
     public String getName() {
@@ -78,11 +67,11 @@ public class RecipeDTO {
         this.image = image;
     }
 
-    public User getUser() {
+    public UserDTO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDTO user) {
         this.user = user;
     }
 

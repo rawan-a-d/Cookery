@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.AuthController;
+import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
 import service.repository.AuthRepository;
@@ -23,7 +24,6 @@ import java.security.Key;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -41,24 +41,26 @@ public class AuthControllerTest {
     @Test
     public void authenticate() throws URISyntaxException, CookeryDatabaseException {
         when(authRepository.authenticate("rawan@gmail.com", "1234")).thenReturn(
-                new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin)
+                new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin)
         );
 
-        User actualUser = authController.authenticate("rawan@gmail.com", "1234");
+        UserDTO actualUser = authController.authenticate("rawan@gmail.com", "1234");
 
-        assertEquals(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin), actualUser);
+        assertEquals(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin), actualUser);
     }
 
 
     @Test
     public void register() throws URISyntaxException, CookeryDatabaseException {
-        User newUser = new User("Denys", "denys@gmail.com", "1234");
+        User newUser = new User("Denys Johnson", "denys@gmail.com", "Qw1234576@");
 
-        when(usersRepository.createUser(newUser)).thenReturn(true);
+        UserDTO expectedUser = new UserDTO(5, "Denys Johnson", "denys@gmail.com", Role.user);
 
-        boolean result = authController.register(newUser);
+        when(usersRepository.createUser(newUser)).thenReturn(expectedUser);
 
-        assertTrue(result);
+        UserDTO user = authController.register(newUser);
+
+        assertEquals(expectedUser, user);
     }
 
 

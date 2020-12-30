@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.AuthController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.UserDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.Role;
@@ -74,26 +75,26 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void getUsers() {
-        List<User> expectedUsers = Arrays.asList(
-                new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin),
-                new User(2, "Anas", "anas@gmail.com", "1234", Role.user),
-                new User(3, "Omar", "omar@gmail.com", "1234", Role.admin),
-                new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user)
+        List<UserDTO> expectedUsers = Arrays.asList(
+                new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin),
+                new UserDTO(2, "Anas", "anas@gmail.com", Role.user),
+                new UserDTO(3, "Omar", "omar@gmail.com", Role.admin),
+                new UserDTO(4, "Raneem", "raneem@gmail.com", Role.user)
         );
 
-        final List<User> actualUsers =  target("users").request().get(new GenericType<List<User>>(){});
+        final List<UserDTO> actualUsers =  target("users").request().get(new GenericType<List<UserDTO>>(){});
         assertEquals(expectedUsers, actualUsers);
     }
 
 
     @Test
     public void getUser() {
-        User expectedUser = new User(2, "Anas", "anas@gmail.com", "1234", Role.user);
+        UserDTO expectedUser = new UserDTO(2, "Anas", "anas@gmail.com", Role.user);
 
         Response response = target("users/2").request().get();
 
         assertEquals("Http Response should be 200: ", Response.Status.OK.getStatusCode(), response.getStatus());
-        assertEquals(expectedUser, response.readEntity(User.class));
+        assertEquals(expectedUser, response.readEntity(UserDTO.class));
     }
 
 
@@ -106,7 +107,7 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void addUser() {
-        User newUser = new User("Denys", "denys@gmail.com", "1234", Role.user);
+        User newUser = new User("Denys", "denys@gmail.com", "Qw1234576@");
 
         Entity<User> userEntity = Entity.entity(newUser, MediaType.APPLICATION_JSON);
         Response response = target("users").request().post(userEntity);
@@ -125,7 +126,7 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void updateUser(){
-        User updatedUser = new User(1, "Rawan", "rawan.ad@gmail.com", "1234", Role.admin);
+        User updatedUser = new User(1, "Rawan", "rawan.ad@gmail.com", "Qw1234576@", Role.admin);
 
         Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
         Response response = target("users/1").request().put(userEntity);
@@ -136,7 +137,7 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void updateUser_invalidId(){
-        User updatedUser = new User(5, "denys", "denys@gmail.com", "1234", Role.user);
+        User updatedUser = new User(5, "denys", "denys@gmail.com", "Qw1234576@", Role.user);
 
         Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
         Response response = target("users/5").request().put(userEntity);
@@ -147,7 +148,7 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void getUserRecipes() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
         List<Recipe> expectedRecipes =  Arrays.asList(
                 new Recipe(1, "recipe 1", "recipe 1 image", "recipe 1 desc",
                         Arrays.asList(
@@ -184,8 +185,8 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void addFavourite() {
-        String token = AuthController.generateAuthToken(new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user));
-        RecipeDTO recipe = new RecipeDTO(4, new User(4, "Raneem"));
+        String token = AuthController.generateAuthToken(new UserDTO(4, "Raneem", "raneem@gmail.com", Role.user));
+        RecipeDTO recipe = new RecipeDTO(4, new UserDTO(4, "Raneem"));
 
         Entity<RecipeDTO> recipeEntity = Entity.entity(recipe, MediaType.APPLICATION_JSON);
         Response response = target("users/4/favourites")
@@ -199,8 +200,8 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void addFavourite_alreadyFavourite_conflict() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
-        RecipeDTO recipe = new RecipeDTO(6, new User(1, "Rawan"));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+        RecipeDTO recipe = new RecipeDTO(6, new UserDTO(1, "Rawan"));
 
         Entity<RecipeDTO> recipeEntity = Entity.entity(recipe, MediaType.APPLICATION_JSON);
         Response response = target("users/1/favourites")
@@ -222,12 +223,12 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void getFavouritesDTO() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(2, "recipe 2", "recipe 2 image",
-                        new User(1, "Rawan")),
+                        new UserDTO(1, "Rawan"), 1, true),
                 new RecipeDTO(3, "recipe 3", "recipe 3 image",
-                        new User(2, "Anas"))
+                        new UserDTO(2, "Anas"), 2, true)
         );
 
         Response response = target("users/1/favourites")

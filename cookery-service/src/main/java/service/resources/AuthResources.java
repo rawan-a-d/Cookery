@@ -3,6 +3,7 @@ package service.resources;
 import service.controller.AuthController;
 import service.controller.UsersController;
 import service.model.Credentials;
+import service.model.DTO.UserDTO;
 import service.model.User;
 
 import javax.annotation.security.PermitAll;
@@ -25,10 +26,13 @@ public class AuthResources {
     @PermitAll
     @Produces(MediaType.TEXT_PLAIN)
     public Response authenticate(Credentials credentials) {
-        User user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
+        System.out.println(credentials);
+        UserDTO user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
             String token = AuthController.generateAuthToken(user);
+
+            System.out.println("Token " + token);
 
             return Response.ok(token).build();
         }
@@ -45,10 +49,13 @@ public class AuthResources {
     @Path("register")
     @Produces(MediaType.TEXT_PLAIN)
     public Response register(User user) {
-        boolean result = usersController.createUser(user);
+        System.out.println("USER "+ user);
+//        ValidationUtils.<User>validate(user);
 
-        if(result) {
-            String token = AuthController.generateAuthToken(user);
+        UserDTO userDTO = usersController.createUser(user);
+
+        if(userDTO != null) {
+            String token = AuthController.generateAuthToken(userDTO);
 
             return Response.ok(token).build();
         }

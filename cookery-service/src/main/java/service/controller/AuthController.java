@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
 import service.repository.AuthRepository;
@@ -25,31 +26,32 @@ public class AuthController {
     UsersRepository usersRepository = new UsersRepository();
 
     /*---------------------------------------------------------------- Authenticate ----------------------------------------------------------------------*/
-    public User authenticate(String email, String password) {
-        User user = null;
+    public UserDTO authenticate(String email, String password) {
+        UserDTO userDTO = null;
         try {
-            user = authRepository.authenticate(email, password);
+            userDTO = authRepository.authenticate(email, password);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
 
-        return user;
+        return userDTO;
     }
 
-    public boolean register(User user) {
+    public UserDTO register(User user) {
+        UserDTO userDTO = null;
         try {
-            return usersRepository.createUser(user);
+            userDTO = usersRepository.createUser(user);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return false;
         }
+        return userDTO;
     }
 
 
 
-    public static String generateAuthToken(User user) {
+    public static String generateAuthToken(UserDTO user) {
         //The JWT signature algorithm we will be using to sign the token
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -93,7 +95,7 @@ public class AuthController {
         return Integer.parseInt(decodedToken.get("sub").toString());
     }
 
-    public static User getUser(String auth) {
+    public static UserDTO getUser(String auth) {
         String authenticationScheme = "Bearer"; // the scheme (value starts with Basic)
         String encodedCredentials = auth.replaceFirst(authenticationScheme + " ", ""); // remove scheme (Basic) and space
         Claims decodedToken = AuthController.decodeJWT(encodedCredentials);
@@ -102,7 +104,7 @@ public class AuthController {
         String name = decodedToken.get("name").toString();
         Role role = Boolean.parseBoolean(decodedToken.get("admin").toString()) ? Role.admin : Role.user;
 
-        User user = new User(id, name, role);
+        UserDTO user = new UserDTO(id, name, role);
         return user;
     }
 }

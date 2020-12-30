@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
@@ -57,27 +58,25 @@ public class UsersRepositoryTest {
 
     @Test
     public void getUsers() throws CookeryDatabaseException, SQLException, ClassNotFoundException, URISyntaxException {
-        List<User> users = usersRepository.getUsers();
+        List<UserDTO> users = usersRepository.getUsers();
 
-        List<User> actualUsers = Arrays.asList(
-                new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin),
-                new User(2, "Anas", "anas@gmail.com", "1234", Role.user),
-                new User(3, "Omar", "omar@gmail.com", "1234", Role.admin),
-                new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user)
+        List<UserDTO> actualUsers = Arrays.asList(
+                new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin),
+                new UserDTO(2, "Anas", "anas@gmail.com", Role.user),
+                new UserDTO(3, "Omar", "omar@gmail.com", Role.admin),
+                new UserDTO(4, "Raneem", "raneem@gmail.com", Role.user)
         );
 
         assertEquals(4, users.size());
-
-        
 
         assertArrayEquals(users.toArray(), actualUsers.toArray()); // in order to use this (equals need to be implemented in User)
     }
 
     @Test
     public void getUser() throws CookeryDatabaseException, URISyntaxException {
-        User expectedUser = new User(1,"Rawan", "rawan@gmail.com", "1234", Role.admin);
+        UserDTO expectedUser = new UserDTO(1,"Rawan", "rawan@gmail.com", Role.admin);
 
-        User actualUser = usersRepository.getUser(1);
+        UserDTO actualUser = usersRepository.getUser(1);
 
         assertEquals(expectedUser, actualUser);
     }
@@ -93,9 +92,11 @@ public class UsersRepositoryTest {
 
     @Test
     public void createUser() throws CookeryDatabaseException, URISyntaxException {
-        boolean result = usersRepository.createUser(new User("Beatrice", "beatrice@gmail.com", "1234"));
+        UserDTO expectedUser = new UserDTO(5, "Beatrice", "beatrice@gmail.com", Role.user);
 
-        assertTrue(result);
+        UserDTO actualUser = usersRepository.createUser(new User("Beatrice", "beatrice@gmail.com", "Tr1234587@"));
+
+        assertEquals(expectedUser, actualUser);
     }
 
 
@@ -119,7 +120,7 @@ public class UsersRepositoryTest {
     @Test
     public void updateUser_invalidId_throwsException() {
         assertThrows(CookeryDatabaseException.class, () -> {
-            usersRepository.updateUser(6, new User("Beatrice", "beatrice@gmail.com", "1234"));
+            usersRepository.updateUser(6, new User("Beatrice", "beatrice@gmail.com", "Tr1234587@"));
         });
     }
 

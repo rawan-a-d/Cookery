@@ -4,6 +4,7 @@ import service.controller.AuthController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.UserDTO;
 import service.model.Recipe;
 import service.model.User;
 
@@ -31,9 +32,9 @@ public class UsersResources {
 //    @RolesAllowed({"admin"})
     @PermitAll
     public Response getAllUsers(){
-        List<User> users = usersController.getUsers();
+        List<UserDTO> users = usersController.getUsers();
 
-        GenericEntity<List<User>> entity = new GenericEntity<List<User>>(users){ };
+        GenericEntity<List<UserDTO>> entity = new GenericEntity<List<UserDTO>>(users){ };
         return Response.ok(entity).build();
     }
 
@@ -43,7 +44,7 @@ public class UsersResources {
 //    @RolesAllowed({"user", "admin"})
     @PermitAll
     public Response getUser(@PathParam("id") int id){
-        User user = usersController.getUser(id);
+        UserDTO user = usersController.getUser(id);
 
         if(user != null){
             return Response.ok(user).build(); // Status ok 200, return user
@@ -58,9 +59,9 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"})
     public Response addUser(User user){
-        boolean result = usersController.createUser(user);
+        UserDTO userDTO = usersController.createUser(user);
 
-        if(result){ // Successful
+        if(userDTO != null){ // Successful
             String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
             URI uri = URI.create(url);
             return Response.created(uri).build();
@@ -119,7 +120,7 @@ public class UsersResources {
         boolean result = recipesController.addFavourite(userId, favourite);
 
         if(result){ // Successful
-            String url = uriInfo.getAbsolutePath() + "/" + favourite.getId();// url of the created user
+            String url = uriInfo.getAbsolutePath() + "/" + favourite.getId();// url of the created favourite
             URI uri = URI.create(url);
             return Response.created(uri).build();
         }
@@ -138,7 +139,7 @@ public class UsersResources {
         return Response.noContent().build();
     }
 
-    @GET //GET at http://localhost:XXXX/users
+    @GET //GET at http://localhost:XXXX/users/1/favourites
     @Path("{id}/favourites")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"})
@@ -153,7 +154,38 @@ public class UsersResources {
 
 
 
+    @POST //GET at http://localhost:XXXX/users/1/followers
+    @Path("{id}/followers")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"user", "admin"})
+    public Response follow(@HeaderParam("Authorization") String auth, UserDTO followee){
+        int userId = authController.getIdInToken(auth); // id in token
 
+        int followId = usersController.follow(userId, followee);
 
+        if(followId > 0){ // Successful
+            String url = uriInfo.getAbsolutePath() + "/" + followId;// url of the created follow
+            URI uri = URI.create(url);
+            return Response.created(uri).build();
+        }
+        else {
+            String entity = "User with id " + userId + " already followed user with id " + followee.getId();
+            return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
+        }
+    }
+
+    @DELETE
+    @Path("{id}/followers/{followId}")
+    @RolesAllowed({"user", "admin"})
+    public Response unFollow(@HeaderParam("Authorization") String auth, @PathParam("id") int id, @PathParam("followId") int followId) {
+        int userId = authController.getIdInToken(auth); // id in token
+
+        System.out.println("follower id " + userId);
+        System.out.println("follow id " + followId);
+
+        usersController.unFollow(userId, followId);
+
+        return Response.noContent().build();
+    }
 
 }

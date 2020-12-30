@@ -3,6 +3,7 @@ package service.controller;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+import service.model.DTO.UserDTO;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
@@ -18,8 +19,8 @@ public class UsersController {
     UsersRepository usersRepository = new UsersRepository();
 
     //	------------------------------------------------------------------------ Users ------------------------------------------------------------------------------
-    public List<User> getUsers() {
-        List<User> users;
+    public List<UserDTO> getUsers() {
+        List<UserDTO> users;
         try {
             users = usersRepository.getUsers();
             return users;
@@ -37,8 +38,8 @@ public class UsersController {
     }
 
 
-    public User getUser(int id) {
-        User user;
+    public UserDTO getUser(int id) {
+        UserDTO user;
 
         try {
             user = usersRepository.getUser(id);
@@ -51,14 +52,16 @@ public class UsersController {
     }
 
 
-    public boolean createUser(User user) {
+    public UserDTO createUser(User user) {
+        UserDTO userDTO = null;
         try {
-            return usersRepository.createUser(user);
+            userDTO = usersRepository.createUser(user);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-            return false;
         }
+
+        return userDTO;
     }
 
 
@@ -104,4 +107,31 @@ public class UsersController {
 //
 //		return isOwner;
 //	}
+
+    // 	public boolean follow(int followerId, UserDTO followee) throws CookeryDatabaseException { // could be current user id, followee object (User)
+    public int follow(int followerId, UserDTO followee) {
+        int result = -1;
+        try {
+            result = usersRepository.follow(followerId, followee);
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+
+        return result;
+    }
+
+
+
+    public boolean unFollow(int followerId, int followId) {
+        boolean result = false;
+        try {
+            result = usersRepository.unFollow(followerId, followId);
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+
+        return result;
+    }
 }

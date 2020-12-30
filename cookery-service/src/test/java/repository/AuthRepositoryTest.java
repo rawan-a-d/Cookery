@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import service.model.DTO.UserDTO;
 import service.model.Role;
-import service.model.User;
 import service.repository.AuthRepository;
 import service.repository.CookeryDatabaseException;
 
@@ -42,9 +42,9 @@ public class AuthRepositoryTest {
 
     @Test
     public void authenticate() throws URISyntaxException, CookeryDatabaseException {
-        User expectedUser = new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin);
+        UserDTO expectedUser = new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin);
 
-        User actualUser = authRepository.authenticate("rawan@gmail.com", "1234");
+        UserDTO actualUser = authRepository.authenticate("rawan@gmail.com", "1234");
 
         assertEquals(expectedUser, actualUser);
     }

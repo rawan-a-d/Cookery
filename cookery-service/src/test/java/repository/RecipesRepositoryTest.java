@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.UserDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
-import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
 
@@ -73,8 +73,8 @@ public class RecipesRepositoryTest {
     @Test
     public void getRecipesByIngredient() throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> expectedRecipes = Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
 
         List<RecipeDTO> actualRecipes = recipesRepository.getRecipes(-1, "onion");
@@ -124,13 +124,13 @@ public class RecipesRepositoryTest {
     public void getRecipesDTO() throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(1, "recipe 1", "recipe 1 image",
-                        new User(1, "Rawan")),
+                        new UserDTO(1, "Rawan")),
                 new RecipeDTO(2, "recipe 2", "recipe 2 image",
-                        new User(1, "Rawan"), 1, true),
+                        new UserDTO(1, "Rawan"), 1, true),
                 new RecipeDTO(3, "recipe 3", "recipe 3 image",
-                        new User(2, "Anas"), 2, true),
+                        new UserDTO(2, "Anas"), 2, true),
                 new RecipeDTO(4, "recipe 4", "recipe 4 image",
-                        new User(3, "Omar"))
+                        new UserDTO(3, "Omar"))
         );
 
         List<RecipeDTO> actualRecipes = recipesRepository.getRecipesDTO(1);
@@ -143,13 +143,13 @@ public class RecipesRepositoryTest {
     public void getRecipesDTO_invalidId_returnsAll() throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(1, "recipe 1", "recipe 1 image",
-                        new User(1, "Rawan")),
+                        new UserDTO(1, "Rawan")),
                 new RecipeDTO(2, "recipe 2", "recipe 2 image",
-                        new User(1, "Rawan")),
+                        new UserDTO(1, "Rawan")),
                 new RecipeDTO(3, "recipe 3", "recipe 3 image",
-                        new User(2, "Anas")),
+                        new UserDTO(2, "Anas")),
                 new RecipeDTO(4, "recipe 4", "recipe 4 image",
-                        new User(3, "Omar"))
+                        new UserDTO(3, "Omar"))
         );
 
         List<RecipeDTO> actualRecipes = recipesRepository.getRecipesDTO(-1);
@@ -243,9 +243,9 @@ public class RecipesRepositoryTest {
     public void getFavouritesDTO() throws Exception {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
                 new RecipeDTO(2, "recipe 2", "recipe 2 image",
-                        new User(1, "Rawan")),
+                        new UserDTO(1, "Rawan"), 1, true),
                 new RecipeDTO(3, "recipe 3", "recipe 3 image",
-                        new User(2, "Anas"))
+                        new UserDTO(2, "Anas"), 2, true)
         );
 
         List<RecipeDTO> actualRecipes = recipesRepository.getFavouritesDTO(1);
@@ -257,7 +257,7 @@ public class RecipesRepositoryTest {
 
     @Test
     public void addFavourite() throws CookeryDatabaseException, SQLException, URISyntaxException {
-        RecipeDTO recipe = new RecipeDTO(4, new User(4, "Raneem"));
+        RecipeDTO recipe = new RecipeDTO(4, new UserDTO(4, "Raneem"));
 
         boolean result = recipesRepository.addFavourite(4, recipe);
 
@@ -267,7 +267,7 @@ public class RecipesRepositoryTest {
 
     @Test
     public void addFavourite_invalidData_throwsException() throws CookeryDatabaseException {
-        RecipeDTO recipe = new RecipeDTO(6, new User(6, "Don't exist"));
+        RecipeDTO recipe = new RecipeDTO(6, new UserDTO(6, "Don't exist"));
 
         assertThrows(CookeryDatabaseException.class, () -> {
             recipesRepository.addFavourite(6, recipe);
@@ -277,7 +277,7 @@ public class RecipesRepositoryTest {
 
     @Test
     public void addFavourite_alreadyFavourite_throwsException() {
-        RecipeDTO recipe = new RecipeDTO(2, new User(1, "Rawan"));
+        RecipeDTO recipe = new RecipeDTO(2, new UserDTO(1, "Rawan"));
 
         assertThrows(CookeryDatabaseException.class, () -> {
             recipesRepository.addFavourite(1, recipe);

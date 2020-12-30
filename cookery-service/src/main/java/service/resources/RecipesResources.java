@@ -4,16 +4,16 @@ import service.controller.AuthController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.RecipeFollowDTO;
+import service.model.DTO.UserDTO;
 import service.model.Recipe;
 import service.model.Role;
-import service.model.User;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/recipes")
@@ -23,19 +23,20 @@ public class RecipesResources {
 	private UriInfo uriInfo;
 
 	private final RecipesController recipesController = new RecipesController();
-//	private final AuthController authController = new AuthController();
 
 	@GET //GET at http://localhost:XXXX/recipes?ingredient=onion OR http://localhost:XXXX/recipes
 	@PermitAll
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRecipesByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
-		List<RecipeDTO> recipes = new ArrayList<>();
+		System.out.println("request");
+		List<RecipeDTO> recipes;
+		System.out.println("after list");
 
-		System.out.println("GET Recipes route");
+		System.out.println("auth " + auth);
 		int userId = -1;
 
-		if(auth != null) { // auth exists
-			System.out.println("Found auth");
+		if(auth != null && auth != ("Bearer " + null)) { // auth exists
+			System.out.println("AUTH exists");
 			userId = AuthController.getIdInToken(auth);
 		}
 
@@ -44,6 +45,7 @@ public class RecipesResources {
 			recipes = recipesController.getRecipesDTO(userId);
 		}
 		else {
+			System.out.println("some");
 			recipes = recipesController.getRecipes(userId, ingredient);
 		}
 
@@ -54,11 +56,31 @@ public class RecipesResources {
 	}
 
 	@GET //GET at http://localhost:XXXX/recipes/1
-	@Path("{id}")
+	@Path("v1/{id}")
 	@PermitAll
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRecipe(@PathParam("id") int id) {
+		System.out.println("V1");
 		Recipe recipe = recipesController.getRecipe(id);
+		if(recipe != null){
+			return Response.ok(recipe).build();
+		}
+		else {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Please provide a valid recipe id").build();
+		}
+	}
+
+
+	@GET //GET at http://localhost:XXXX/recipes/1
+	@Path("v2/{id}")
+	@PermitAll
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRecipeFollow(@PathParam("id") int id, @HeaderParam("Authorization") String auth) {
+		System.out.println("V2");
+		UserDTO user = AuthController.getUser(auth); // user in token
+
+		RecipeFollowDTO recipe = recipesController.getRecipeFollow(id, user.getId());
+		System.out.println("Found recipe " + recipe);
 		if(recipe != null){
 			return Response.ok(recipe).build();
 		}
@@ -84,7 +106,7 @@ public class RecipesResources {
 	@Path("{id}")
 	@RolesAllowed({"user", "admin"})
 	public Response updateRecipe(@PathParam("id") int id, Recipe recipe, @HeaderParam("Authorization") String auth){
-		User user = AuthController.getUser(auth); // user in token
+		UserDTO user = AuthController.getUser(auth); // user in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
 		if(user.getId() != ownerId && user.getRole() != Role.valueOf("admin")) {
@@ -105,7 +127,7 @@ public class RecipesResources {
 	@Path("{id}")
 	@RolesAllowed({"user", "admin"})
 	public Response deleteRecipe(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-		User user = AuthController.getUser(auth); // user in token
+		UserDTO user = AuthController.getUser(auth); // user in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
 		if(user.getId() != ownerId && user.getRole() != Role.valueOf("admin")) {

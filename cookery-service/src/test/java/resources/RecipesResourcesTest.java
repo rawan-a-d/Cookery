@@ -13,10 +13,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.AuthController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.UserDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.Role;
-import service.model.User;
 import service.repository.JDBCRepository;
 import service.resources.RecipesResources;
 
@@ -72,10 +72,10 @@ public class RecipesResourcesTest extends JerseyTest {
     @Test
     public void getRecipes() {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan")),
-                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas")),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new UserDTO(2, "Anas")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
         Response response = target("recipes").request().get();
 
@@ -86,13 +86,13 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void getRecipes_loggedInUser_ReturnsRecipesWithFavourites() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
 
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan"), 1, true),
-                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas"), 2, true),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new UserDTO(1, "Rawan"), 1, true),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new UserDTO(2, "Anas"), 2, true),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
         Response response = target("recipes")
                 .request()
@@ -107,10 +107,10 @@ public class RecipesResourcesTest extends JerseyTest {
     @Test
     public void getRecipes_allIngredients() {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan")),
-                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas")),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new UserDTO(2, "Anas")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
         Response response = target("recipes").queryParam("ingredient", "all").request().get();
 
@@ -121,12 +121,12 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void getRecipes_allIngredients_loggedInUser() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(2, "recipe 2", "recipe 2 image", new User(1, "Rawan"), 1, true),
-                new RecipeDTO(3, "recipe 3", "recipe 3 image", new User(2, "Anas"), 2, true),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(2, "recipe 2", "recipe 2 image", new UserDTO(1, "Rawan"), 1, true),
+                new RecipeDTO(3, "recipe 3", "recipe 3 image", new UserDTO(2, "Anas"), 2, true),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
 
         Response response = target("recipes")
@@ -143,8 +143,8 @@ public class RecipesResourcesTest extends JerseyTest {
     @Test
     public void getRecipes_specificIngredient() {
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
 
         Response response = target("recipes").queryParam("ingredient", "onion").request().get();
@@ -155,10 +155,10 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void getRecipes_specificIngredient_loggedInUser() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
         List<RecipeDTO> expectedRecipes =  Arrays.asList(
-                new RecipeDTO(1, "recipe 1", "recipe 1 image", new User(1, "Rawan")),
-                new RecipeDTO(4, "recipe 4", "recipe 4 image", new User(3, "Omar"))
+                new RecipeDTO(1, "recipe 1", "recipe 1 image", new UserDTO(1, "Rawan")),
+                new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
 
         Response response = target("recipes")
@@ -187,7 +187,7 @@ public class RecipesResourcesTest extends JerseyTest {
                                 new Ingredient(2, "garlic", 1)
                         ), 1);
 
-        Response response = target("recipes/1").request().get();
+        Response response = target("recipes/v1/1").request().get();
 
         assertEquals(expectedRecipe, response.readEntity(Recipe.class));
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -196,7 +196,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void getRecipe_invalidId_badRequest() {
-        Response response = target("recipes/6").request().get();
+        Response response = target("/recipes/v1/6").request().get();
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -219,7 +219,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void updateRecipe() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
 
         Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
                 Arrays.asList(
@@ -240,7 +240,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void updateRecipe_notOwner_forbidden() {
-        String token = AuthController.generateAuthToken(new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user));
+        String token = AuthController.generateAuthToken(new UserDTO(4, "Raneem", "raneem@gmail.com", Role.user));
 
         Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
                 Arrays.asList(
@@ -261,7 +261,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void updateRecipe_invalidId_forbidden() {
-        String token = AuthController.generateAuthToken(new User(4, "Ranim", "ranim@gmail.com", "1234", Role.user));
+        String token = AuthController.generateAuthToken(new UserDTO(4, "Ranim", "ranim@gmail.com", Role.user));
 
         Recipe updatedRecipe = new Recipe(1, "recipe 1", "recipe 1 image new", "recipe 1 desc",
                 Arrays.asList(
@@ -282,7 +282,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void deleteRecipe() {
-        String token = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
 
         Response response = target("recipes/1")
                             .request()
@@ -295,7 +295,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
     @Test
     public void deleteRecipe_notOwner_forbidden() {
-        String token = AuthController.generateAuthToken(new User(4, "Raneem", "raneem@gmail.com", "1234", Role.user));
+        String token = AuthController.generateAuthToken(new UserDTO(4, "Raneem", "raneem@gmail.com", Role.user));
 
         Response response = target("recipes/1")
                 .request()

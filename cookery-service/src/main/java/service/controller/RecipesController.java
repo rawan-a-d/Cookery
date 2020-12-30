@@ -1,6 +1,7 @@
 package service.controller;
 
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.RecipeFollowDTO;
 import service.model.Recipe;
 import service.repository.CookeryDatabaseException;
 import service.repository.RecipesRepository;
@@ -29,12 +30,22 @@ public class RecipesController {
     }
 
     public Recipe getRecipe(int id) {
-
         Recipe recipe = null;
         try {
             recipe = recipesRepository.getRecipe(id);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+        return recipe;
+    }
+
+    public RecipeFollowDTO getRecipeFollow(int recipeId, int userId) {
+        RecipeFollowDTO recipe = null;
+        try {
+            recipe = recipesRepository.getRecipeFollow(recipeId, userId);
+        }
+        catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
         }
         return recipe;
@@ -52,6 +63,7 @@ public class RecipesController {
     }
 
 
+    // ???????????????????????????????????????????????????
     public List<RecipeDTO> getRecipes(int userId, String ingredient) {
         List<RecipeDTO> recipes = null;
         try {
@@ -61,6 +73,18 @@ public class RecipesController {
             LOGGER.info(ex.getMessage()); // Compliant
         }
         return recipes;
+    }
+
+    public List<RecipeDTO> getRecipesDTO(int userId) {
+        List<RecipeDTO> recipes;
+        try {
+            recipes = recipesRepository.getRecipesDTO(userId);
+            return recipes;
+        }
+        catch (CookeryDatabaseException | URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
+        }
     }
 
 
@@ -122,19 +146,6 @@ public class RecipesController {
         }
 
         return result;
-    }
-
-    public List<RecipeDTO> getRecipesDTO(int userId) {
-
-        List<RecipeDTO> recipes;
-        try {
-            recipes = recipesRepository.getRecipesDTO(userId);
-            return recipes;
-        }
-        catch (CookeryDatabaseException | URISyntaxException ex) {
-            LOGGER.info(ex.getMessage()); // Compliant
-            return null;
-        }
     }
 
 

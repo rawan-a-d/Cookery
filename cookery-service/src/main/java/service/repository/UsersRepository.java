@@ -1,6 +1,7 @@
 package service.repository;
 
 
+import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
 
@@ -18,8 +19,8 @@ public class UsersRepository extends JDBCRepository{
 		this.jdbcRepository = new JDBCRepository();
 	}
 
-	public List<User> getUsers() throws CookeryDatabaseException, URISyntaxException {
-		List<User> users = new ArrayList<>();
+	public List<UserDTO> getUsers() throws CookeryDatabaseException, URISyntaxException {
+		List<UserDTO> users = new ArrayList<>();
 
 		String sql = "SELECT * FROM user";
 
@@ -35,7 +36,7 @@ public class UsersRepository extends JDBCRepository{
 				Role role = Role.valueOf(resultSet.getString("role"));
 
 
-				User user = new User(id, name, email, password, role);
+				UserDTO user = new UserDTO(id, name, email, role);
 				users.add(user);
 			}
 
@@ -47,7 +48,7 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 
-	public User getUser(int id) throws CookeryDatabaseException, URISyntaxException {
+	public UserDTO getUser(int id) throws CookeryDatabaseException, URISyntaxException {
 		System.out.println("DATA BASE");
 
 		System.out.println(jdbcRepository.getDatabaseConnection());
@@ -67,7 +68,7 @@ public class UsersRepository extends JDBCRepository{
 				String password = resultSet.getString("password");
 				Role role = Role.valueOf(resultSet.getString("role"));
 
-				User user = new User(id, name, email, password, role);
+				UserDTO user = new UserDTO(id, name, email, role);
 
 				return user;
 			}
@@ -99,28 +100,37 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 
-	public boolean createUser(User user) throws CookeryDatabaseException, URISyntaxException {
+	public UserDTO createUser(User user) throws CookeryDatabaseException, URISyntaxException {
 		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
-			 PreparedStatement statement = connection.prepareStatement(sql)) {
+			 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
-			if (user.getRole() == null) {
-				user.setRole(Role.user);
-			}
-			statement.setString(4, user.getRole().toString());
+			statement.setString(4, Role.user.toString());
 
 			statement.executeUpdate();
 
+			ResultSet resultSet = statement.getGeneratedKeys();
+			int userId = -1;
+			if(resultSet.next()) {
+				userId = resultSet.getInt(1);
+
+				connection.commit();
+			}
+			else {
+				throw new CookeryDatabaseException("Cannot get the id of the new user.");
+			}
+
 			connection.commit();
 
-			return true;
+			return new UserDTO(userId, user.getName(), user.getEmail(), user.getRole());
 		} catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot create user in the database", throwable);
 		}
 	}
+
 
 	public boolean deleteUser(int id) throws CookeryDatabaseException, URISyntaxException {
 		String sql = "DELETE FROM user WHERE id = ?";
@@ -200,4 +210,59 @@ public class UsersRepository extends JDBCRepository{
 			throw new CookeryDatabaseException("Cannot update user in the database", throwable);
 		}
 	}
+
+
+	public int follow(int followerId, UserDTO followee) throws CookeryDatabaseException { // could be current user id, followee object (User)
+		String sql = "INSERT INTO follow (follower_id, followee_id) VALUES (?, ?)";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+			statement.setInt(1, followerId);
+			statement.setInt(2, followee.getId());
+
+			statement.executeUpdate();
+
+			ResultSet resultSet = statement.getGeneratedKeys();
+
+			if(resultSet.next()) {
+				int followId = resultSet.getInt(1);
+
+				connection.commit();
+
+				return followId;
+			}
+			else {
+				throw new CookeryDatabaseException("Cannot get the id of the new recipe.");
+			}
+
+		} catch (SQLException | URISyntaxException throwable) {
+			throw new CookeryDatabaseException("Cannot follow user", throwable);
+		}
+	}
+
+
+	public boolean unFollow(int followerId, int followId) throws CookeryDatabaseException { // could be current user id, followee object (User)
+		String sql = "DELETE FROM follow WHERE id = ? AND follower_id = ?";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setInt(1, followId);
+			statement.setInt(2, followerId);
+
+			statement.executeUpdate();
+
+			connection.commit();
+
+			return true;
+		} catch (SQLException | URISyntaxException throwable) {
+			throw new CookeryDatabaseException("Cannot unfollow user", throwable);
+		}
+	}
+
+
+	// Followers by userId
+	// return list of follows (id, userDTO)
+//	public List<> getFollowers(int id) {
+//
+//	}
 }

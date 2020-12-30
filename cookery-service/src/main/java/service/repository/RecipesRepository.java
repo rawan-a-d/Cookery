@@ -2,9 +2,10 @@ package service.repository;
 
 import service.controller.RecipesController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.RecipeFollowDTO;
+import service.model.DTO.UserDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
-import service.model.User;
 
 import java.net.URISyntaxException;
 import java.sql.*;
@@ -68,6 +69,89 @@ public class RecipesRepository {
             }
         }
         catch (SQLException throwable) {
+            throw new CookeryDatabaseException("Cannot read recipe from the database", throwable);
+        }
+    }
+
+    public RecipeFollowDTO getRecipeFollow(int recipeId, int userId) throws CookeryDatabaseException {
+        String sql = "SELECT recipe.id, recipe.name, recipe.description, recipe.image, " +
+                        "ingredient.id AS ingredient_id, ingredient.ingredient, ingredient.amount, " +
+                        "user.id AS user_id, user.name AS user_name, " +
+                        "follow.id AS follow_id," +
+                        "ufr.id AS favourite_id " +
+                        "FROM recipe " +
+                        "LEFT JOIN ingredient ON ingredient.recipe_id = recipe.id " +
+                        "LEFT JOIN user ON user.id = recipe.user_id " +
+                        "LEFT JOIN follow ON follow.followee_id = user.id AND follow.follower_id = ? " +
+                        "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id AND ufr.user_id = ? " +
+                        "WHERE recipe.id = ?";
+
+        RecipeFollowDTO recipe = null;
+
+        System.out.println("pre prepare");
+
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            System.out.println("post prepare");
+
+            statement.setInt(1, userId);
+            statement.setInt(2, userId);
+            statement.setInt(3, recipeId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            System.out.println("post result");
+            if(!resultSet.isBeforeFirst()) {
+                connection.close();
+                throw new CookeryDatabaseException("Recipe with recipe id " + recipeId + " cannot be found");
+            }
+            else {
+                while(resultSet.next()) {
+
+                    if(recipe == null) {
+                        String name = resultSet.getString("name");
+                        String description = resultSet.getString("description");
+                        String image = resultSet.getString("image");
+                        int creatorId = resultSet.getInt("user_id");
+                        String userName = resultSet.getString("user_name");
+                        int followId = resultSet.getInt("follow_id");
+                        boolean isFollowed = followId == 0 ? false : true;
+                        int favouriteId = resultSet.getInt("favourite_id");
+                        boolean isFavourite = favouriteId == 0 ? false : true;
+
+                        System.out.println("FollowedId " + followId);
+                        System.out.println("isFollowed "+ isFollowed);
+                        System.out.println("favouriteId " + favouriteId);
+                        System.out.println("isFavourite "+ isFavourite);
+
+                        recipe = new RecipeFollowDTO(recipeId, name, image, description, new UserDTO(creatorId, userName), favouriteId, isFavourite, followId, isFollowed);
+
+                        System.out.println("recipe " + recipe);
+                    }
+
+                    // Gather ingredients
+                    int ingredientId = resultSet.getInt("ingredient_id");
+                    String ingredientName = resultSet.getString("ingredient");
+                    int ingredientAmount = resultSet.getInt("amount");
+                    System.out.println("ingredient id " + ingredientId);
+                    System.out.println("ingredient name " + ingredientAmount);
+                    System.out.println("ingredient amount " + ingredientName);
+
+                    Ingredient ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
+                    System.out.println("Ingredient created " + ingredient);
+                    recipe.addIngredient(ingredient);
+
+                    System.out.println("Ingredients " + ingredient);
+
+                    System.out.println("Recipe " + recipe);
+                }
+
+                connection.commit();
+
+                return recipe;
+            }
+        }
+        catch (SQLException | URISyntaxException throwable) {
             throw new CookeryDatabaseException("Cannot read recipe from the database", throwable);
         }
     }
@@ -238,7 +322,7 @@ public class RecipesRepository {
                     isFavourite = true;
                 }
 
-                User user = new User(creatorId, userName);
+                UserDTO user = new UserDTO(creatorId, userName);
 
                 RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
 
@@ -300,7 +384,7 @@ public class RecipesRepository {
                 }
 
 //                RecipeDTO recipe = new RecipeDTO(recipeId, recipeName, recipeImage, new User(creatorId, userName));
-                User user = new User(creatorId, userName);
+                UserDTO user = new UserDTO(creatorId, userName);
 
                 RecipeDTO recipe = new RecipeDTO(recipeId, recipeName, recipeImage,  user, favouriteId, isFavourite);
                 recipes.add(recipe);
@@ -625,10 +709,11 @@ public class RecipesRepository {
                 String userName = resultSet.getString("userName");
                 int creatorId = resultSet.getInt("userId");
                 int favouriteId = resultSet.getInt("favouriteId");
+                boolean isFavourite = favouriteId == 0 ? false : true;
 
-                User user = new User(creatorId, userName);
+                UserDTO user = new UserDTO(creatorId, userName);
 
-                RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId);
+                RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
 
                 recipes.add(recipe);
             }

@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.UsersController;
+import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
@@ -31,19 +32,19 @@ class UsersControllerTest {
 
     @Test
     public void getUsers() throws CookeryDatabaseException, URISyntaxException {
-            List<User> expectedUsers = Arrays.asList(
-                    new User(1, "Anas", "anas@gmail.com", "1234", Role.user),
-                    new User(2, "Beatrice", "beatrice@gmail.com", "1234", Role.admin)
+            List<UserDTO> expectedUsers = Arrays.asList(
+                    new UserDTO(1, "Anas", "anas@gmail.com", Role.user),
+                    new UserDTO(2, "Beatrice", "beatrice@gmail.com", Role.admin)
             );
 
             when(usersRepository.getUsers()).thenReturn(
                     Arrays.asList(
-                            new User(1, "Anas", "anas@gmail.com", "1234", Role.user),
-                            new User(2, "Beatrice", "beatrice@gmail.com", "1234", Role.admin)
+                            new UserDTO(1, "Anas", "anas@gmail.com", Role.user),
+                            new UserDTO(2, "Beatrice", "beatrice@gmail.com", Role.admin)
                     )
             );
 
-            List<User> actualUsers = usersController.getUsers();
+            List<UserDTO> actualUsers = usersController.getUsers();
 
             assertEquals(expectedUsers, actualUsers);
             assertEquals(expectedUsers.size(), actualUsers.size());
@@ -53,10 +54,10 @@ class UsersControllerTest {
     @Test
     public void getUser() throws CookeryDatabaseException, URISyntaxException {
         when(usersRepository.getUser(1)).thenReturn(
-                new User(1, "Anas", "anas@gmail.com", "1234", Role.user)
+                new UserDTO(1, "Anas", "anas@gmail.com", Role.user)
         );
 
-        User user = usersController.getUser(1);
+        UserDTO user = usersController.getUser(1);
 
         assertNotEquals(null, user);
         assertEquals(1, user.getId());
@@ -70,7 +71,7 @@ class UsersControllerTest {
                 null
         );
 
-        User user = usersController.getUser(4);
+        UserDTO user = usersController.getUser(4);
 
         assertEquals(null, user);
     }
@@ -79,9 +80,13 @@ class UsersControllerTest {
     @Test
     public void createUser() throws CookeryDatabaseException, URISyntaxException {
         User user = new User(1, "Omar", "omar@gmail.com", "1234", Role.user);
-        when(usersRepository.createUser(user)).thenReturn(true);
 
-        assertTrue(usersController.createUser(user));
+        UserDTO expectedUser = new UserDTO(1, "Omar", "omar@gmail.com", Role.user);
+        when(usersRepository.createUser(user)).thenReturn(
+                expectedUser
+        );
+
+        assertEquals(expectedUser, usersController.createUser(user));
     }
 
 
