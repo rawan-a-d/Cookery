@@ -112,7 +112,7 @@ public class UsersResourcesTest extends JerseyTest {
         Entity<User> userEntity = Entity.entity(newUser, MediaType.APPLICATION_JSON);
         Response response = target("users").request().post(userEntity);
 
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
 

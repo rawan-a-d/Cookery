@@ -6,6 +6,8 @@ import service.model.Role;
 import service.model.User;
 
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +51,6 @@ public class UsersRepository extends JDBCRepository{
 
 
 	public UserDTO getUser(int id) throws CookeryDatabaseException, URISyntaxException {
-		System.out.println("DATA BASE");
-
-		System.out.println(jdbcRepository.getDatabaseConnection());
 		String sql = "SELECT * FROM user WHERE id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -65,7 +64,6 @@ public class UsersRepository extends JDBCRepository{
 			} else {
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
-				String password = resultSet.getString("password");
 				Role role = Role.valueOf(resultSet.getString("role"));
 
 				UserDTO user = new UserDTO(id, name, email, role);
@@ -107,7 +105,8 @@ public class UsersRepository extends JDBCRepository{
 			 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
-			statement.setString(3, user.getPassword());
+			// Encrypt password
+			statement.setString(3, doHashing(user.getPassword()));
 			statement.setString(4, Role.user.toString());
 
 			statement.executeUpdate();
@@ -258,6 +257,32 @@ public class UsersRepository extends JDBCRepository{
 			throw new CookeryDatabaseException("Cannot unfollow user", throwable);
 		}
 	}
+
+
+	//To encrypt the password
+	public static String doHashing (String password) {
+		try {
+			MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+
+			messageDigest.update(password.getBytes());
+
+			byte[] resultByteArray = messageDigest.digest();
+
+			StringBuilder sb = new StringBuilder();
+
+			for (byte b : resultByteArray) {
+				sb.append(String.format("%02x", b));
+			}
+
+			return sb.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		return "";
+	}
+
 
 
 	// Followers by userId

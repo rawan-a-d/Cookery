@@ -40,10 +40,10 @@ CONSTRAINT USER_ID_FOREIGNKEY FOREIGN KEY (user_id)
 REFERENCES  user( id ));
 
 
-INSERT INTO user (name, email, password, role) VALUES ('Rawan', 'rawan@gmail.com', '1234', 'admin');
-INSERT INTO user (name, email, password, role) VALUES ('Anas', 'anas@gmail.com', '1234', 'user');
-INSERT INTO user (name, email, password, role) VALUES ('Omar', 'omar@gmail.com', '1234', 'admin');
-INSERT INTO user (name, email, password, role) VALUES ('Raneem', 'raneem@gmail.com', '1234', 'user');
+INSERT INTO user (name, email, password, role) VALUES ('Rawan', 'rawan@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'admin');
+INSERT INTO user (name, email, password, role) VALUES ('Anas', 'anas@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'user');
+INSERT INTO user (name, email, password, role) VALUES ('Omar', 'omar@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'admin');
+INSERT INTO user (name, email, password, role) VALUES ('Raneem', 'raneem@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'user');
 
 
 INSERT INTO recipe (name, description, image, date, user_id) VALUES ('recipe 1', 'recipe 1 desc', 'recipe 1 image', '2020-02-01', 1);

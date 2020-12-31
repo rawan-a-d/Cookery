@@ -21,13 +21,12 @@ public class AuthRepository {
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, email);
-            statement.setString(2, password);
 
             ResultSet resultSet = statement.executeQuery();
 
             if(!resultSet.next()) {
                 connection.close();
+
                 throw new CookeryDatabaseException("Email or password are incorrect");
             }
             else {

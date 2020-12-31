@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import service.model.DTO.UserDTO;
 import service.model.Role;
-import service.model.User;
 import service.repository.AuthRepository;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
@@ -29,7 +28,10 @@ public class AuthController {
     public UserDTO authenticate(String email, String password) {
         UserDTO userDTO = null;
         try {
-            userDTO = authRepository.authenticate(email, password);
+            // Encrypt password
+            String encrypted = UsersRepository.doHashing(password);
+
+            userDTO = authRepository.authenticate(email, encrypted);
         }
         catch (CookeryDatabaseException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
@@ -38,16 +40,17 @@ public class AuthController {
         return userDTO;
     }
 
-    public UserDTO register(User user) {
-        UserDTO userDTO = null;
-        try {
-            userDTO = usersRepository.createUser(user);
-        }
-        catch (CookeryDatabaseException | URISyntaxException ex) {
-            LOGGER.info(ex.getMessage()); // Compliant
-        }
-        return userDTO;
-    }
+//    public UserDTO register(User user) {
+//        UserDTO userDTO = null;
+//        try {
+//
+//            userDTO = usersRepository.createUser(user);
+//        }
+//        catch (CookeryDatabaseException | URISyntaxException ex) {
+//            LOGGER.info(ex.getMessage()); // Compliant
+//        }
+//        return userDTO;
+//    }
 
 
 

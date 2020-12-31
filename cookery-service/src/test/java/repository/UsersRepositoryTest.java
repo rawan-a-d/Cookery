@@ -1,5 +1,6 @@
 package repository;
 
+import org.h2.tools.RunScript;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.glassfish.jersey.message.internal.ReaderWriter.UTF8;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +52,8 @@ public class UsersRepositoryTest {
 
         System.out.println("JDBC " + jdbcRepository.getDatabaseConnection());
 
-        repository.JDBCRepository.generateData();
+//        repository.JDBCRepository.generateData();
+        RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:data.sql", UTF8, false);
 
 //        RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:data.sql", UTF8, false);
 

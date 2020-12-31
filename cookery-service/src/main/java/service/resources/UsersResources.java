@@ -57,20 +57,24 @@ public class UsersResources {
 
     @POST //POST at http://localhost:XXXX/users
     @Consumes(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"user", "admin"})
+    @PermitAll
     public Response addUser(User user){
         UserDTO userDTO = usersController.createUser(user);
 
         if(userDTO != null){ // Successful
-            String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
-            URI uri = URI.create(url);
-            return Response.created(uri).build();
+//            String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
+//            URI uri = URI.create(url);
+//            return Response.created(uri).build();
+            String token = AuthController.generateAuthToken(userDTO);
+
+            return Response.ok(token).build();
         }
         else {
             String entity = "User with id " + user.getId() + " already exists";
             return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
         }
     }
+
 
     @PUT //PUT at http://localhost:XXXX/users/3
     @Consumes(MediaType.APPLICATION_JSON)
