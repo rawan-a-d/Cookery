@@ -93,14 +93,11 @@ public class AuthController {
     }
 
 
-    public static boolean isTokenValid(String jwt) {
+    public static boolean isTokenValid(Claims jwt) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
 
-        //This line will throw an exception if it is not a signed JWS (as expected)
-        Claims claims = decodeJWT(jwt);
-
-        return claims.getExpiration().after(now);
+        return jwt.getExpiration().after(now);
     }
 
 

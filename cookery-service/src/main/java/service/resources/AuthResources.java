@@ -26,13 +26,10 @@ public class AuthResources {
     @PermitAll
     @Produces(MediaType.TEXT_PLAIN)
     public Response authenticate(Credentials credentials) {
-        System.out.println(credentials);
         UserDTO user = authController.authenticate(credentials.getEmail(), credentials.getPassword());
 
         if(user != null) {
             String token = AuthController.generateAuthToken(user);
-
-            System.out.println("Token " + token);
 
             return Response.ok(token).build();
         }
@@ -49,9 +46,6 @@ public class AuthResources {
     @Path("register")
     @Produces(MediaType.TEXT_PLAIN)
     public Response register(User user) {
-        System.out.println("USER "+ user);
-//        ValidationUtils.<User>validate(user);
-
         UserDTO userDTO = usersController.createUser(user);
 
         if(userDTO != null) {
