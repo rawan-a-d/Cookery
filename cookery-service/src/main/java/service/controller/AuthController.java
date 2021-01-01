@@ -14,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.net.URISyntaxException;
 import java.security.Key;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -60,6 +61,8 @@ public class AuthController {
 
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
+//        Date oneWeek = Date.from(ZonedDateTime.now().plusHours(24).toInstant());
+        Date oneWeek = Date.from(ZonedDateTime.now().plusHours(5).toInstant());
 
         //We will sign our JWT with our ApiKey secret
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
@@ -69,11 +72,11 @@ public class AuthController {
 
         JwtBuilder builder = Jwts.builder()
                 .setIssuedAt(now)
+                .setExpiration(oneWeek)
                 .setSubject(Integer.toString(user.getId()))
                 .signWith(signatureAlgorithm, signingKey)
                 .claim("name", user.getName())
                 .claim("admin", isAdmin);
-
 
         //Builds the JWT and serializes it to a compact, URL-safe string
         return builder.compact();
@@ -87,6 +90,17 @@ public class AuthController {
                 .parseClaimsJws(jwt).getBody();
 
         return claims;
+    }
+
+
+    public static boolean isTokenValid(String jwt) {
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+
+        //This line will throw an exception if it is not a signed JWS (as expected)
+        Claims claims = decodeJWT(jwt);
+
+        return claims.getExpiration().after(now);
     }
 
 

@@ -95,7 +95,15 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Validate token
         Claims token = null;
         try {
-            token = AuthController.decodeJWT(encodedCredentials);
+//            token = AuthController.decodeJWT(encodedCredentials);
+            if(AuthController.isTokenValid(encodedCredentials)) {
+
+            }
+            else {
+                Response response = Response.status(Response.Status.UNAUTHORIZED).entity("Token has expired").build();
+                requestContext.abortWith(response);
+                return;
+            }
         }
         catch (Exception exception){
             //Invalid signature/claims
