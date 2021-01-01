@@ -119,31 +119,16 @@ public class RecipesRepository {
                         int favouriteId = resultSet.getInt("favourite_id");
                         boolean isFavourite = favouriteId == 0 ? false : true;
 
-                        System.out.println("FollowedId " + followId);
-                        System.out.println("isFollowed "+ isFollowed);
-                        System.out.println("favouriteId " + favouriteId);
-                        System.out.println("isFavourite "+ isFavourite);
-
                         recipe = new RecipeFollowDTO(recipeId, name, image, description, new UserDTO(creatorId, userName), favouriteId, isFavourite, followId, isFollowed);
-
-                        System.out.println("recipe " + recipe);
                     }
 
                     // Gather ingredients
                     int ingredientId = resultSet.getInt("ingredient_id");
                     String ingredientName = resultSet.getString("ingredient");
                     int ingredientAmount = resultSet.getInt("amount");
-                    System.out.println("ingredient id " + ingredientId);
-                    System.out.println("ingredient name " + ingredientAmount);
-                    System.out.println("ingredient amount " + ingredientName);
 
                     Ingredient ingredient = new Ingredient(ingredientId, ingredientName, ingredientAmount);
-                    System.out.println("Ingredient created " + ingredient);
                     recipe.addIngredient(ingredient);
-
-                    System.out.println("Ingredients " + ingredient);
-
-                    System.out.println("Recipe " + recipe);
                 }
 
                 connection.commit();
@@ -542,7 +527,6 @@ public class RecipesRepository {
     }
 
     public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException {
-
         String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -560,10 +544,8 @@ public class RecipesRepository {
             if(resultSet.next()) {
                 int recipeId = resultSet.getInt(1);
 
-                connection.commit();
 
                 List<Ingredient> ingredients = recipe.getIngredients();
-
 
                 for(Ingredient ingredient: ingredients) {
                     preparedStatementIngredient.setString(1, ingredient.getIngredient());
@@ -575,6 +557,8 @@ public class RecipesRepository {
                 }
 
                 preparedStatementIngredient.executeBatch();
+
+                connection.commit();
 
                 return true;
             }

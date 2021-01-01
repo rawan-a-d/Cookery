@@ -90,13 +90,18 @@ public class RecipesResources {
 	public Response addRecipe(Recipe recipe, @HeaderParam("Authorization") String auth){
 		int userId = -1;
 
+		System.out.println("RECIPE " + recipe);
+
 		if(auth != null) { // auth exists/ logged in user
 			userId = AuthController.getIdInToken(auth);
 
 			System.out.println(userId);
 			System.out.println(recipe.getUserId());
 			if(recipe.getUserId() == userId) { // Same user
+
+				System.out.println("Recipe 2 " + recipe );
 				recipesController.createRecipe(recipe);
+
 
 				String url = uriInfo.getAbsolutePath() + "/" + recipe.getId();
 				URI uri = URI.create(url);
@@ -142,7 +147,7 @@ public class RecipesResources {
 		UserDTO user = AuthController.getUser(auth); // user in token
 		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
-		if(user.getId() != ownerId || user.getRole() != Role.valueOf("admin")) {
+		if(user.getId() != ownerId && user.getRole() != Role.valueOf("admin")) {
 			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 		}
 

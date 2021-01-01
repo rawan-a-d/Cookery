@@ -8,6 +8,7 @@ import service.repository.RecipesRepository;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ public class RecipesController {
     }
 
     public List<Recipe> getRecipes(int userId) {
-        List<Recipe> recipes = null;
+        List<Recipe> recipes = new ArrayList<>();
         try {
             recipes = recipesRepository.getRecipes(userId);
         }

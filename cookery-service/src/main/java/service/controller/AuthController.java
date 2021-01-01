@@ -84,10 +84,13 @@ public class AuthController {
 
 
     public static Claims decodeJWT(String jwt) {
+        System.out.println("Trying to decode");
         //This line will throw an exception if it is not a signed JWS (as expected)
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
                 .parseClaimsJws(jwt).getBody();
+
+        System.out.println("Claims " + claims);
 
         return claims;
     }
@@ -96,6 +99,7 @@ public class AuthController {
     public static boolean isTokenValid(Claims jwt) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
+        System.out.println("Token hoho");
 
         return jwt.getExpiration().after(now);
     }
