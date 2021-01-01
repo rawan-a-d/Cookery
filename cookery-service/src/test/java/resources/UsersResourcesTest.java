@@ -118,18 +118,33 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void deleteUser() {
-        Response response = target("users/4").request().delete();
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        Response response = target("users/4")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .delete();
 
         assertEquals(204, response.getStatus());
     }
 
 
+//    String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+//
+//    Response response = target("users/1/favourites/2")
+//            .request()
+//            .header("Authorization", "Bearer " + token)
+//            .delete();
     @Test
     public void updateUser(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
         User updatedUser = new User(1, "Rawan", "rawan.ad@gmail.com", "Qw1234576@", Role.admin);
 
         Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
-        Response response = target("users/1").request().put(userEntity);
+        Response response = target("users/1")
+                                .request()
+                                .header("Authorization", "Bearer " + token)
+                                .put(userEntity);
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
@@ -137,10 +152,14 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void updateUser_invalidId(){
+        String token = AuthController.generateAuthToken(new UserDTO(5, "denys", "denys@gmail.com", Role.user));
         User updatedUser = new User(5, "denys", "denys@gmail.com", "Qw1234576@", Role.user);
 
         Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
-        Response response = target("users/5").request().put(userEntity);
+        Response response = target("users/5")
+                                .request()
+                                .header("Authorization", "Bearer " + token)
+                                .put(userEntity);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
@@ -201,6 +220,7 @@ public class UsersResourcesTest extends JerseyTest {
     @Test
     public void addFavourite_alreadyFavourite_conflict() {
         String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
         RecipeDTO recipe = new RecipeDTO(6, new UserDTO(1, "Rawan"));
 
         Entity<RecipeDTO> recipeEntity = Entity.entity(recipe, MediaType.APPLICATION_JSON);
@@ -215,7 +235,12 @@ public class UsersResourcesTest extends JerseyTest {
 
     @Test
     public void deleteFavourite() {
-        Response response = target("users/1/favourites/2").request().delete();
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        Response response = target("users/1/favourites/2")
+                                .request()
+                                .header("Authorization", "Bearer " + token)
+                                .delete();
 
         assertEquals(204, response.getStatus());
     }

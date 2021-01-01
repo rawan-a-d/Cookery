@@ -628,12 +628,13 @@ public class RecipesRepository {
         }
     }
 
-    public boolean removeFavourite(int favouriteId) throws CookeryDatabaseException, SQLException, URISyntaxException {
-        String sql = "DELETE FROM user_favourite_recipe WHERE id = ?";
+    public boolean deleteFavourite(int userId, int favouriteId) throws CookeryDatabaseException, SQLException, URISyntaxException {
+        String sql = "DELETE FROM user_favourite_recipe WHERE id = ? AND user_id = ?";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, favouriteId);
+            statement.setInt(2, userId);
 
             int affected = statement.executeUpdate();
 

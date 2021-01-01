@@ -327,9 +327,9 @@ public class RecipesControllerTest {
 
     @Test
     public void removeFavourite() throws CookeryDatabaseException, SQLException, URISyntaxException {
-        when(recipesRepository.removeFavourite(2)).thenReturn(true);
+        when(recipesRepository.deleteFavourite(1, 2)).thenReturn(true);
 
-        boolean result = recipesController.removeFavourite(2);
+        boolean result = recipesController.deleteFavourite(1,2);
 
         assertTrue(result);
     }

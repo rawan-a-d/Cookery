@@ -6,6 +6,7 @@ import service.controller.UsersController;
 import service.model.DTO.RecipeDTO;
 import service.model.DTO.UserDTO;
 import service.model.Recipe;
+import service.model.Role;
 import service.model.User;
 
 import javax.annotation.security.PermitAll;
@@ -29,8 +30,7 @@ public class UsersResources {
 
     @GET //GET at http://localhost:XXXX/users
     @Produces(MediaType.APPLICATION_JSON)
-//    @RolesAllowed({"admin"})
-    @PermitAll
+    @RolesAllowed({"admin"})
     public Response getAllUsers(){
         List<UserDTO> users = usersController.getUsers();
 
@@ -62,9 +62,6 @@ public class UsersResources {
         UserDTO userDTO = usersController.createUser(user);
 
         if(userDTO != null){ // Successful
-//            String url = uriInfo.getAbsolutePath() + "/" + user.getId();// url of the created user
-//            URI uri = URI.create(url);
-//            return Response.created(uri).build();
             String token = AuthController.generateAuthToken(userDTO);
 
             return Response.ok(token).build();
@@ -80,7 +77,13 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @RolesAllowed({"user", "admin"})
-    public Response updateUser(@PathParam("id") int id, User user){
+    public Response updateUser(@PathParam("id") int id, User user, @HeaderParam("Authorization") String auth){
+        UserDTO userInToken = AuthController.getUser(auth); // user in token
+
+        if(user.getId() != userInToken.getId()) {
+            return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
+        }
+
         boolean result = usersController.updateUser(id, user);
 
         if(result) { // Successful
@@ -94,7 +97,12 @@ public class UsersResources {
     @DELETE //DELETE at http://localhost:XXXX/users/3
     @Path("{id}")
     @RolesAllowed({"admin"})
-    public Response deleteUser(@PathParam("id") int id){
+    public Response deleteUser(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
+        UserDTO userInToken = AuthController.getUser(auth); // user in token
+
+        if(userInToken.getRole() != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
+        }
         usersController.deleteUser(id);
 
         return Response.noContent().build();
@@ -104,8 +112,8 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/2/recipes
     @Path("{id}/recipes")
     @Produces(MediaType.APPLICATION_JSON)
-//    @PermitAll
-    public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){ // GET RECIPES BASED ON URL OR Authorization Header????????????????
+    @RolesAllowed({"user", "admin"}) // get recipes of logged in users
+    public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
         int userId = authController.getIdInToken(auth);
 
         List<Recipe> recipes = recipesController.getRecipes(userId);
@@ -118,6 +126,7 @@ public class UsersResources {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}/favourites")
+    @RolesAllowed({"user", "admin"}) // logged in users
     public Response addFavourite(@PathParam("id") int id, RecipeDTO favourite, @HeaderParam("Authorization") String auth) {
         int userId = authController.getIdInToken(auth);
 
@@ -135,18 +144,23 @@ public class UsersResources {
     }
 
 
+    //****************
     @DELETE
     @Path("{id}/favourites/{favouriteId}")
-    public Response deleteFavourite(@PathParam("id") int id, @PathParam("favouriteId") int favouriteId) {
-        recipesController.removeFavourite(favouriteId);
+    @RolesAllowed({"user", "admin"}) // logged in users
+    public Response deleteFavourite(@PathParam("id") int id, @PathParam("favouriteId") int favouriteId, @HeaderParam("Authorization") String auth) {
+        int userId = authController.getIdInToken(auth); // id in token
+
+        recipesController.deleteFavourite(userId, favouriteId);
 
         return Response.noContent().build();
     }
 
+
     @GET //GET at http://localhost:XXXX/users/1/favourites
     @Path("{id}/favourites")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"user", "admin"})
+    @RolesAllowed({"user", "admin"}) // logged in users
     public Response getAllFavourites(@HeaderParam("Authorization") String auth){
         int userId = authController.getIdInToken(auth); // id in token
 
@@ -157,11 +171,10 @@ public class UsersResources {
     }
 
 
-
     @POST //GET at http://localhost:XXXX/users/1/followers
     @Path("{id}/followers")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"user", "admin"})
+    @RolesAllowed({"user", "admin"}) // logged in users
     public Response follow(@HeaderParam("Authorization") String auth, UserDTO followee){
         int userId = authController.getIdInToken(auth); // id in token
 
@@ -180,16 +193,12 @@ public class UsersResources {
 
     @DELETE
     @Path("{id}/followers/{followId}")
-    @RolesAllowed({"user", "admin"})
+    @RolesAllowed({"user", "admin"}) // logged in users
     public Response unFollow(@HeaderParam("Authorization") String auth, @PathParam("id") int id, @PathParam("followId") int followId) {
         int userId = authController.getIdInToken(auth); // id in token
-
-        System.out.println("follower id " + userId);
-        System.out.println("follow id " + followId);
 
         usersController.unFollow(userId, followId);
 
         return Response.noContent().build();
     }
-
 }

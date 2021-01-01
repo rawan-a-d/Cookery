@@ -203,7 +203,47 @@ public class RecipesResourcesTest extends JerseyTest {
 
 
     @Test
-    public void addRecipe() {
+    public void addRecipe_user() {
+        String token = AuthController.generateAuthToken(new UserDTO( 4, "Raneem", "raneem@gmail.com", Role.user));
+
+        Recipe newRecipe = new Recipe(5, "recipe 5", "recipe 5 image", "recipe 5 desc",
+                Arrays.asList(
+                        new Ingredient(5, "onion", 4),
+                        new Ingredient(6, "courgette", 2)
+                ), 4);
+        Entity<Recipe> recipeEntity = Entity.entity(newRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes")
+                                .request()
+                                .header("Authorization", "Bearer " + token)
+                                .post(recipeEntity);
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void addRecipe_admin() {
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        Recipe newRecipe = new Recipe(5, "recipe 5", "recipe 5 image", "recipe 5 desc",
+                Arrays.asList(
+                        new Ingredient(5, "onion", 4),
+                        new Ingredient(6, "courgette", 2)
+                ), 1);
+        Entity<Recipe> recipeEntity = Entity.entity(newRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .post(recipeEntity);
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void addRecipe_notLoggedIn_unAuthorized() {
         Recipe newRecipe = new Recipe(5, "recipe 5", "recipe 5 image", "recipe 5 desc",
                 Arrays.asList(
                         new Ingredient(5, "onion", 4),
@@ -213,7 +253,7 @@ public class RecipesResourcesTest extends JerseyTest {
 
         Response response = target("recipes").request().post(recipeEntity);
 
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
 

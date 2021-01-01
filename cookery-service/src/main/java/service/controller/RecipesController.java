@@ -162,10 +162,10 @@ public class RecipesController {
     }
 
 
-    public boolean removeFavourite(int favouriteId) {
+    public boolean deleteFavourite(int userId, int favouriteId) {
         boolean result = false;
         try {
-            result = recipesRepository.removeFavourite(favouriteId);
+            result = recipesRepository.deleteFavourite(userId, favouriteId);
         }
         catch (CookeryDatabaseException | SQLException | URISyntaxException ex) {
             LOGGER.info(ex.getMessage()); // Compliant

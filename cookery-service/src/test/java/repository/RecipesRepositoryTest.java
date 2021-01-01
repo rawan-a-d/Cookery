@@ -287,7 +287,7 @@ public class RecipesRepositoryTest {
 
     @Test
     public void removeFavourite() throws CookeryDatabaseException, SQLException, URISyntaxException {
-        boolean result = recipesRepository.removeFavourite(2);
+        boolean result = recipesRepository.deleteFavourite(1, 2);
 
         assertTrue(result);
     }
@@ -296,7 +296,7 @@ public class RecipesRepositoryTest {
     @Test
     public void removeFavourite_invalidId_throwsException() {
         assertThrows(CookeryDatabaseException.class, () -> {
-            recipesRepository.removeFavourite(7);
+            recipesRepository.deleteFavourite(1,7);
         });
     }
 }
