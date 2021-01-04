@@ -1,6 +1,8 @@
 package service.repository;
 
 
+import service.model.DTO.ProfileDTO;
+import service.model.DTO.UserBase;
 import service.model.DTO.UserDTO;
 import service.model.Role;
 import service.model.User;
@@ -75,6 +77,39 @@ public class UsersRepository extends JDBCRepository{
 			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
 		}
 	}
+
+	public ProfileDTO getProfile(int userId) throws CookeryDatabaseException, URISyntaxException {
+		String sql = "SELECT user.id, user.name, user.email, " +
+						"(SELECT COUNT(recipe.user_id) from recipe where user_id = user.id) AS recipesNr, " +
+						"(SELECT COUNT(follow.followee_id) from follow WHERE followee_id = user.id) AS followersNr " +
+						"FROM user " +
+						"WHERE user.id = ?";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+			statement.setInt(1, userId);
+			ResultSet resultSet = statement.executeQuery();
+
+			if (!resultSet.next()) {
+				throw new CookeryDatabaseException("User with id " + userId + " cannot be found");
+			} else {
+				String name = resultSet.getString("name");
+				String email = resultSet.getString("email");
+				int recipesNr = resultSet.getInt("recipesNr");
+				int followersNr = resultSet.getInt("followersNr");
+
+				UserBase user = new UserBase(userId, name, email);
+				ProfileDTO profile = new ProfileDTO(user, recipesNr, followersNr);
+
+				return profile;
+			}
+
+		} catch (SQLException throwable) {
+			throw new CookeryDatabaseException("Cannot read user from the database", throwable);
+		}
+	}
+
 
 	public int getUserId(int recipeId) throws CookeryDatabaseException, URISyntaxException {
 		String sql = "SELECT * FROM user INNER JOIN recipe ON recipe.id = ?";
@@ -285,7 +320,7 @@ public class UsersRepository extends JDBCRepository{
 
 
 
-	// Followers by userId
+    // Followers by userId
 	// return list of follows (id, userDTO)
 //	public List<> getFollowers(int id) {
 //

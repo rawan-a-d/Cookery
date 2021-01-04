@@ -3,6 +3,7 @@ package service.resources;
 import service.controller.AuthController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
+import service.model.DTO.ProfileDTO;
 import service.model.DTO.RecipeDTO;
 import service.model.DTO.UserDTO;
 import service.model.Recipe;
@@ -38,16 +39,35 @@ public class UsersResources {
         return Response.ok(entity).build();
     }
 
+
     @GET //GET at http://localhost:XXXX/users/1
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-//    @RolesAllowed({"user", "admin"})
+    @RolesAllowed({"user", "admin"})
     @PermitAll
     public Response getUser(@PathParam("id") int id){
         UserDTO user = usersController.getUser(id);
 
         if(user != null){
             return Response.ok(user).build(); // Status ok 200, return user
+        }
+        else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Please provide a valid user id").build();
+        }
+    }
+
+
+    @GET //GET at http://localhost:XXXX/users/1/profile
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{id}/profile")
+    @RolesAllowed({"user", "admin"})
+    @PermitAll
+    public Response getUserProfile(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
+        int userId = AuthController.getIdInToken(auth); // user in token
+
+        ProfileDTO profile = usersController.getProfile(userId);
+        if(profile != null){
+            return Response.ok(profile).build(); // Status ok 200, return profile
         }
         else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Please provide a valid user id").build();

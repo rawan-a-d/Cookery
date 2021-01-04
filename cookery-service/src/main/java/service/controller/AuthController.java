@@ -85,6 +85,8 @@ public class AuthController {
 
     public static Claims decodeJWT(String jwt) {
         System.out.println("Trying to decode");
+
+        System.out.println("JWT " + jwt);
         //This line will throw an exception if it is not a signed JWS (as expected)
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))

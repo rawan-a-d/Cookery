@@ -3,6 +3,7 @@ package service.controller;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+import service.model.DTO.ProfileDTO;
 import service.model.DTO.UserDTO;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
@@ -133,5 +134,18 @@ public class UsersController {
         }
 
         return result;
+    }
+
+
+    public ProfileDTO getProfile(int userId) {
+        ProfileDTO profile = null;
+        try {
+            profile = usersRepository.getProfile(userId);
+        }
+        catch (CookeryDatabaseException | URISyntaxException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+
+        return profile;
     }
 }

@@ -3,6 +3,7 @@ plugins {
     id 'org.sonarqube' version '3.0'
     // Applying the JaCoCo plugin
     id 'jacoco'
+    id'com.github.johnrengelman.shadow'version'6.1.0'
 
 }
 
@@ -19,6 +20,7 @@ test {
 //    jvmArgs '--enable-preview'
 }
 
+// sonarqube: http://localhost:9000/
 // https://docs.gradle.org/current/userguide/jacoco_plugin.html
 // Configuring test task
 jacocoTestReport {
@@ -82,4 +84,19 @@ dependencies {
 
 // https://mvnrepository.com/artifact/org.glassfish.jersey.test-framework.providers/jersey-test-framework-provider-grizzly2
     testCompile group: 'org.glassfish.jersey.test-framework.providers', name: 'jersey-test-framework-provider-grizzly2', version: '2.32'
+
+    // Fatjar
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+}
+
+
+// task to create Jar file with the name with all dependencies
+// will be created in school-service/build/libs
+shadowJar {
+    mergeServiceFiles()
+
+    manifest {
+        attributes 'Main-Class': 'service.Publisher'
+    }
 }

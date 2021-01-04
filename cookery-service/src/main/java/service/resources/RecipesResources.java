@@ -36,12 +36,15 @@ public class RecipesResources {
 			userId = AuthController.getIdInToken(auth);
 		}
 
+		System.out.println("Ingredient " + ingredient);
 		if(ingredient.equals("all")) {
 			recipes = recipesController.getRecipesDTO(userId);
 		}
 		else {
 			recipes = recipesController.getRecipes(userId, ingredient);
 		}
+
+		System.out.println("Recipes " + recipes);
 
 		GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };
 		return Response.ok(entity).build();
