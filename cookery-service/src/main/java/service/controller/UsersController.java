@@ -148,4 +148,17 @@ public class UsersController {
 
         return profile;
     }
+
+
+    public boolean uploadImage(int id, String name) {
+        boolean result = false;
+        try {
+            result = usersRepository.uploadImage(id, name);
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+        }
+
+        return result;
+    }
 }

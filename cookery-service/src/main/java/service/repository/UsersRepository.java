@@ -79,7 +79,7 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public ProfileDTO getProfile(int userId) throws CookeryDatabaseException, URISyntaxException {
-		String sql = "SELECT user.id, user.name, user.email, " +
+		String sql = "SELECT user.id, user.name, user.email, user.image, " +
 						"(SELECT COUNT(recipe.user_id) from recipe where user_id = user.id) AS recipesNr, " +
 						"(SELECT COUNT(follow.followee_id) from follow WHERE followee_id = user.id) AS followersNr " +
 						"FROM user " +
@@ -96,11 +96,16 @@ public class UsersRepository extends JDBCRepository{
 			} else {
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
+				String image = resultSet.getString("image");
 				int recipesNr = resultSet.getInt("recipesNr");
 				int followersNr = resultSet.getInt("followersNr");
 
 				UserBase user = new UserBase(userId, name, email);
-				ProfileDTO profile = new ProfileDTO(user, recipesNr, followersNr);
+				ProfileDTO profile = new ProfileDTO(user, image, recipesNr, followersNr);
+
+				System.out.println("profile ");
+				System.out.println(profile);
+
 
 				return profile;
 			}
@@ -318,9 +323,31 @@ public class UsersRepository extends JDBCRepository{
 		return "";
 	}
 
+	public boolean uploadImage(int id, String name) throws CookeryDatabaseException {
+		String sql = "UPDATE user SET image = ? WHERE id = ?";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, name);
+			statement.setInt(2, id);
+
+			int affected = statement.executeUpdate();
+
+			if(affected <= 0) {
+				connection.close();
+				throw new CookeryDatabaseException("User was not found");
+			}
+			connection.commit();
+
+			return true;
+
+		} catch (SQLException | URISyntaxException throwable) {
+			throw new CookeryDatabaseException("Cannot update user in the database", throwable);
+		}
+	}
 
 
-    // Followers by userId
+	// Followers by userId
 	// return list of follows (id, userDTO)
 //	public List<> getFollowers(int id) {
 //

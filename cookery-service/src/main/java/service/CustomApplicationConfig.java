@@ -1,6 +1,7 @@
 package service;
 
 import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import service.resources.AuthenticationFilter;
 import service.resources.CorsFilter;
@@ -20,6 +21,8 @@ public class CustomApplicationConfig extends ResourceConfig
         register(CorsFilter.class);
 
         register(AuthenticationFilter.class);
+
+        register(MultiPartFeature.class);
     }
 }
 

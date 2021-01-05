@@ -1,5 +1,7 @@
 package service.resources;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import service.controller.AuthController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
@@ -14,8 +16,12 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.*;
 import java.net.URI;
 import java.util.List;
+
+//import java.io.*;
+//import javax.ws.rs.*;
 
 
 @Path("/users")
@@ -220,5 +226,93 @@ public class UsersResources {
         usersController.unFollow(userId, followId);
 
         return Response.noContent().build();
+    }
+
+
+    @PUT //PUT at http://localhost:XXXX/users/1/image
+    @Path("{id}/image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @PermitAll
+    @RolesAllowed({"user", "admin"}) // logged in users
+    public Response uploadImage(@PathParam("id") int id,
+                                @HeaderParam("Authorization") String auth,
+                                @FormDataParam("file") InputStream fileInputStream,
+                                @FormDataParam("file") FormDataContentDisposition fileMetaData) throws IOException {
+
+        int userId = AuthController.getIdInToken(auth); // id in token
+
+        UsersController usersController = new UsersController();
+
+        String UPLOAD_PATH = "cookery-service/src/images/";
+
+        File file = getFileName(new File(UPLOAD_PATH + fileMetaData.getFileName()));
+
+        int read = 0;
+        byte[] bytes = new byte[1024];
+        String completePath = file.toString(); //+id;
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(completePath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        while ((read = fileInputStream.read(bytes)) != -1)
+        {
+            out.write(bytes, 0, read);
+        }
+
+        boolean result = usersController.uploadImage(userId, file.getName());
+
+        if(result){
+            out.flush();
+            out.close();
+
+
+            return Response.noContent().build();
+        }
+        else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+        }
+    }
+
+
+    private File getFileName(File file) {
+        if (file.exists()){
+            String newFileName = file.getName();
+            String simpleName = file.getName().substring(0,newFileName.indexOf("."));
+            String strDigit="";
+
+            try {
+                simpleName = (Integer.parseInt(simpleName)+1+"");
+                File newFile = new File(file.getParent()+"/"+simpleName+getExtension(file.getName()));
+                return getFileName(newFile);
+            }
+            catch (Exception e){
+
+            }
+
+            for (int i=simpleName.length()-1;i>=0;i--){
+                if (!Character.isDigit(simpleName.charAt(i))){
+                    strDigit = simpleName.substring(i+1);
+                    simpleName = simpleName.substring(0,i+1);
+                    break;
+                }
+            }
+
+            if (strDigit.length()>0){
+                simpleName = simpleName+(Integer.parseInt(strDigit)+1);
+            } else {
+                simpleName+="1";
+            }
+
+            File newFile = new File(file.getParent() + "/" + simpleName+getExtension(file.getName()));
+            return getFileName(newFile);
+        }
+        return file;
+    }
+
+    private String getExtension(String name) {
+        return name.substring(name.lastIndexOf("."));
     }
 }
