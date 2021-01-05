@@ -1,5 +1,6 @@
 package resources;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
@@ -67,7 +68,9 @@ public class UsersResourcesTest extends JerseyTest {
         forceSet(TestProperties.CONTAINER_PORT, "0"); // runs on available port
         enable(TestProperties.LOG_TRAFFIC);
         enable(TestProperties.DUMP_ENTITY);
-        return new ResourceConfig(UsersResources.class);
+        return new ResourceConfig(UsersResources.class)
+            .register(MultiPartFeature.class);
+
 //                .register("app.properties");
     }
 

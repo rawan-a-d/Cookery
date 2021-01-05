@@ -234,11 +234,10 @@ public class UsersResources {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @PermitAll
     @RolesAllowed({"user", "admin"}) // logged in users
-    public Response uploadImage(@PathParam("id") int id,
-                                @HeaderParam("Authorization") String auth,
-                                @FormDataParam("file") InputStream fileInputStream,
-                                @FormDataParam("file") FormDataContentDisposition fileMetaData) throws IOException {
-
+    public Response uploadImage(@FormDataParam("file") InputStream fileInputStream,
+                                @FormDataParam("file") FormDataContentDisposition fileMetaData,
+                                @PathParam("id") int id,
+                                @HeaderParam("Authorization") String auth) throws IOException {
         int userId = AuthController.getIdInToken(auth); // id in token
 
         UsersController usersController = new UsersController();
