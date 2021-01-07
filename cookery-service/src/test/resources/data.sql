@@ -7,6 +7,7 @@ CREATE TABLE user
  email VARCHAR(255),
  password VARCHAR(255),
  role VARCHAR(255),
+ image TEXT,
  PRIMARY KEY ( id ));
 
 CREATE TABLE recipe

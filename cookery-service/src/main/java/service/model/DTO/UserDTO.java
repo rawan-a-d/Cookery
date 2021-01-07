@@ -72,6 +72,16 @@ public class UserDTO {
 
 
     @Override
+    public String toString() {
+        return "UserDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

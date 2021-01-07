@@ -152,16 +152,12 @@ public class UsersRepository extends JDBCRepository{
 			int userId = -1;
 			if(resultSet.next()) {
 				userId = resultSet.getInt(1);
-
-				connection.commit();
 			}
 			else {
 				throw new CookeryDatabaseException("Cannot get the id of the new user.");
 			}
 
-			connection.commit();
-
-			return new UserDTO(userId, user.getName(), user.getEmail(), user.getRole());
+			return new UserDTO(userId, user.getName(), user.getEmail(), Role.user);
 		} catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot create user in the database", throwable);
 		}
