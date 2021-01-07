@@ -5,6 +5,7 @@ package service.controller;
 
 import service.model.DTO.ProfileDTO;
 import service.model.DTO.UserDTO;
+import service.model.DTO.UserFollowDTO;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
 import service.repository.UsersRepository;
@@ -160,5 +161,23 @@ public class UsersController {
         }
 
         return result;
+    }
+
+    public List<UserFollowDTO> getFollowers(int id) {
+        List<UserFollowDTO> users;
+        try {
+            users = usersRepository.getFollowers(id);
+            return users;
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+
+            return null;
+        }
+        catch (Exception ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
+
+        }
     }
 }

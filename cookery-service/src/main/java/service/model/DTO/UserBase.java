@@ -1,5 +1,7 @@
 package service.model.DTO;
 
+import java.util.Objects;
+
 public class UserBase {
     private int id;
     private String name;
@@ -34,4 +36,30 @@ public class UserBase {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserBase userBase = (UserBase) o;
+        return id == userBase.id &&
+                Objects.equals(name, userBase.name) &&
+                Objects.equals(email, userBase.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email);
+    }
+
+    @Override
+    public String toString() {
+        return "UserBase{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
+

@@ -4,6 +4,7 @@ package service.repository;
 import service.model.DTO.ProfileDTO;
 import service.model.DTO.UserBase;
 import service.model.DTO.UserDTO;
+import service.model.DTO.UserFollowDTO;
 import service.model.Role;
 import service.model.User;
 
@@ -349,7 +350,32 @@ public class UsersRepository extends JDBCRepository{
 
 	// Followers by userId
 	// return list of follows (id, userDTO)
-//	public List<> getFollowers(int id) {
-//
-//	}
+	public List<UserFollowDTO> getFollowers(int id) throws CookeryDatabaseException {
+		List<UserFollowDTO> users = new ArrayList<>();
+
+		String sql = "SELECT user.*, follow.followee_id, follow.follower_id FROM user " +
+				 		"INNER JOIN follow ON follow.followee_id = ? AND follow.follower_id = user.id";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+			statement.setInt(1, id);
+			ResultSet resultSet = statement.executeQuery();
+
+			while (resultSet.next()) {
+				int userId = resultSet.getInt("id");
+				String name = resultSet.getString("name");
+				String email = resultSet.getString("email");
+				String image = resultSet.getString("image");
+
+				UserFollowDTO user = new UserFollowDTO(new UserBase(userId, name, email), image);
+				users.add(user);
+			}
+
+		} catch (SQLException | URISyntaxException throwable) {
+			throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+		}
+
+		return users;
+	}
 }

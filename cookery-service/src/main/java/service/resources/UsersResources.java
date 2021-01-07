@@ -9,6 +9,7 @@ import service.controller.UsersController;
 import service.model.DTO.ProfileDTO;
 import service.model.DTO.RecipeDTO;
 import service.model.DTO.UserDTO;
+import service.model.DTO.UserFollowDTO;
 import service.model.Recipe;
 import service.model.Role;
 import service.model.User;
@@ -300,6 +301,20 @@ public class UsersResources {
     }
 
 
+    @GET //GET at http://localhost:XXXX/users
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"admin"})
+    @Path("{id}/followers")
+    public Response getFollowers(@HeaderParam("Authorization") String auth){
+        int userId = AuthController.getIdInToken(auth); // id in token
+
+        List<UserFollowDTO> users = usersController.getFollowers(userId);
+
+        GenericEntity<List<UserFollowDTO>> entity = new GenericEntity<List<UserFollowDTO>>(users){ };
+        return Response.ok(entity).build();
+    }
+
+
     private File getFileName(File file) {
         if (file.exists()){
             String newFileName = file.getName();
@@ -338,4 +353,5 @@ public class UsersResources {
     private String getExtension(String name) {
         return name.substring(name.lastIndexOf("."));
     }
+
 }
