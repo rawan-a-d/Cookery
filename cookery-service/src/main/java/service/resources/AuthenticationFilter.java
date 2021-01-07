@@ -88,17 +88,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             return;
         }
 
-        System.out.println("In auth filter pre encodedCredentials");
         //Get encoded username and password
         final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
-        System.out.println("Post encodedCredentials");
 
         // Validate token
-        System.out.println("Pre claim");
         Claims token;
         try {
             token = AuthController.decodeJWT(encodedCredentials);
-            System.out.println("Post claim");
 
 //            if(!AuthController.isTokenValid(token)) {
 //                System.out.println("Token has expired");

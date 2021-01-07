@@ -103,10 +103,6 @@ public class UsersRepository extends JDBCRepository{
 				UserBase user = new UserBase(userId, name, email);
 				ProfileDTO profile = new ProfileDTO(user, image, recipesNr, followersNr);
 
-				System.out.println("profile ");
-				System.out.println(profile);
-
-
 				return profile;
 			}
 
@@ -139,7 +135,7 @@ public class UsersRepository extends JDBCRepository{
 
 
 	public UserDTO createUser(User user) throws CookeryDatabaseException, URISyntaxException {
-		String sql = "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO user (name, email, password, role, image) VALUES (?, ?, ?, ?, ?)";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -148,6 +144,7 @@ public class UsersRepository extends JDBCRepository{
 			// Encrypt password
 			statement.setString(3, doHashing(user.getPassword()));
 			statement.setString(4, Role.user.toString());
+			statement.setString(5, "placeholder.png");
 
 			statement.executeUpdate();
 
@@ -225,14 +222,21 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 	public boolean updateUser(int id, User user) throws CookeryDatabaseException, URISyntaxException {
-		String sql = "UPDATE user SET name = ?, email = ?, password = ?, role = ? WHERE id = ?";
+		// Update columns if not null, if null keep old data
+		String sql = "UPDATE user SET name = IFNULL(?, name), " +
+				"email = IFNULL(?, email), " +
+				"password = IFNULL(?, password), " +
+				"role = IFNULL(?, role) " +
+				"WHERE id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql)) {
+
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			statement.setString(3, user.getPassword());
-			statement.setString(4, user.getRole().toString());
+			String role = user.getRole() == null ? null : user.getRole().toString();
+			statement.setString(4, role);
 			statement.setInt(5, id);
 
 			int affected = statement.executeUpdate();

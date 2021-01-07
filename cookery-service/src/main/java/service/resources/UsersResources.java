@@ -1,5 +1,6 @@
 package service.resources;
 
+import cyclops.control.Validated;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import service.controller.AuthController;
@@ -11,6 +12,8 @@ import service.model.DTO.UserDTO;
 import service.model.Recipe;
 import service.model.Role;
 import service.model.User;
+import service.validators.Error;
+import service.validators.UserValidator;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -18,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.List;
 
 //import java.io.*;
@@ -106,17 +110,28 @@ public class UsersResources {
     public Response updateUser(@PathParam("id") int id, User user, @HeaderParam("Authorization") String auth){
         UserDTO userInToken = AuthController.getUser(auth); // user in token
 
-        if(user.getId() != userInToken.getId()) {
+        // If someone else is trying to change the data, and user trying to change the role
+        if((user.getId() != userInToken.getId() && userInToken.getRole().equals("user"))) {
             return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
         }
 
-        boolean result = usersController.updateUser(id, user);
+        // Validate data
+        Validated<Error, String> name = UserValidator.validName(user);;
+        Validated<Error, String> email = UserValidator.validEmail(user);
+        Validated<Error, String> pass = UserValidator.validPassword(user);
 
-        if(result) { // Successful
-            return Response.noContent().build();
+        // if name is not null and valid , if email not null and valid, if password is not null and invalid -> incorrect data
+        if((user.getName() != null && name.isInvalid()) || (user.getEmail() != null && email.isInvalid()) || (user.getPassword() != null && pass.isInvalid())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
         }
         else {
-            return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+            boolean result = usersController.updateUser(id, user);
+
+            if (result) { // Successful
+                return Response.noContent().build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+            }
         }
     }
 
@@ -246,32 +261,41 @@ public class UsersResources {
 
         File file = getFileName(new File(UPLOAD_PATH + fileMetaData.getFileName()));
 
-        int read = 0;
-        byte[] bytes = new byte[1024];
-        String completePath = file.toString(); //+id;
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(completePath);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        System.out.println(file);
+        System.out.println("Image File " + Files.probeContentType(file.toPath()));
 
-        while ((read = fileInputStream.read(bytes)) != -1)
-        {
-            out.write(bytes, 0, read);
-        }
+        System.out.println("Image File " + Files.probeContentType(file.toPath()).contains("image"));
 
-        boolean result = usersController.uploadImage(userId, file.getName());
+        if(Files.probeContentType(file.toPath()).contains("image")) {
+            int read = 0;
+            byte[] bytes = new byte[1024];
+            String completePath = file.toString(); //+id;
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(completePath);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
-        if(result){
-            out.flush();
-            out.close();
+            while ((read = fileInputStream.read(bytes)) != -1)
+            {
+                out.write(bytes, 0, read);
+            }
 
+            boolean result = usersController.uploadImage(userId, file.getName());
 
-            return Response.noContent().build();
+            if(result){
+                out.flush();
+                out.close();
+
+                return Response.noContent().build();
+            }
+            else {
+                return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+            }
         }
         else {
-            return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+            return Response.status(Response.Status.BAD_REQUEST).entity("Image is invalid").build();
         }
     }
 

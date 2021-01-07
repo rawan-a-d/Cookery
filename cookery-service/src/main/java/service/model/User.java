@@ -1,9 +1,6 @@
 package service.model;
 
-import java.beans.ConstructorProperties;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class User {
     private int id;
@@ -14,11 +11,14 @@ public class User {
 
     public User() { }
 
-    @ConstructorProperties({"name", "email", "password"})
+//    @ConstructorProperties({"name", "email", "password"})
     public User(String name, String email, String password) {
-        this.setName(name);
-        this.setEmail(email);
-        this.setPassword(password);
+//        this.setName(name);
+//        this.setEmail(email);
+//        this.setPassword(password);
+        this.name = name;
+        this.email = email;
+        this.password = password;
         this.role = Role.user;
     }
 
@@ -43,14 +43,14 @@ public class User {
     }
 
     public void setName(String name) {
-        if(name.length() >= 4) {
+//        if(name.length() >= 4) {
             this.name = name;
-        }
-        else {
-            System.out.println("Invalid name");
-
-            throw new IllegalStateException("Name is invalid");
-        }
+//        }
+//        else {
+//            System.out.println("Invalid name");
+//
+//            throw new IllegalStateException("Name is invalid");
+//        }
     }
 
     public String getEmail() {
@@ -58,19 +58,19 @@ public class User {
     }
 
     public void setEmail(String email) {
-        String regex = "^[a-zA-Z0-9_!#$%&�*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-
-        Pattern pattern = Pattern.compile(regex);
-
-        Matcher matcher = pattern.matcher(email);
-
-        if(matcher.matches()) {
+//        String regex = "^[a-zA-Z0-9_!#$%&�*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+//
+//        Pattern pattern = Pattern.compile(regex);
+//
+//        Matcher matcher = pattern.matcher(email);
+//
+//        if(matcher.matches()) {
             this.email = email;
-        }
-        else {
-            System.out.println("Invalid email");
-            throw new IllegalStateException("Email is invalid");
-        }
+//        }
+//        else {
+//            System.out.println("Invalid email");
+//            throw new IllegalStateException("Email is invalid");
+//        }
     }
 
     public String getPassword() {
@@ -78,21 +78,21 @@ public class User {
     }
 
     public void setPassword(String password) {
-        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
-
-        Pattern pattern = Pattern.compile(regex);
-
-        Matcher matcher = pattern.matcher(password);
-
-        if(matcher.matches()) {
-            System.out.println("Correct pass");
+//        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
+//
+//        Pattern pattern = Pattern.compile(regex);
+//
+//        Matcher matcher = pattern.matcher(password);
+//
+//        if(matcher.matches()) {
+//            System.out.println("Correct pass");
             this.password = password;
-        }
-        else {
-            System.out.println("Incorrect pass");
-
-            throw new IllegalStateException("Password is invalid");
-        }
+//        }
+//        else {
+//            System.out.println("Incorrect pass");
+//
+//            throw new IllegalStateException("Password is invalid");
+//        }
     }
 
     public void setRole(Role role) {
