@@ -2,7 +2,7 @@ stages:
   - build
   - test
   - sonarqube
-  - deploy
+#  - deploy
 
 build:
   stage: build
@@ -26,10 +26,10 @@ sonarqube:
   dependencies:
     - test
 
-deploy:
-  stage: deploy
-  script:
-    - docker build -t cookery-service:1.0 .
-    - docker run -p 91:90 cookery-service:1.0
-  dependencies:
-    - test
+#deploy:
+#  stage: deploy
+#  script:
+#    - docker build -t cookery-service:1.0 .
+#    - docker run -p 91:90 cookery-service:1.0
+#  dependencies:
+#    - test

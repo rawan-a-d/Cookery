@@ -142,20 +142,17 @@ public class RecipesRepository {
     }
 
     public List<Recipe> getRecipes() throws CookeryDatabaseException, URISyntaxException {
-        System.out.println("recipes repo");
         List<Recipe> recipes = new ArrayList<>();
 
         String  sql = "SELECT `recipe`.*, `ingredient`.`id` AS `ingredient_id`, `ingredient`.`ingredient`, `ingredient`.`amount` " +
                 "FROM `recipe` " +
                 "LEFT JOIN `ingredient` ON `ingredient`.`recipe_id` = `recipe`.`id`" +
                 "ORDER BY recipe.id";
-        System.out.println("After query");
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
 
-            System.out.println("Try");
             int lastId = -1;
             String name;
             String description;
@@ -164,7 +161,6 @@ public class RecipesRepository {
             Recipe recipe = null;
 
             while(resultSet.next()) {
-                System.out.println("While");
                 int id = resultSet.getInt("id");
 
                 if(id != lastId) { // new recipe
