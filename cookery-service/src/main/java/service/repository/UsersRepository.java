@@ -348,13 +348,45 @@ public class UsersRepository extends JDBCRepository{
 	}
 
 
-	// Followers by userId
-	// return list of follows (id, userDTO)
+	// Get users who followed me
 	public List<UserFollowDTO> getFollowers(int id) throws CookeryDatabaseException {
 		List<UserFollowDTO> users = new ArrayList<>();
 
 		String sql = "SELECT user.*, follow.followee_id, follow.follower_id FROM user " +
 				 		"INNER JOIN follow ON follow.followee_id = ? AND follow.follower_id = user.id";
+
+		try (Connection connection = jdbcRepository.getDatabaseConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+			statement.setInt(1, id);
+			ResultSet resultSet = statement.executeQuery();
+
+			while (resultSet.next()) {
+				int userId = resultSet.getInt("id");
+				String name = resultSet.getString("name");
+				String email = resultSet.getString("email");
+				String image = resultSet.getString("image");
+
+				UserFollowDTO user = new UserFollowDTO(new UserBase(userId, name, email), image);
+				users.add(user);
+			}
+
+		} catch (SQLException | URISyntaxException throwable) {
+			throw new CookeryDatabaseException("Cannot read users from the database.", throwable);
+		}
+
+		return users;
+	}
+
+
+	// Get users I followed
+	public List<UserFollowDTO> getFollowees(int id) throws CookeryDatabaseException {
+		List<UserFollowDTO> users = new ArrayList<>();
+
+//		SELECT user.id, follow.followee_id, follow.follower_id FROM user
+//		INNER JOIN follow ON follow.followee_id = user.id AND follow.follower_id = 86
+		String sql = "SELECT user.*, follow.followee_id, follow.follower_id FROM user " +
+				"INNER JOIN follow ON follow.followee_id = user.id AND follow.follower_id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql)) {

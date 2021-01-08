@@ -180,4 +180,22 @@ public class UsersController {
 
         }
     }
+
+    public List<UserFollowDTO> getFollowees(int id) {
+        List<UserFollowDTO> users;
+        try {
+            users = usersRepository.getFollowees(id);
+            return users;
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+
+            return null;
+        }
+        catch (Exception ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+            return null;
+
+        }
+    }
 }

@@ -1,14 +1,10 @@
 package service.repository;
 
-import service.controller.RecipesController;
+import org.glassfish.jersey.jaxb.internal.XmlRootElementJaxbProvider.*;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,29 +12,22 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 public class JDBCRepository {
-    private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(JDBCRepository.class.getName());
 
     // db setup
-    // protected
     public Connection getDatabaseConnection() throws URISyntaxException {
-        // Get configuration
-        URL res = getClass().getClassLoader().getResource("app.properties");
-        File configFile = Paths.get(res.toURI()).toFile();
-
+        Properties prop = new Properties();
         String url = "";
         String username = "";
         String pass = "";
         Connection connection = null;
 
-        try(FileReader reader = new FileReader(configFile)) {
-            Class.forName("org.h2.Driver");
+        try {
+            prop.load(App.class.getClassLoader().getResourceAsStream("app.properties"));
 
-            Properties properties = new Properties();
-            properties.load(reader);
-
-            url = properties.getProperty("host");
-            username = properties.getProperty("username");
-            pass = properties.getProperty("pass");
+            url = prop.getProperty("host");
+            username = prop.getProperty("username");
+            pass = prop.getProperty("pass");
 
             connection = DriverManager.getConnection(url, username, pass);
 
@@ -52,8 +41,6 @@ public class JDBCRepository {
         }
         catch (IOException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
 
         return connection;

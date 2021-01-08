@@ -30,18 +30,25 @@ public class RecipesResources {
 	public Response getRecipesByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
 		List<RecipeDTO> recipes;
 
+		System.out.println("Recipes route");
 		int userId = -1;
 
 		if(auth != null) { // auth exists
+			System.out.println("AUTH");
 			userId = AuthController.getIdInToken(auth);
+			System.out.println("userId " + userId);
 		}
 
 		System.out.println("Ingredient " + ingredient);
 		if(ingredient.equals("all")) {
+			System.out.println("Getting recipes");
 			recipes = recipesController.getRecipesDTO(userId);
+			System.out.println(recipes);
 		}
 		else {
+			System.out.println("Getting recipes by ingredient");
 			recipes = recipesController.getRecipes(userId, ingredient);
+			System.out.println(recipes);
 		}
 
 		System.out.println("Recipes " + recipes);

@@ -303,12 +303,26 @@ public class UsersResources {
 
     @GET //GET at http://localhost:XXXX/users
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"admin"})
+    @RolesAllowed({"user", "admin"})
     @Path("{id}/followers")
     public Response getFollowers(@HeaderParam("Authorization") String auth){
         int userId = AuthController.getIdInToken(auth); // id in token
 
         List<UserFollowDTO> users = usersController.getFollowers(userId);
+
+        GenericEntity<List<UserFollowDTO>> entity = new GenericEntity<List<UserFollowDTO>>(users){ };
+        return Response.ok(entity).build();
+    }
+
+
+    @GET //GET at http://localhost:XXXX/users
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"user", "admin"})
+    @Path("{id}/followees")
+    public Response getFollowees(@HeaderParam("Authorization") String auth){
+        int userId = AuthController.getIdInToken(auth); // id in token
+
+        List<UserFollowDTO> users = usersController.getFollowees(userId);
 
         GenericEntity<List<UserFollowDTO>> entity = new GenericEntity<List<UserFollowDTO>>(users){ };
         return Response.ok(entity).build();
