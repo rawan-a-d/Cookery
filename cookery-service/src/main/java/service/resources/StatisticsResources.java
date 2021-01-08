@@ -23,7 +23,7 @@ public class StatisticsResources {
 
     @GET //GET at http://localhost:XXXX/statistics
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFavouritesPerUser(@QueryParam("type") String type){
+    public Response getStatistic(@QueryParam("type") String type){
 //        List<ChartDataDTO> chartData = null;
         ChartDataDTO chartData = null;
 
@@ -32,6 +32,9 @@ public class StatisticsResources {
         }
         else if(type.equals("recipes-per-month")) {
             chartData = statisticsController.getPostedRecipesPerMonth();
+        }
+        else if(type.equals("top-followed-users")) {
+            chartData = statisticsController.getTopFollowedUsers();
         }
         else {
             System.out.println("No type");

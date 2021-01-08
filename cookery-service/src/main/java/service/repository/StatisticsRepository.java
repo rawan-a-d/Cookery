@@ -67,4 +67,41 @@ public class StatisticsRepository {
         return chartData;
     }
 
+
+    // SELECT COUNT(*) AS nrOfFollowers, followee_id FROM follow
+    //    GROUP BY followee_id
+    //    ORDER BY nrOfFollowers
+    //    LIMIT 5;
+
+    //SELECT COUNT(*) AS nrOfFollowers, user.id, user.name FROM follow
+    //    LEFT JOIN user on user.id = followee_id
+    //    GROUP BY followee_id
+    //    ORDER BY nrOfFollowers DESC
+    //    LIMIT 5;
+    public ChartDataDTO getTopFollowedUsers() throws CookeryDatabaseException {
+        String sql = "SELECT COUNT(*) AS nrOfFollowers, user.id, user.name FROM follow " +
+                        "LEFT JOIN user on user.id = followee_id " +
+                        "GROUP BY followee_id " +
+                        "ORDER BY nrOfFollowers DESC " +
+                        "LIMIT 5";
+
+        ChartDataDTO chartData = new ChartDataDTO("Top followed users");
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                int nrOfFollowers = resultSet.getInt("nrOfFollowers");
+
+                chartData.addX(name);
+                chartData.addY(nrOfFollowers);
+            }
+
+        } catch (SQLException | URISyntaxException throwable) {
+            throw new CookeryDatabaseException("Can't read statistics from the database", throwable);
+        }
+
+        return chartData;
+    }
 }

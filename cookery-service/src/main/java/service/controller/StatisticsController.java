@@ -36,4 +36,15 @@ public class StatisticsController {
             return null;
         }
     }
+
+    public ChartDataDTO getTopFollowedUsers() {
+        try {
+            return statisticsRepository.getTopFollowedUsers();
+        }
+        catch (CookeryDatabaseException ex) {
+            LOGGER.info(ex.getMessage()); // Compliant
+
+            return null;
+        }
+    }
 }
