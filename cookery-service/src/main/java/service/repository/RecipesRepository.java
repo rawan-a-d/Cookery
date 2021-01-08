@@ -10,6 +10,7 @@ import service.model.Recipe;
 import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -88,11 +89,8 @@ public class RecipesRepository {
 
         RecipeFollowDTO recipe = null;
 
-        System.out.println("pre prepare");
-
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            System.out.println("post prepare");
 
             statement.setInt(1, userId);
             statement.setInt(2, userId);
@@ -100,7 +98,6 @@ public class RecipesRepository {
 
             ResultSet resultSet = statement.executeQuery();
 
-            System.out.println("post result");
             if(!resultSet.isBeforeFirst()) {
                 connection.close();
                 throw new CookeryDatabaseException("Recipe with recipe id " + recipeId + " cannot be found");
@@ -527,7 +524,7 @@ public class RecipesRepository {
     }
 
     public boolean createRecipe(Recipe recipe) throws CookeryDatabaseException {
-        String sql = "INSERT INTO recipe (name, description, image, user_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO recipe (name, description, image, user_id, date) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -537,6 +534,7 @@ public class RecipesRepository {
             preparedStatement.setString(2, recipe.getDescription());
             preparedStatement.setString(3, recipe.getImage());
             preparedStatement.setInt(4, recipe.getUserId());
+            preparedStatement.setDate(5, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
             preparedStatement.executeUpdate();
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
