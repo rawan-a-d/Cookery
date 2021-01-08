@@ -55,7 +55,7 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @RolesAllowed({"user", "admin"})
-    @PermitAll
+//    @PermitAll
     public Response getUser(@PathParam("id") int id){
         UserDTO user = usersController.getUser(id);
 
@@ -71,12 +71,13 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/1/profile
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}/profile")
-    @RolesAllowed({"user", "admin"})
+//    @RolesAllowed({"user", "admin"})
     @PermitAll
     public Response getUserProfile(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-        int userId = AuthController.getIdInToken(auth); // user in token
+//        int userId = AuthController.getIdInToken(auth); // user in token
 
-        ProfileDTO profile = usersController.getProfile(userId);
+        System.out.println("ID PROFILE " + id);
+        ProfileDTO profile = usersController.getProfile(id);
         if(profile != null){
             return Response.ok(profile).build(); // Status ok 200, return profile
         }

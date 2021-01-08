@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Publisher {
-//    private static final URI BASE_URI = URI.create("http://localhost:90");
-    private static final URI BASE_URI = URI.create("http://0.0.0.0:90/"); // docker
+    private static final URI BASE_URI = URI.create("http://localhost:90");
+//    private static final URI BASE_URI = URI.create("http://0.0.0.0:90/"); // docker
 
     public static void main(String[] args) {
         try {

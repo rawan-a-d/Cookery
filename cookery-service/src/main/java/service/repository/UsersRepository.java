@@ -140,6 +140,7 @@ public class UsersRepository extends JDBCRepository{
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
 			// Encrypt password
@@ -150,15 +151,18 @@ public class UsersRepository extends JDBCRepository{
 			statement.executeUpdate();
 
 			ResultSet resultSet = statement.getGeneratedKeys();
+
+			connection.commit();
 			int userId = -1;
 			if(resultSet.next()) {
 				userId = resultSet.getInt(1);
+
+				return new UserDTO(userId, user.getName(), user.getEmail(), Role.user);
 			}
 			else {
 				throw new CookeryDatabaseException("Cannot get the id of the new user.");
 			}
 
-			return new UserDTO(userId, user.getName(), user.getEmail(), Role.user);
 		} catch (SQLException throwable) {
 			throw new CookeryDatabaseException("Cannot create user in the database", throwable);
 		}
@@ -352,7 +356,7 @@ public class UsersRepository extends JDBCRepository{
 	public List<UserFollowDTO> getFollowers(int id) throws CookeryDatabaseException {
 		List<UserFollowDTO> users = new ArrayList<>();
 
-		String sql = "SELECT user.*, follow.followee_id, follow.follower_id FROM user " +
+		String sql = "SELECT user.*, follow.id AS followId, follow.followee_id, follow.follower_id FROM user " +
 				 		"INNER JOIN follow ON follow.followee_id = ? AND follow.follower_id = user.id";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -362,12 +366,13 @@ public class UsersRepository extends JDBCRepository{
 			ResultSet resultSet = statement.executeQuery();
 
 			while (resultSet.next()) {
+				int followId = resultSet.getInt("followId");
 				int userId = resultSet.getInt("id");
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
 				String image = resultSet.getString("image");
 
-				UserFollowDTO user = new UserFollowDTO(new UserBase(userId, name, email), image);
+				UserFollowDTO user = new UserFollowDTO(followId, new UserBase(userId, name, email), image);
 				users.add(user);
 			}
 
@@ -385,7 +390,7 @@ public class UsersRepository extends JDBCRepository{
 
 //		SELECT user.id, follow.followee_id, follow.follower_id FROM user
 //		INNER JOIN follow ON follow.followee_id = user.id AND follow.follower_id = 86
-		String sql = "SELECT user.*, follow.followee_id, follow.follower_id FROM user " +
+		String sql = "SELECT user.*, follow.id AS followId, follow.followee_id, follow.follower_id FROM user " +
 				"INNER JOIN follow ON follow.followee_id = user.id AND follow.follower_id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -395,12 +400,13 @@ public class UsersRepository extends JDBCRepository{
 			ResultSet resultSet = statement.executeQuery();
 
 			while (resultSet.next()) {
+				int followId = resultSet.getInt("followId");
 				int userId = resultSet.getInt("id");
 				String name = resultSet.getString("name");
 				String email = resultSet.getString("email");
 				String image = resultSet.getString("image");
 
-				UserFollowDTO user = new UserFollowDTO(new UserBase(userId, name, email), image);
+				UserFollowDTO user = new UserFollowDTO(followId, new UserBase(userId, name, email), image);
 				users.add(user);
 			}
 
