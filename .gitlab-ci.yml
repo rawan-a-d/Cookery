@@ -31,3 +31,5 @@ deploy:
   script:
     - cd cookery-service
     - ./gradlew deploy
+  dependencies:
+    - test
