@@ -1,6 +1,7 @@
 package repository;
 
 import org.h2.tools.RunScript;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,24 +41,17 @@ public class UsersRepositoryTest {
         Class.forName ("org.h2.Driver");
 
         when(jdbcRepository.getDatabaseConnection()).thenReturn(
-
-//                DriverManager.getConnection ("jdbc:h2:~/test") // WORKING
-
                 DriverManager.getConnection("jdbc:h2:mem:~/test") // test is the name of the folder inside db
-//                DriverManager.getConnection("jdbc:h2:mem:test_mem", "root", "")
-//                DriverManager.getConnection("jdbc:h2:mem:test_mem;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false", "", "") // select * from SCHEMA_COOKERY.recipe;
-//                DriverManager.getConnection("jdbc:h2:mem:;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false") // select * from SCHEMA_COOKERY.recipe;
-        // jdbc:h2:mem:~/test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
         );
 
-        System.out.println("JDBC " + jdbcRepository.getDatabaseConnection());
-
-//        repository.JDBCRepository.generateData();
         RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:data.sql", UTF8, false);
-
-//        RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:data.sql", UTF8, false);
-
     }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        RunScript.execute("jdbc:h2:mem:~/test", "", "", "classpath:shutdown.sql", UTF8, false);
+    }
+
 
     @Test
     public void getUsers() throws CookeryDatabaseException, SQLException, ClassNotFoundException, URISyntaxException {

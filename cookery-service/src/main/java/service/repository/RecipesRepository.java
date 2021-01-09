@@ -534,15 +534,20 @@ public class RecipesRepository {
             preparedStatement.setString(2, recipe.getDescription());
             preparedStatement.setString(3, recipe.getImage());
             preparedStatement.setInt(4, recipe.getUserId());
-            preparedStatement.setDate(5, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+//            preparedStatement.setDate(5, date);
+            //preparedStatement.setTimestamp(5, date.toLocalDate());
+//            statement.setDate(index, new java.sql.Date(time));
+            preparedStatement.setDate(5, new java.sql.Date(Calendar.getInstance().getTime().getTime()));
             preparedStatement.executeUpdate();
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
+//            System.out.println("DATE " + date);
             if(resultSet.next()) {
                 int recipeId = resultSet.getInt(1);
 
 
+                System.out.println(preparedStatement);
                 List<Ingredient> ingredients = recipe.getIngredients();
 
                 for(Ingredient ingredient: ingredients) {
