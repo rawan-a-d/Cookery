@@ -15,6 +15,7 @@ import service.repository.RecipesRepository;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,9 +83,13 @@ public class RecipesControllerTest {
                 new RecipeDTO(4, "recipe 4", "recipe 4 image", new UserDTO(3, "Omar"))
         );
 
-        when(recipesRepository.getRecipes(1, "onion")).thenReturn(expectedRecipes);
+        // Ingredients list
+        List<String> ingredients = new ArrayList<>();
+        ingredients.add("onion");
 
-        List<RecipeDTO> actualRecipes = recipesController.getRecipes(1, "onion");
+        when(recipesRepository.getRecipes(1, ingredients)).thenReturn(expectedRecipes);
+
+        List<RecipeDTO> actualRecipes = recipesController.getRecipes(1, ingredients);
 
         assertEquals(expectedRecipes.size(), actualRecipes.size());
         assertArrayEquals(expectedRecipes.toArray(), actualRecipes.toArray());
@@ -93,11 +98,15 @@ public class RecipesControllerTest {
 
     @Test
     public void getRecipesByIngredient_notFound_returnsEmptyArray() throws CookeryDatabaseException, URISyntaxException {
-        when(recipesRepository.getRecipes(1, "tomato sauce")).thenReturn(
+        // Ingredients list
+        List<String> ingredients = new ArrayList<>();
+        ingredients.add("tomato sauce");
+
+        when(recipesRepository.getRecipes(1, ingredients)).thenReturn(
                 Arrays.asList()
         );
 
-        assertEquals(0, recipesController.getRecipes(1, "tomato sauce").size());
+        assertEquals(0, recipesController.getRecipes(1, ingredients).size());
     }
 
 

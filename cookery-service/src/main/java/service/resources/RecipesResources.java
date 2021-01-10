@@ -27,7 +27,7 @@ public class RecipesResources {
 	@GET //GET at http://localhost:XXXX/recipes?ingredient=onion OR http://localhost:XXXX/recipes
 	@PermitAll
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRecipesByIngredient(@DefaultValue("all") @QueryParam("ingredient") String ingredient, @HeaderParam("Authorization") String auth){
+	public Response getRecipesByIngredient(@DefaultValue("all") @QueryParam("ingredient") List<String> ingredients, @HeaderParam("Authorization") String auth){
 		List<RecipeDTO> recipes;
 
 		int userId = -1;
@@ -36,11 +36,12 @@ public class RecipesResources {
 			userId = AuthController.getIdInToken(auth);
 		}
 
-		if(ingredient.equals("all")) {
+		System.out.println("ingredient " + ingredients);
+		if(ingredients.get(0).equals("all")) {
 			recipes = recipesController.getRecipesDTO(userId);
 		}
 		else {
-			recipes = recipesController.getRecipes(userId, ingredient);
+			recipes = recipesController.getRecipes(userId, ingredients);
 		}
 
 		GenericEntity<List<RecipeDTO>> entity = new GenericEntity<List<RecipeDTO>>(recipes){ };

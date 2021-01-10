@@ -321,20 +321,10 @@ public class RecipesRepository {
 
     }
 
-    public List<RecipeDTO> getRecipes(int userId, String ingredient) throws CookeryDatabaseException, URISyntaxException {
+    // Get recipes which contains list of ingredients
+    public List<RecipeDTO> getRecipes(int userId, List<String> ingredients) throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> recipes = new ArrayList<>();
 
-//        String sql = "SELECT recipe.id AS recipeId, recipe.name AS recipeName, recipe.image AS recipeImage, " +
-//                "user.id AS userId, user.name AS userName, " +
-//                "ufr.id " +
-//                "FROM recipe " +
-//                "LEFT JOIN USER ON recipe.user_id = user.id " +
-//                "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
-//                "AND ufr.user_id = ?";
-
-//        String sql = "SELECT ingredient.*, recipe.name, recipe.description, recipe.image, recipe.user_id FROM ingredient " +
-//                "LEFT JOIN recipe on recipe.id = ingredient.recipe_id " +
-//                "WHERE ingredient = ?";
         String sql = "SELECT ingredient.recipe_id, recipe.name, recipe.image, recipe.user_id, " +
                         "user.name AS userName, ufr.id " +
                         "FROM ingredient " +
@@ -342,30 +332,46 @@ public class RecipesRepository {
                         "LEFT JOIN user on recipe.user_id = user.id " +
                         "LEFT JOIN user_favourite_recipe ufr " +
                         "ON recipe.id = ufr.recipe_id AND ufr.user_id = ? " +
-                        "WHERE ingredient = ?";
+                        "WHERE ingredient IN (";
+
+        for (int i = 0; i < ingredients.size(); i++) {
+            // last ingredient
+            if(ingredients.get(i).equals(ingredients.get(ingredients.size() - 1))) {
+                sql += "? ";
+                break;
+            }
+            sql += "?, ";
+        }
+
+        sql += ") " +
+        "GROUP BY recipe.id " +
+                "HAVING COUNT(*) = ?";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql))  {
             statement.setInt(1, userId);
-            statement.setString(2, ingredient);
+
+            int counter = 2;
+            for (String value : ingredients) {
+                statement.setString(counter, value);
+                counter++;
+            }
+            statement.setInt(counter, ingredients.size());
 
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 int recipeId = resultSet.getInt("recipe_id");
                 String recipeName = resultSet.getString("name");
-//                String recipeDescription = resultSet.getString("description");
                 String recipeImage = resultSet.getString("image");
                 int creatorId = resultSet.getInt("user_id");
                 int favouriteId = resultSet.getInt("id");
                 String userName = resultSet.getString("userName");
-                // public RecipeDTO(int id, String name, String image, User user, int favouriteId, boolean isFavourite) {
 
                 boolean isFavourite = false;
                 if(favouriteId > 0) {
                     isFavourite = true;
                 }
 
-//                RecipeDTO recipe = new RecipeDTO(recipeId, recipeName, recipeImage, new User(creatorId, userName));
                 UserDTO user = new UserDTO(creatorId, userName);
 
                 RecipeDTO recipe = new RecipeDTO(recipeId, recipeName, recipeImage,  user, favouriteId, isFavourite);
