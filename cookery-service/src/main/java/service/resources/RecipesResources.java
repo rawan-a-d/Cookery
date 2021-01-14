@@ -12,6 +12,8 @@ import service.model.Role;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
@@ -119,26 +121,37 @@ public class RecipesResources {
 		}
 	}
 
+	// ASYNC
 	@PUT //PUT at http://localhost:XXXX/recipes/3
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{id}")
 	@RolesAllowed({"user", "admin"}) // Allowed only for owners
-	public Response updateRecipe(@PathParam("id") int id, Recipe recipe, @HeaderParam("Authorization") String auth){
-		UserDTO user = AuthController.getUser(auth); // user in token
-		int ownerId = UsersController.getUserId(id); // id of owner of the recipe
+	public void updateRecipe(@PathParam("id") int id, Recipe recipe, @HeaderParam("Authorization") String auth, @Suspended final AsyncResponse asyncResponse){
+		new Thread((new Runnable() {
+			@Override
+			public void run() {
+				Response response = update();
+				asyncResponse.resume(response);
+			}
 
-		if(user.getId() != ownerId) {
-			return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
-		}
+			private Response update() {
+				UserDTO user = AuthController.getUser(auth); // user in token
+				int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
-		boolean result = recipesController.updateRecipe(id, recipe);
+				if(user.getId() != ownerId) {
+					return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
+				}
 
-		if(result) {
-			return Response.noContent().build();
-		}
-		else {
-			return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid recipe id").build();
-		}
+				boolean result = recipesController.updateRecipe(id, recipe);
+
+				if(result) {
+					return Response.noContent().build();
+				}
+				else {
+					return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid recipe id").build();
+				}
+			}
+		})).start();
 	}
 
 	@DELETE //DELETE at http://localhost:XXXX/recipes/3
