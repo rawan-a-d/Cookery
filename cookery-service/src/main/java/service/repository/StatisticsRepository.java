@@ -18,7 +18,7 @@ public class StatisticsRepository {
     // Favourites per user
     public ChartDataDTO getFavouritesPerUser() throws CookeryDatabaseException {
         String sql = "SELECT user.name AS userName, count(*) AS favouritesNr FROM user " +
-                        "INNER JOIN recipe r on user.id = r.user_id " +
+                        "INNER JOIN user_favourite_recipe r on user.id = r.user_id " +
                         "GROUP BY user.id";
         ChartDataDTO chartData = new ChartDataDTO("Number of favourites recipes per user");
         try (Connection connection = jdbcRepository.getDatabaseConnection();

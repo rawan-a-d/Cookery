@@ -97,12 +97,12 @@ public class UsersRepositoryTest {
     }
 
 
-    @Test
-    public void deleteUser() throws CookeryDatabaseException, URISyntaxException {
-        boolean result = usersRepository.deleteUser(1);
-
-        assertTrue(result);
-    }
+//    @Test
+//    public void deleteUser() throws CookeryDatabaseException, URISyntaxException {
+//        boolean result = usersRepository.deleteUser(1);
+//
+//        assertTrue(result);
+//    }
 
 
     @Test

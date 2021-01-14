@@ -21,10 +21,9 @@ public class StatisticsResources {
 
     private final StatisticsController statisticsController = new StatisticsController();
 
-    @GET //GET at http://localhost:XXXX/statistics
+    @GET //GET at http://localhost:XXXX/statistics?type="favourites-recipes-per-user"
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStatistic(@QueryParam("type") String type){
-//        List<ChartDataDTO> chartData = null;
         ChartDataDTO chartData = null;
 
         if(type.equals("favourites-recipes-per-user")) {
@@ -40,9 +39,6 @@ public class StatisticsResources {
             System.out.println("No type");
         }
 
-//        GenericEntity<List<ChartDataDTO>> entity = new GenericEntity<List<ChartDataDTO>>(chartData){ };
         return Response.ok(chartData).build(); // Status ok 200, return user
-
-//        return Response.ok(entity).build();
     }
 }

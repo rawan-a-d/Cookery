@@ -40,6 +40,16 @@ REFERENCES  recipe( id ),
 CONSTRAINT USER_ID_FOREIGNKEY FOREIGN KEY (user_id)
 REFERENCES  user( id ));
 
+CREATE TABLE follow
+(id INTEGER not NULL AUTO_INCREMENT,
+ follower_id INTEGER,
+ followee_id INTEGER,
+ PRIMARY KEY ( id ),
+ CONSTRAINT FOLLOWER_ID_FOREIGNKEY FOREIGN KEY (follower_id)
+     REFERENCES  user( id ),
+ CONSTRAINT FOLLOWEE_ID_FOREIGNKEY FOREIGN KEY (followee_id)
+     REFERENCES  user( id ));
+
 
 INSERT INTO user (name, email, password, role) VALUES ('Rawan', 'rawan@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'admin');
 INSERT INTO user (name, email, password, role) VALUES ('Anas', 'anas@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'user');
@@ -61,3 +71,9 @@ INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES ('onion', 5, 4);
 INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (1, 2);
 INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (1, 3);
 INSERT INTO user_favourite_recipe (user_id, recipe_id) VALUES (2, 1);
+
+
+INSERT INTO follow (follower_id, followee_id) VALUES (2, 1);
+INSERT INTO follow (follower_id, followee_id) VALUES (3, 1);
+INSERT INTO follow (follower_id, followee_id) VALUES (1, 2);
+INSERT INTO follow (follower_id, followee_id) VALUES (1, 4);
