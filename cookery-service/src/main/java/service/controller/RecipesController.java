@@ -124,6 +124,13 @@ public class RecipesController {
         boolean result = false;
         try {
             result = recipesRepository.createRecipe(recipe);
+
+            if(result) {
+                System.out.println("Recipe added success");
+                NotificationController notificationController = NotificationController.getInstance();
+
+//                notificationController.onNewRecipe(recipe);
+            }
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant

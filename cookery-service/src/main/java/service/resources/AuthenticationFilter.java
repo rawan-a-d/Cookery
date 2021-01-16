@@ -2,6 +2,7 @@ package service.resources;
 
 import io.jsonwebtoken.Claims;
 import service.controller.AuthController;
+import service.controller.NotificationController;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -52,16 +53,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // 2. check if the user has one of these roles
         // 3. if not, abort requestContext with FORBIDDEN response
 
-
-
         /* Get information about the service method which is being called. This information includes the annotated/permitted roles. */
         Method method = resourceInfo.getResourceMethod();
-
-        // if access is allowed for all -> do not check anything further : access is approved for all
-        // if you want all logged in users to be able to access this route (add this check at the end of the class)
-        if (method.isAnnotationPresent(PermitAll.class)) {
-            return;
-        }
 
         // if access is denied for all: deny access
         if (method.isAnnotationPresent(DenyAll.class)) {
@@ -81,22 +74,33 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY); // authorization header
 
         //If no authorization information present: abort with UNAUTHORIZED and stop
-        if (authorization == null || authorization.isEmpty()) {
+        if ((authorization == null || authorization.isEmpty()) && !method.isAnnotationPresent(PermitAll.class)) {
             Response response = Response.status(Response.Status.UNAUTHORIZED).
                     entity("Missing username and/or password.").build();
             requestContext.abortWith(response); // inform the client it's aborted with the above content
             return;
         }
 
-        //Get encoded username and password
-        final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
 
-        // Validate token
-        Claims token;
-        try {
-            token = AuthController.decodeJWT(encodedCredentials);
+        Claims token = null;
+        if(authorization != null) {
+            //Get encoded username and password
+            final String encodedCredentials = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", ""); // remove scheme (Basic) and space
 
-            System.out.println("Token " + token);
+            // Validate token
+            try {
+                token = AuthController.decodeJWT(encodedCredentials);
+
+                System.out.println("Token " + token);
+
+                System.out.println("AUTH");
+                NotificationController notificationController = NotificationController.getInstance();
+
+                // Create socket for logged in user
+                int userId = Integer.parseInt(token.get("sub").toString());
+                System.out.println("userId " +  userId);
+                notificationController.onConnect(userId);
+
 //            if(!AuthController.isTokenValid(token)) {
 //                System.out.println("Token has expired");
 //                Response response = Response.status(Response.Status.UNAUTHORIZED).entity("Token has expired").build();
@@ -104,12 +108,21 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 //                return;
 //            }
 
+            }
+            catch (Exception exception){
+                //Invalid signature/claims
+                Response response = Response.status(Response.Status.UNAUTHORIZED).
+                        entity("Token is invalid " + exception.getMessage()).build();
+                requestContext.abortWith(response);
+                return;
+            }
         }
-        catch (Exception exception){
-            //Invalid signature/claims
-            Response response = Response.status(Response.Status.UNAUTHORIZED).
-                    entity("Token is invalid " + exception.getMessage()).build();
-            requestContext.abortWith(response);
+
+
+        // Permit all after checking auth to create a socket if user is logged in
+        // if access is allowed for all: access is approved for all
+        // if you want all logged in users to be able to access this route (add this check at the end of the class)
+        if (method.isAnnotationPresent(PermitAll.class)) {
             return;
         }
 
@@ -145,6 +158,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // 2. Select the user object here and check the role
 
         if((rolesSet.contains("admin") && isAdmin) || (rolesSet.contains("user") && !isAdmin)) {
+            System.out.println("Role allowed");
             return true;
         }
 

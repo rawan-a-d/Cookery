@@ -1,5 +1,6 @@
 package service.repository;
 
+import service.controller.NotificationController;
 import service.controller.RecipesController;
 import service.model.DTO.RecipeDTO;
 import service.model.DTO.RecipeFollowDTO;
@@ -540,9 +541,6 @@ public class RecipesRepository {
             preparedStatement.setString(2, recipe.getDescription());
             preparedStatement.setString(3, recipe.getImage());
             preparedStatement.setInt(4, recipe.getUserId());
-//            preparedStatement.setDate(5, date);
-            //preparedStatement.setTimestamp(5, date.toLocalDate());
-//            statement.setDate(index, new java.sql.Date(time));
             preparedStatement.setDate(5, new java.sql.Date(Calendar.getInstance().getTime().getTime()));
             preparedStatement.executeUpdate();
 
@@ -568,6 +566,8 @@ public class RecipesRepository {
                 preparedStatementIngredient.executeBatch();
 
                 connection.commit();
+
+                System.out.println("onNew recipe recipesRepo");
 
                 return true;
             }
