@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 
 public class Publisher {
 //    private static final URI BASE_URI = URI.create("http://localhost:90");
-    private static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(90).build();
+//    private static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(90).build();
+    private static final URI BASE_URI = UriBuilder.fromUri("http://0.0.0.0/").port(90).build();
 
 //    private static final URI BASE_URI = URI.create("http://0.0.0.0:90/"); // docker
 

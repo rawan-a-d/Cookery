@@ -30,7 +30,7 @@ deploy:
   stage: deploy
   script:
     - cd cookery-service
-    - ./gradlew shadowJar
+    - "./gradlew shadowJar"
     - docker build -t cookeryApp:1.0 .
   dependencies:
     - sonarqube
