@@ -2,7 +2,7 @@ package service.resources;
 
 import io.jsonwebtoken.Claims;
 import service.controller.AuthController;
-import service.controller.NotificationController;
+import service.controller.NotificationSocketController;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -94,7 +94,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 System.out.println("Token " + token);
 
                 System.out.println("AUTH");
-                NotificationController notificationController = NotificationController.getInstance();
+                NotificationSocketController notificationController = NotificationSocketController.getInstance();
 
                 // Create socket for logged in user
                 int userId = Integer.parseInt(token.get("sub").toString());

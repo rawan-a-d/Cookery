@@ -4,12 +4,10 @@ import cyclops.control.Validated;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import service.controller.AuthController;
+import service.controller.NotificationController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
-import service.model.DTO.ProfileDTO;
-import service.model.DTO.RecipeDTO;
-import service.model.DTO.UserDTO;
-import service.model.DTO.UserFollowDTO;
+import service.model.DTO.*;
 import service.model.Recipe;
 import service.model.Role;
 import service.model.User;
@@ -37,7 +35,8 @@ public class UsersResources {
 
     private final UsersController usersController = new UsersController();
     private final RecipesController recipesController = new RecipesController();
-    AuthController authController = new AuthController();
+    private final AuthController authController = new AuthController();
+    private final NotificationController notificationController = new NotificationController();
 
 
     @GET //GET at http://localhost:XXXX/users
@@ -157,9 +156,9 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"}) // get recipes of logged in users
     public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-        int userId = authController.getIdInToken(auth);
+//        int userId = authController.getIdInToken(auth);
 
-        List<Recipe> recipes = recipesController.getRecipes(userId);
+        List<Recipe> recipes = recipesController.getRecipes(id);
 
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
@@ -327,6 +326,32 @@ public class UsersResources {
 
         GenericEntity<List<UserFollowDTO>> entity = new GenericEntity<List<UserFollowDTO>>(users){ };
         return Response.ok(entity).build();
+    }
+
+
+    @GET //GET at http://localhost:XXXX/users/1/notifications
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"user", "admin"})
+    @Path("{id}/notifications")
+    public Response getNotifications(@HeaderParam("Authorization") String auth) {
+        int userId = AuthController.getIdInToken(auth); // id in token
+
+        NotificationDTO notification = notificationController.getNotifications(userId);
+
+        return Response.ok(notification).build();
+    }
+
+
+    @PUT //GET at http://localhost:XXXX/users/1/notifications
+    @RolesAllowed({"user", "admin"})
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("{id}/notifications/seen")
+    public Response markNotificationsAsSeen(@HeaderParam("Authorization") String auth) {
+        int userId = AuthController.getIdInToken(auth); // id in token
+
+        boolean result = notificationController.markAsSeen(userId);
+
+        return Response.noContent().build();
     }
 
 

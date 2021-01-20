@@ -76,8 +76,8 @@ public class StatisticsResourcesTest extends JerseyTest {
 
         assertEquals("Http Response should be 200: ", Response.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(expectedChartData.getTitle(), actualChartData.getTitle());
-        assertArrayEquals(expectedChartData.getXAxis().toArray(), actualChartData.getXAxis().toArray());
-        assertArrayEquals(expectedChartData.getYAxis().toArray(), actualChartData.getYAxis().toArray());
+        assertArrayEquals(expectedChartData.getxAxis().toArray(), actualChartData.getxAxis().toArray());
+        assertArrayEquals(expectedChartData.getyAxis().toArray(), actualChartData.getyAxis().toArray());
     }
 
 
@@ -99,8 +99,8 @@ public class StatisticsResourcesTest extends JerseyTest {
 
         assertEquals("Http Response should be 200: ", Response.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(expectedChartData.getTitle(), actualChartData.getTitle());
-        assertArrayEquals(expectedChartData.getXAxis().toArray(), actualChartData.getXAxis().toArray());
-        assertArrayEquals(expectedChartData.getYAxis().toArray(), actualChartData.getYAxis().toArray());
+        assertArrayEquals(expectedChartData.getxAxis().toArray(), actualChartData.getxAxis().toArray());
+        assertArrayEquals(expectedChartData.getyAxis().toArray(), actualChartData.getyAxis().toArray());
     }
 
 
@@ -123,7 +123,7 @@ public class StatisticsResourcesTest extends JerseyTest {
 
         assertEquals("Http Response should be 200: ", Response.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(expectedChartData.getTitle(), actualChartData.getTitle());
-        assertArrayEquals(expectedChartData.getXAxis().toArray(), actualChartData.getXAxis().toArray());
-        assertArrayEquals(expectedChartData.getYAxis().toArray(), actualChartData.getYAxis().toArray());
+        assertArrayEquals(expectedChartData.getxAxis().toArray(), actualChartData.getxAxis().toArray());
+        assertArrayEquals(expectedChartData.getyAxis().toArray(), actualChartData.getyAxis().toArray());
     }
 }

@@ -82,7 +82,8 @@ public class UsersRepository extends JDBCRepository{
 	public ProfileDTO getProfile(int userId) throws CookeryDatabaseException, URISyntaxException {
 		String sql = "SELECT user.id, user.name, user.email, user.image, " +
 						"(SELECT COUNT(recipe.user_id) from recipe where user_id = user.id) AS recipesNr, " +
-						"(SELECT COUNT(follow.followee_id) from follow WHERE followee_id = user.id) AS followersNr " +
+						"(SELECT COUNT(follow.followee_id) from follow WHERE followee_id = user.id) AS followersNr, " + // followers
+						"(SELECT COUNT(follow.follower_id) from follow WHERE follower_id = user.id) AS followeesNr "+ // users current user is following
 						"FROM user " +
 						"WHERE user.id = ?";
 
@@ -100,10 +101,12 @@ public class UsersRepository extends JDBCRepository{
 				String image = resultSet.getString("image");
 				int recipesNr = resultSet.getInt("recipesNr");
 				int followersNr = resultSet.getInt("followersNr");
+				int followeesNr = resultSet.getInt("followeesNr");
 
 				UserBase user = new UserBase(userId, name, email);
-				ProfileDTO profile = new ProfileDTO(user, image, recipesNr, followersNr);
+				ProfileDTO profile = new ProfileDTO(user, image, recipesNr, followersNr, followeesNr);
 
+				System.out.println("Profile " + profile);
 				return profile;
 			}
 

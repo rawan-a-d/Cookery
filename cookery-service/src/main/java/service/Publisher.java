@@ -4,7 +4,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.websockets.WebSocketAddOn;
 import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import service.controller.NotificationController;
+import service.controller.NotificationSocketController;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Publisher {
-//    URI baseUri = UriBuilder.fromUri("http://localhost/").port(9988).build();
-
 //    private static final URI BASE_URI = URI.create("http://localhost:90");
     private static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(90).build();
 
@@ -32,8 +30,8 @@ public class Publisher {
             server.getListeners().forEach(listener -> { listener.registerAddOn(webSocketAddOn);}); // listen to web socket
 
             // register my websocket app (shape web socket, specify under which url it will be available -> root/ws/demo)
-            NotificationController notificationController = NotificationController.getInstance(); // notification controller
-            WebSocketEngine.getEngine().register("/ws", "/notification", notificationController);
+            NotificationSocketController socketController = NotificationSocketController.getInstance(); // notification controller
+            WebSocketEngine.getEngine().register("/ws", "/notification", socketController);
 
             // Now start the server
             server.start();

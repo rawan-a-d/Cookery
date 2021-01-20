@@ -75,6 +75,51 @@ public class RecipesRepository {
         }
     }
 
+
+    public RecipeDTO getRecipeDTO(int id) throws CookeryDatabaseException, URISyntaxException {
+
+        String  sql = "SELECT recipe.*, user.name AS user_name " +
+                "FROM recipe " +
+                "LEFT JOIN user ON user.id = recipe.user_id " +
+                "WHERE recipe.id = ?";
+
+        System.out.println("RECIPE ID DTO SOCKET" + id);
+        RecipeDTO recipe = null;
+
+        try (Connection connection = jdbcRepository.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(!resultSet.isBeforeFirst()) {
+                connection.close();
+                throw new CookeryDatabaseException("Recipe with recipe id " + id + " cannot be found");
+            }
+            else {
+                while(resultSet.next()) {
+
+                    if(recipe == null) {
+                        String name = resultSet.getString("name");
+                        String image = resultSet.getString("image");
+                        int userId = resultSet.getInt("user_id");
+                        String userName = resultSet.getString("user_name");
+
+                        UserDTO user = new UserDTO(userId, userName);
+                        recipe = new RecipeDTO(id, name, image, user);
+                    }
+                }
+
+                connection.commit();
+
+                return recipe;
+            }
+        }
+        catch (SQLException throwable) {
+            throw new CookeryDatabaseException("Cannot read recipe from the database", throwable);
+        }
+    }
+
     public RecipeFollowDTO getRecipeFollow(int recipeId, int userId) throws CookeryDatabaseException {
         String sql = "SELECT recipe.id, recipe.name, recipe.description, recipe.image, " +
                         "ingredient.id AS ingredient_id, ingredient.ingredient, ingredient.amount, " +
@@ -550,8 +595,8 @@ public class RecipesRepository {
             if(resultSet.next()) {
                 int recipeId = resultSet.getInt(1);
 
+                System.out.println("New recipe id " + recipeId);
 
-                System.out.println(preparedStatement);
                 List<Ingredient> ingredients = recipe.getIngredients();
 
                 for(Ingredient ingredient: ingredients) {
@@ -568,6 +613,13 @@ public class RecipesRepository {
                 connection.commit();
 
                 System.out.println("onNew recipe recipesRepo");
+
+                // Get recipe with id and user name
+                RecipeDTO recipeDTO = getRecipeDTO(recipeId);
+
+                // Create notification
+                NotificationController notificationController = new NotificationController();
+                notificationController.createNotification(recipeDTO);
 
                 return true;
             }

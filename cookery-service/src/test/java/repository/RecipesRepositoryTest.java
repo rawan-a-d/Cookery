@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import service.controller.NotificationController;
 import service.model.DTO.RecipeDTO;
 import service.model.DTO.UserDTO;
 import service.model.Ingredient;
@@ -35,6 +36,10 @@ public class RecipesRepositoryTest {
 
     @InjectMocks
     RecipesRepository recipesRepository;
+
+    @Mock
+    NotificationController notificationController;
+
 
     @BeforeEach
     public void setUp() throws SQLException, ClassNotFoundException, CookeryDatabaseException, URISyntaxException {
@@ -237,6 +242,9 @@ public class RecipesRepositoryTest {
                         new Ingredient("ingredient 4", 2),
                         new Ingredient("ingredient 5", 3)
                 ));
+
+        // Mock notification
+//        when(notificationController.createNotification())
 
         boolean result = recipesRepository.createRecipe(newRecipe);
 

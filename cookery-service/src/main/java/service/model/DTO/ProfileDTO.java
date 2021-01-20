@@ -1,16 +1,20 @@
 package service.model.DTO;
 
+import java.util.Objects;
+
 public class ProfileDTO {
     private UserBase user;
     private String image;
     private int recipesNr;
     private int followersNr;
+    private int followeesNr;
 
-    public ProfileDTO(UserBase user, String image, int recipesNr, int followersNr) {
+    public ProfileDTO(UserBase user, String image, int recipesNr, int followersNr, int followeesNr) {
         this.user = user;
         this.image = image;
         this.recipesNr = recipesNr;
         this.followersNr = followersNr;
+        this.followeesNr = followeesNr;
     }
 
     public UserBase getUser() {
@@ -43,5 +47,41 @@ public class ProfileDTO {
 
     public void setFollowersNr(int followersNr) {
         this.followersNr = followersNr;
+    }
+
+    public int getFolloweesNr() {
+        return followeesNr;
+    }
+
+    public void setFolloweesNr(int followeesNr) {
+        this.followeesNr = followeesNr;
+    }
+
+    @Override
+    public String toString() {
+        return "ProfileDTO{" +
+                "user=" + user +
+                ", image='" + image + '\'' +
+                ", recipesNr=" + recipesNr +
+                ", followersNr=" + followersNr +
+                ", followeesNr=" + followeesNr +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProfileDTO that = (ProfileDTO) o;
+        return recipesNr == that.recipesNr &&
+                followersNr == that.followersNr &&
+                followeesNr == that.followeesNr &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(image, that.image);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, image, recipesNr, followersNr, followeesNr);
     }
 }

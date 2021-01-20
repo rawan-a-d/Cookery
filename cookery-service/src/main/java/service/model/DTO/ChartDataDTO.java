@@ -43,22 +43,22 @@ public class ChartDataDTO {
         this.yAxis.add(y);
     }
 
-    public List<Object> getXAxis() {
+    public List<Object> getxAxis() {
         System.out.println("get x " + xAxis);
         return xAxis;
     }
 
-    public List<Integer> getYAxis() {
+    public List<Integer> getyAxis() {
         System.out.println("get y " + yAxis);
 
         return yAxis;
     }
 
-    public void setXAxis(List<Object> xAxis) {
+    public void setxAxis(List<Object> xAxis) {
         this.xAxis = xAxis;
     }
 
-    public void setYAxis(List<Integer> yAxis) {
+    public void setyAxis(List<Integer> yAxis) {
         this.yAxis = yAxis;
     }
 
