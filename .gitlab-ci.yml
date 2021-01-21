@@ -2,7 +2,7 @@ stages:
   - build
   - test
   - sonarqube
-  - deploy
+#  - deploy
 
 build:
   stage: build
@@ -26,11 +26,11 @@ sonarqube:
   dependencies:
     - test
 
-deploy:
-  stage: deploy
-  script:
-    - cd cookery-service
-    - "./gradlew shadowJar"
-    - "docker build -t cookeryapp:1.0 ."
-  dependencies:
-    - sonarqube
+#deploy:
+#  stage: deploy
+#  script:
+#    - cd cookery-service
+#    - "./gradlew shadowJar"
+#    - "docker build -t cookeryapp:1.0 ."
+#  dependencies:
+#    - sonarqube

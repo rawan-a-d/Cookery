@@ -12,8 +12,8 @@ public class UserValidator {
         if(user.getName() == null) { // null
             return Validated.invalid(Error.NULL);
         }
-        else if(user.getName().length() < 4) { // invalid
-            return Validated.invalid(Error.INVALID_PASS);
+        else if(user.getName().length() < 4 || !user.getName().matches("^[a-zA-Z\\s]*$")) { // invalid
+            return Validated.invalid(Error.INVALID_NAME);
         }
         else { // valid
             return Validated.valid("Valid name");

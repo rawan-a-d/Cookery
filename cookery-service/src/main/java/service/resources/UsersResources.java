@@ -70,12 +70,8 @@ public class UsersResources {
     @GET //GET at http://localhost:XXXX/users/1/profile
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}/profile")
-//    @RolesAllowed({"user", "admin"})
-    @PermitAll
+    @RolesAllowed({"user", "admin"})
     public Response getUserProfile(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-//        int userId = AuthController.getIdInToken(auth); // user in token
-
-        System.out.println("ID PROFILE " + id);
         ProfileDTO profile = usersController.getProfile(id);
         if(profile != null){
             return Response.ok(profile).build(); // Status ok 200, return profile
@@ -90,16 +86,27 @@ public class UsersResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @PermitAll
     public Response addUser(User user){
-        UserDTO userDTO = usersController.createUser(user);
+        // Validate data
+        Validated<Error, String> name = UserValidator.validName(user);;
+        Validated<Error, String> email = UserValidator.validEmail(user);
+        Validated<Error, String> pass = UserValidator.validPassword(user);
 
-        if(userDTO != null){ // Successful
-            String token = AuthController.generateAuthToken(userDTO);
-
-            return Response.ok(token).build();
+        // if name is invalid , if email is invalid, if password is invalid -> incorrect data
+        if(name.isInvalid() || email.isInvalid() || pass.isInvalid()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
         }
         else {
-            String entity = "User with id " + user.getId() + " already exists";
-            return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
+            UserDTO userDTO = usersController.createUser(user);
+
+            if(userDTO != null){ // Successful
+                String token = AuthController.generateAuthToken(userDTO);
+
+                return Response.ok(token).build();
+            }
+            else {
+                String entity = "User with id " + user.getId() + " already exists";
+                return Response.status(Response.Status.CONFLICT).entity(entity).build(); // status conflict, return previous reply
+            }
         }
     }
 

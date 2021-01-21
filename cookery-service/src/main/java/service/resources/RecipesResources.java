@@ -1,5 +1,6 @@
 package service.resources;
 
+import cyclops.control.Validated;
 import service.controller.AuthController;
 import service.controller.RecipesController;
 import service.controller.UsersController;
@@ -8,6 +9,8 @@ import service.model.DTO.RecipeFollowDTO;
 import service.model.DTO.UserDTO;
 import service.model.Recipe;
 import service.model.Role;
+import service.validators.Error;
+import service.validators.RecipeValidator;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -93,18 +96,20 @@ public class RecipesResources {
 	public Response addRecipe(Recipe recipe, @HeaderParam("Authorization") String auth){
 		int userId = -1;
 
-		System.out.println("RECIPE " + recipe);
+		// Validate data
+		Validated<Error, String> name = RecipeValidator.validName(recipe);;
+		Validated<Error, String> description = RecipeValidator.validDescription(recipe);
+		Validated<Error, String> ingredients = RecipeValidator.validIngredients(recipe);
 
-		if(auth != null) { // auth exists/ logged in user
+		// if name is invalid , if email is invalid, if password is invalid -> incorrect data
+		if(name.isInvalid() || description.isInvalid() || ingredients.isInvalid()) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+		}
+		else {
 			userId = AuthController.getIdInToken(auth);
 
-			System.out.println(userId);
-			System.out.println(recipe.getUserId());
 			if(recipe.getUserId() == userId) { // Same user
-
-				System.out.println("Recipe 2 " + recipe );
 				recipesController.createRecipe(recipe);
-
 
 				String url = uriInfo.getAbsolutePath() + "/" + recipe.getId();
 				URI uri = URI.create(url);
@@ -114,10 +119,6 @@ public class RecipesResources {
 				return Response.status(Response.Status.FORBIDDEN)
 						.entity("You are not allowed to perform this action").build();
 			}
-		}
-		else {
-			return Response.status(Response.Status.UNAUTHORIZED).
-					entity("You need to log in to add a recipe").build();
 		}
 	}
 
@@ -135,6 +136,8 @@ public class RecipesResources {
 			}
 
 			private Response update() {
+
+				System.out.println("RECIPE " + recipe);
 				UserDTO user = AuthController.getUser(auth); // user in token
 				int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 
@@ -142,13 +145,22 @@ public class RecipesResources {
 					return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
 				}
 
-				boolean result = recipesController.updateRecipe(id, recipe);
+				// Validate data
+				final Validated<Error, String> name = RecipeValidator.validName(recipe);;
+				final Validated<Error, String> description = RecipeValidator.validDescription(recipe);
+				final Validated<Error, String> ingredients = RecipeValidator.validIngredients(recipe);
 
-				if(result) {
-					return Response.noContent().build();
+				boolean result = recipesController.updateRecipe(id, recipe);
+				// if name is invalid , if email is invalid, if password is invalid -> incorrect data
+				if(name != null && name.isInvalid() || description != null && description.isInvalid() || ingredients != null && ingredients.isInvalid()) {
+					return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
 				}
 				else {
-					return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid recipe id").build();
+					if (result) {
+						return Response.noContent().build();
+					} else {
+						return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid recipe id").build();
+					}
 				}
 			}
 		})).start();

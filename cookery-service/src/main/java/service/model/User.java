@@ -11,11 +11,7 @@ public class User {
 
     public User() { }
 
-//    @ConstructorProperties({"name", "email", "password"})
     public User(String name, String email, String password) {
-//        this.setName(name);
-//        this.setEmail(email);
-//        this.setPassword(password);
         this.name = name;
         this.email = email;
         this.password = password;
@@ -43,14 +39,7 @@ public class User {
     }
 
     public void setName(String name) {
-//        if(name.length() >= 4) {
-            this.name = name;
-//        }
-//        else {
-//            System.out.println("Invalid name");
-//
-//            throw new IllegalStateException("Name is invalid");
-//        }
+        this.name = name;
     }
 
     public String getEmail() {
@@ -58,19 +47,7 @@ public class User {
     }
 
     public void setEmail(String email) {
-//        String regex = "^[a-zA-Z0-9_!#$%&�*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-//
-//        Pattern pattern = Pattern.compile(regex);
-//
-//        Matcher matcher = pattern.matcher(email);
-//
-//        if(matcher.matches()) {
-            this.email = email;
-//        }
-//        else {
-//            System.out.println("Invalid email");
-//            throw new IllegalStateException("Email is invalid");
-//        }
+        this.email = email;
     }
 
     public String getPassword() {
@@ -78,21 +55,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-//        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
-//
-//        Pattern pattern = Pattern.compile(regex);
-//
-//        Matcher matcher = pattern.matcher(password);
-//
-//        if(matcher.matches()) {
-//            System.out.println("Correct pass");
-            this.password = password;
-//        }
-//        else {
-//            System.out.println("Incorrect pass");
-//
-//            throw new IllegalStateException("Password is invalid");
-//        }
+        this.password = password;
     }
 
     public void setRole(Role role) {

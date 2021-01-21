@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class RecipesRepository {
     private final static Logger LOGGER = Logger.getLogger(RecipesController.class.getName());
 
-    //    @Inject
     JDBCRepository jdbcRepository;
 
     public RecipesRepository() {
@@ -83,7 +82,6 @@ public class RecipesRepository {
                 "LEFT JOIN user ON user.id = recipe.user_id " +
                 "WHERE recipe.id = ?";
 
-        System.out.println("RECIPE ID DTO SOCKET" + id);
         RecipeDTO recipe = null;
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
@@ -329,8 +327,6 @@ public class RecipesRepository {
                 "LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id " +
                 "AND ufr.user_id = ?";
 
-        System.out.println("USER ID " + userId);
-
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
@@ -354,7 +350,6 @@ public class RecipesRepository {
 
                 RecipeDTO recipe = new RecipeDTO(id, name, image, user, favouriteId, isFavourite);
 
-                System.out.println("Recipe " + recipe);
                 recipes.add(recipe);
             }
 
@@ -433,7 +428,6 @@ public class RecipesRepository {
     }
 
     public boolean updateRecipe(int id, Recipe recipe) throws CookeryDatabaseException, SQLException {
-        System.out.println("Repo");
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement stmt = connection.prepareStatement("UPDATE recipe SET name = ?, description = ?, image = ? WHERE id = ?");
             PreparedStatement createStmt = connection.prepareStatement("INSERT INTO ingredient (ingredient, amount, recipe_id) VALUES (?, ?, ?)");
@@ -442,7 +436,6 @@ public class RecipesRepository {
             PreparedStatement getIngredients = connection.prepareStatement("SELECT * FROM ingredient WHERE recipe_id = ?");
             PreparedStatement getIngredientsInRecipe = connection.prepareStatement("SELECT * FROM ingredient WHERE id = ? AND recipe_id = ?")) {
             if(recipe != null) {
-                System.out.println("After try");
                 // Update recipe
 
                 stmt.setString(1, recipe.getName());
@@ -451,7 +444,6 @@ public class RecipesRepository {
                 stmt.setInt(4, id);
 
                 stmt.executeUpdate();
-                System.out.println("After execute");
 
                 // Compare ingredients
                 List<Ingredient> ingredients = recipe.getIngredients();
@@ -459,7 +451,6 @@ public class RecipesRepository {
 
                 getIngredients.setInt(1, id);
                 ResultSet resultSet = getIngredients.executeQuery();
-                System.out.println("Pre while");
 
                 while(resultSet.next()) {
                     int ingredientId = resultSet.getInt("id");
@@ -471,8 +462,6 @@ public class RecipesRepository {
                     DBIngredients.add(ingredient);
                 }
 
-                System.out.println("Pre for");
-                // **************************************************** delete and update are similar
                 // Check if an ingredient is deleted
                 boolean isDeleted = true;
                 for (Ingredient DBIngredient: DBIngredients) {
@@ -494,8 +483,6 @@ public class RecipesRepository {
                         deleteStmt.addBatch();
                     }
                 }
-
-                System.out.println("After for");
 
 
                 for (int i = 0; i < ingredients.size(); i++) {
@@ -524,13 +511,11 @@ public class RecipesRepository {
                         updateStmt.addBatch();
                     }
                 }
-                System.out.println("After update batch");
 
                 updateStmt.executeBatch(); //executing the batch
                 createStmt.executeBatch(); //executing the batch
                 deleteStmt.executeBatch();
 
-                System.out.println("After execute batch");
                 connection.commit();
                 connection.close();
 
@@ -591,11 +576,8 @@ public class RecipesRepository {
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
-//            System.out.println("DATE " + date);
             if(resultSet.next()) {
                 int recipeId = resultSet.getInt(1);
-
-                System.out.println("New recipe id " + recipeId);
 
                 List<Ingredient> ingredients = recipe.getIngredients();
 
@@ -611,8 +593,6 @@ public class RecipesRepository {
                 preparedStatementIngredient.executeBatch();
 
                 connection.commit();
-
-                System.out.println("onNew recipe recipesRepo");
 
                 // Get recipe with id and user name
                 RecipeDTO recipeDTO = getRecipeDTO(recipeId);
@@ -640,30 +620,22 @@ public class RecipesRepository {
 
     /*------------------------------------------------ Favourites ------------------------------------------------------*/
     public boolean addFavourite(int userId, RecipeDTO favourite) throws CookeryDatabaseException, URISyntaxException {
-        System.out.println("Add favourite");
         String sql = "INSERT INTO user_favourite_recipe (user_id, recipe_id) " +
                 "SELECT ?, ? Where not exists( SELECT user_id, recipe_id FROM user_favourite_recipe " +
                 "WHERE user_id = ? AND recipe_id = ?)";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            System.out.println("userId " + userId);
-            System.out.println("favourite " + favourite.getId());
-            System.out.println("Connection " + connection);
-            System.out.println(userId);
-            System.out.println(favourite.getId());
+
             statement.setInt(1, userId);
             statement.setInt(2, favourite.getId());
             statement.setInt(3, userId);
             statement.setInt(4, favourite.getId());
             int affected = statement.executeUpdate();
-            System.out.println("affected " + affected);
 
             if(affected <= 0) {
-                System.out.println("Can't add favourite");
                 throw new CookeryDatabaseException("Cannot add favourite into the database");
             }
-            System.out.println("Favourite added");
 
             connection.commit();
 

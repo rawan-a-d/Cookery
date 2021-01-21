@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class Recipe {
 	private int id;
-	private static int idSeeder = 0;
 	private String name;
 	private String image;
 	private String description;
@@ -15,13 +14,10 @@ public class Recipe {
 
 
 	public Recipe() {
-		this.id = idSeeder;
-		idSeeder++;
+
 	}
 
 	public Recipe(String name, String image, String description, int userId) {
-		this.id = idSeeder;
-		idSeeder++;
 		this.name = name;
 		this.image = image;
 		this.description = description;
@@ -29,8 +25,6 @@ public class Recipe {
 	}
 
 	public Recipe(String name, String image, String description, int userId, List<Ingredient> ingredients) {
-		this.id = idSeeder;
-		idSeeder++;
 		this.name = name;
 		this.image = image;
 		this.description = description;
@@ -107,10 +101,6 @@ public class Recipe {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-
-	public static void decreaseIdSeeder() {
-		idSeeder--;
 	}
 
 
