@@ -122,7 +122,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         }
 
 
-
         /* here you do
         1.	the AUTHENTICATION first (as explained in previous sections), and
         2.	if AUTHENTICATION succeeds, you do the authorization like this:
@@ -131,6 +130,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             // get allowed roles for this method
             RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
             Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
+
+            if(token == null) { // fix sonar
+                Response response = Response.status(Response.Status.UNAUTHORIZED).
+                        entity("Token is invalid ").build();
+                requestContext.abortWith(response);
+                return;
+            }
 
             /* isUserAllowed : implement this method to check if this user has any of the roles in the rolesSet
             if not isUserAllowed abort the requestContext with FORBIDDEN response*/
