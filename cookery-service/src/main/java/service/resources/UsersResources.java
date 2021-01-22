@@ -291,7 +291,7 @@ public class UsersResources {
                 else {
                     return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
                 }
-            } catch (FileNotFoundException e) {
+            } catch (NullPointerException | FileNotFoundException e) {
                 e.printStackTrace();
             }
             finally {
