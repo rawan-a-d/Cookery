@@ -119,7 +119,7 @@ public class UsersResources {
         UserDTO userInToken = AuthController.getUser(auth); // user in token
 
         // If someone else is trying to change the data, and user trying to change the role
-        if((user.getId() != userInToken.getId() && userInToken.getRole().equals("user"))) {
+        if((user.getId() != userInToken.getId() && userInToken.getRole().equals(Role.valueOf("user")))) {
             return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to perform this action").build();
         }
 
@@ -163,9 +163,10 @@ public class UsersResources {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user", "admin"}) // get recipes of logged in users
     public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
-//        int userId = authController.getIdInToken(auth);
-
         List<Recipe> recipes = recipesController.getRecipes(id);
+
+        System.out.println("Recipes for user " + id);
+        System.out.println("Recipes size " + recipes.size());
 
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
@@ -193,7 +194,6 @@ public class UsersResources {
     }
 
 
-    //****************
     @DELETE
     @Path("{id}/favourites/{favouriteId}")
     @RolesAllowed({"user", "admin"}) // logged in users
@@ -269,11 +269,6 @@ public class UsersResources {
 
         File file = getFileName(new File(UPLOAD_PATH + fileMetaData.getFileName()));
 
-        System.out.println(file);
-        System.out.println("Image File " + Files.probeContentType(file.toPath()));
-
-        System.out.println("Image File " + Files.probeContentType(file.toPath()).contains("image"));
-
         if(Files.probeContentType(file.toPath()).contains("image")) {
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -281,26 +276,31 @@ public class UsersResources {
             OutputStream out = null;
             try {
                 out = new FileOutputStream(completePath);
+
+                while ((read = fileInputStream.read(bytes)) != -1)
+                {
+                    out.write(bytes, 0, read);
+                }
+
+                boolean result = usersController.uploadImage(userId, file.getName());
+
+                if(result){
+                    out.flush();
+                    out.close();
+                }
+                else {
+                    return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
+                }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
-            while ((read = fileInputStream.read(bytes)) != -1)
-            {
-                out.write(bytes, 0, read);
+            finally {
+                if(fileInputStream != null) {
+                    fileInputStream.close();
+                }
             }
 
-            boolean result = usersController.uploadImage(userId, file.getName());
-
-            if(result){
-                out.flush();
-                out.close();
-
-                return Response.noContent().build();
-            }
-            else {
-                return Response.status(Response.Status.NOT_FOUND).entity("Please provide a valid user id").build(); // Status not found, return error message
-            }
+            return Response.noContent().build();
         }
         else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Image is invalid").build();

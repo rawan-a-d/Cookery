@@ -91,23 +91,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             try {
                 token = AuthController.decodeJWT(encodedCredentials);
 
-                System.out.println("Token " + token);
-
-                System.out.println("AUTH");
                 NotificationSocketController notificationController = NotificationSocketController.getInstance();
 
                 // Create socket for logged in user
                 int userId = Integer.parseInt(token.get("sub").toString());
-                System.out.println("userId " +  userId);
                 notificationController.onConnect(userId);
-
-//            if(!AuthController.isTokenValid(token)) {
-//                System.out.println("Token has expired");
-//                Response response = Response.status(Response.Status.UNAUTHORIZED).entity("Token has expired").build();
-//                requestContext.abortWith(response);
-//                return;
-//            }
-
+            }
+            catch (NullPointerException exception){
+                //Invalid signature/claims
+                Response response = Response.status(Response.Status.UNAUTHORIZED).
+                        entity("Token is invalid " + exception.getMessage()).build();
+                requestContext.abortWith(response);
+                return;
             }
             catch (Exception exception){
                 //Invalid signature/claims
