@@ -309,12 +309,7 @@ public class RecipesRepository {
         return recipes;
 
     }
-//
-//    SELECT recipe.name, recipe.description, recipe.image, recipe.user_id, user.name FROM ingredient
-//    LEFT JOIN recipe on recipe.id = ingredient.recipe_id
-//    LEFT JOIN user on recipe.user_id = user.id
-//    LEFT JOIN user_favourite_recipe ufr ON recipe.id = ufr.recipe_id AND ufr.user_id = 1
-//    WHERE ingredient = 'onion'
+
 
     public List<RecipeDTO> getRecipesDTO(int userId) throws CookeryDatabaseException, URISyntaxException {
         List<RecipeDTO> recipes = new ArrayList<>();

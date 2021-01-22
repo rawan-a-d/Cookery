@@ -7,6 +7,9 @@ public class UserBase {
     private String name;
     private String email;
 
+    public UserBase() {
+    }
+
     public UserBase(int id, String name, String email) {
         this.id = id;
         this.name = name;

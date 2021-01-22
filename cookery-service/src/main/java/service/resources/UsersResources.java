@@ -165,9 +165,6 @@ public class UsersResources {
     public Response getUserRecipes(@PathParam("id") int id, @HeaderParam("Authorization") String auth){
         List<Recipe> recipes = recipesController.getRecipes(id);
 
-        System.out.println("Recipes for user " + id);
-        System.out.println("Recipes size " + recipes.size());
-
         GenericEntity<List<Recipe>> entity = new GenericEntity<List<Recipe>>(recipes){ };
         return Response.ok(entity).build();
     }

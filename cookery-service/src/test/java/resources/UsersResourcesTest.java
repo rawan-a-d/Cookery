@@ -14,7 +14,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.AuthController;
 import service.model.DTO.RecipeDTO;
+import service.model.DTO.UserBase;
 import service.model.DTO.UserDTO;
+import service.model.DTO.UserFollowDTO;
 import service.model.Ingredient;
 import service.model.Recipe;
 import service.model.Role;
@@ -118,6 +120,26 @@ public class UsersResourcesTest extends JerseyTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void addUser_invalidName_returnsBadRequest() {
+        User newUser = new User("Denys1", "denys@gmail.com", "Qw1234576@");
+
+        Entity<User> userEntity = Entity.entity(newUser, MediaType.APPLICATION_JSON);
+        Response response = target("users").request().post(userEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void addUser_invalidEmail_returnsBadRequest() {
+        User newUser = new User("Denys", "denys", "Qw1234576@");
+
+        Entity<User> userEntity = Entity.entity(newUser, MediaType.APPLICATION_JSON);
+        Response response = target("users").request().post(userEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
 
     @Test
     public void deleteUser() {
@@ -132,12 +154,6 @@ public class UsersResourcesTest extends JerseyTest {
     }
 
 
-//    String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
-//
-//    Response response = target("users/1/favourites/2")
-//            .request()
-//            .header("Authorization", "Bearer " + token)
-//            .delete();
     @Test
     public void updateUser(){
         String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
@@ -150,6 +166,34 @@ public class UsersResourcesTest extends JerseyTest {
                                 .put(userEntity);
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void updateUser_invalidName_returnsBadRequest(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+        User updatedUser = new User(1, "Rawan1", "rawan.ad@gmail.com", "Qw1234576@", Role.admin);
+
+        Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
+        Response response = target("users/1")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .put(userEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void updateUser_invalidEmail_returnsBadRequest(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+        User updatedUser = new User(1, "Rawan", "rawan.ad", "Qw1234576@", Role.admin);
+
+        Entity<User> userEntity = Entity.entity(updatedUser, MediaType.APPLICATION_JSON);
+        Response response = target("users/1")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .put(userEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
 
@@ -267,4 +311,112 @@ public class UsersResourcesTest extends JerseyTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(expectedRecipes, response.readEntity(new GenericType<List<RecipeDTO>>() {}));
     }
+
+
+// INSERT INTO follow (follower_id, followee_id) VALUES (2, 1);
+//INSERT INTO follow (follower_id, followee_id) VALUES (3, 1);
+//INSERT INTO follow (follower_id, followee_id) VALUES (1, 2);
+//INSERT INTO follow (follower_id, followee_id) VALUES (1, 4);
+
+    @Test
+    public void follow(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        UserDTO followee = new UserDTO(3, "Omar");
+        Entity<UserDTO> followeeEntity = Entity.entity(followee, MediaType.APPLICATION_JSON);
+
+        Response response = target("users/1/followers")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .post(followeeEntity);
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void unFollow() {
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        Response response = target("users/1/followers/3")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .delete();
+
+        assertEquals(204, response.getStatus());
+    }
+
+
+    @Test
+    public void getFollowers(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        List<UserFollowDTO> expectedUsers = Arrays.asList(
+                new UserFollowDTO(1, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                new UserFollowDTO(2, new UserBase(3, "Omar", "omar@gmail.com"), "omar image")
+        );
+
+        final Response response =  target("users/1/followers")
+                                            .request()
+                                            .header("Authorization", "Bearer " + token)
+                                            .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(expectedUsers, response.readEntity(new GenericType<List<UserFollowDTO>>() {}));
+    }
+
+
+    //    INSERT INTO user (name, email, password, role) VALUES ('Rawan', 'rawan@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'admin');
+//    INSERT INTO user (name, email, password, role) VALUES ('Anas', 'anas@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'user');
+//    INSERT INTO user (name, email, password, role) VALUES ('Omar', 'omar@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'admin');
+//    INSERT INTO user (name, email, password, role) VALUES ('Raneem', 'raneem@gmail.com', 'cd73952c896e75f83a188d4d16858ef2', 'user');
+// INSERT INTO follow (follower_id, followee_id) VALUES (2, 1);
+//INSERT INTO follow (follower_id, followee_id) VALUES (3, 1);
+//INSERT INTO follow (follower_id, followee_id) VALUES (1, 2);
+//INSERT INTO follow (follower_id, followee_id) VALUES (1, 4);
+
+    @Test
+    public void getFollowees(){
+        String token = AuthController.generateAuthToken(new UserDTO(1, "Rawan", "rawan@gmail.com", Role.admin));
+
+        List<UserFollowDTO> expectedUsers = Arrays.asList(
+                new UserFollowDTO(3, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                new UserFollowDTO(4, new UserBase(4, "Raneem", "raneem@gmail.com"), "raneem image")
+        );
+
+        final Response response =  target("users/1/followees")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(expectedUsers, response.readEntity(new GenericType<List<UserFollowDTO>>() {}));
+    }
+
+//
+//
+//    @GET //GET at http://localhost:XXXX/users/1/notifications
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @RolesAllowed({"user", "admin"})
+//    @Path("{id}/notifications")
+//    public Response getNotifications(@HeaderParam("Authorization") String auth) {
+//        int userId = AuthController.getIdInToken(auth); // id in token
+//
+//        NotificationDTO notification = notificationController.getNotifications(userId);
+//
+//        return Response.ok(notification).build();
+//    }
+//
+//
+//    @PUT //GET at http://localhost:XXXX/users/1/notifications
+//    @RolesAllowed({"user", "admin"})
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @Path("{id}/notifications/seen")
+//    public Response markNotificationsAsSeen(@HeaderParam("Authorization") String auth) {
+//        int userId = AuthController.getIdInToken(auth); // id in token
+//
+//        boolean result = notificationController.markAsSeen(userId);
+//
+//        return Response.noContent().build();
+//    }
 }

@@ -49,29 +49,6 @@ public class AuthControllerTest {
     }
 
 
-//    @Test
-//    public void register() throws URISyntaxException, CookeryDatabaseException {
-//        User newUser = new User("Denys Johnson", "denys@gmail.com", "Qw1234576@");
-//
-//        UserDTO expectedUser = new UserDTO(5, "Denys Johnson", "denys@gmail.com", Role.user);
-//
-//        when(usersRepository.createUser(newUser)).thenReturn(expectedUser);
-//
-//        UserDTO user = authController.register(newUser);
-//
-//        assertEquals(expectedUser, user);
-//    }
-
-
-//    @Test
-//    public void generateAuthToken() {
-//        String expectedToken = generateToken(1, "Rawan", true);
-//
-//        String actualToken = AuthController.generateAuthToken(new User(1, "Rawan", "rawan@gmail.com", "1234", Role.admin));
-//
-//        assertEquals(expectedToken, actualToken);
-//    }
-
 
     @Test
     public void decodeJWT() {

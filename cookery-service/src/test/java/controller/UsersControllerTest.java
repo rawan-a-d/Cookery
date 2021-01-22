@@ -6,7 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import service.controller.UsersController;
+import service.model.DTO.UserBase;
 import service.model.DTO.UserDTO;
+import service.model.DTO.UserFollowDTO;
 import service.model.Role;
 import service.model.User;
 import service.repository.CookeryDatabaseException;
@@ -16,6 +18,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -106,10 +109,62 @@ class UsersControllerTest {
         assertTrue(usersController.deleteUser(1));
     }
 
-//    @Test
-//    public void getUserId() throws CookeryDatabaseException {
-//        when(usersRepository.getUserId(2)).thenReturn(1);
-//
-//        assertEquals(UsersController.getUserId(2), 1);
-//    }
+
+    @Test
+    public void follow() throws CookeryDatabaseException {
+        UserDTO followee = new UserDTO(3, "Omar");
+
+        when(usersRepository.follow(1, followee)).thenReturn(5);
+
+        assertEquals(5, usersController.follow(1, followee));
+    }
+
+
+    @Test
+    public void unFollow() throws CookeryDatabaseException {
+        when(usersRepository.unFollow(1, 3)).thenReturn(true);
+
+        assertTrue(usersController.unFollow(1, 3));
+    }
+
+
+    @Test
+    public void getFollowers() throws CookeryDatabaseException {
+        List<UserFollowDTO> expectedUsers = Arrays.asList(
+                new UserFollowDTO(1, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                new UserFollowDTO(2, new UserBase(3, "Omar", "omar@gmail.com"), "omar image")
+        );
+
+        when(usersRepository.getFollowers(1)).thenReturn(
+                Arrays.asList(
+                        new UserFollowDTO(1, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                        new UserFollowDTO(2, new UserBase(3, "Omar", "omar@gmail.com"), "omar image")
+                )
+        );
+
+        List<UserFollowDTO> actualUsers = usersController.getFollowers(1);
+
+        assertEquals(expectedUsers, actualUsers);
+        assertEquals(expectedUsers.size(), actualUsers.size());
+    }
+
+    @Test
+    public void getFollowees() throws CookeryDatabaseException {
+        List<UserFollowDTO> expectedUsers = Arrays.asList(
+                new UserFollowDTO(3, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                new UserFollowDTO(4, new UserBase(4, "Raneem", "raneem@gmail.com"), "raneem image")
+        );
+
+        when(usersRepository.getFollowees(1)).thenReturn(
+                Arrays.asList(
+                        new UserFollowDTO(3, new UserBase(2, "Anas", "anas@gmail.com"), "anas image"),
+                        new UserFollowDTO(4, new UserBase(4, "Raneem", "raneem@gmail.com"), "raneem image")
+                )
+        );
+
+        List<UserFollowDTO> actualUsers = usersController.getFollowees(1);
+
+        assertEquals(expectedUsers, actualUsers);
+        assertEquals(expectedUsers.size(), actualUsers.size());
+    }
 }

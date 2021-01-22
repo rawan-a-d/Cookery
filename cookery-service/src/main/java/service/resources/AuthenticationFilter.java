@@ -159,7 +159,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // 2. Select the user object here and check the role
 
         if((rolesSet.contains("admin") && isAdmin) || (rolesSet.contains("user") && !isAdmin)) {
-            System.out.println("Role allowed");
             return true;
         }
 

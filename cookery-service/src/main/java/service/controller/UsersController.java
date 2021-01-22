@@ -1,8 +1,5 @@
 package service.controller;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import service.model.DTO.ProfileDTO;
 import service.model.DTO.UserDTO;
 import service.model.DTO.UserFollowDTO;
@@ -17,7 +14,6 @@ import java.util.logging.Logger;
 public class UsersController {
     private final static Logger LOGGER = Logger.getLogger(UsersController.class.getName());
 
-//    @Inject
     UsersRepository usersRepository = new UsersRepository();
 
     //	------------------------------------------------------------------------ Users ------------------------------------------------------------------------------
@@ -102,15 +98,7 @@ public class UsersController {
         return id;
     }
 
-//	public boolean isOwner(int tokenUserId, int userId) {
-//		AuthenticationRepository authenticationRepository = new AuthenticationRepository();
-//
-//		boolean isOwner = tokenUserId == userId ? true : false;
-//
-//		return isOwner;
-//	}
 
-    // 	public boolean follow(int followerId, UserDTO followee) throws CookeryDatabaseException { // could be current user id, followee object (User)
     public int follow(int followerId, UserDTO followee) {
         int result = -1;
         try {

@@ -41,7 +41,6 @@ public class RecipesResources {
 			userId = AuthController.getIdInToken(auth);
 		}
 
-		System.out.println("ingredient " + ingredients);
 		if(ingredients.get(0).equals("all")) {
 			recipes = recipesController.getRecipesDTO(userId);
 		}
@@ -136,8 +135,6 @@ public class RecipesResources {
 			}
 
 			private Response update() {
-
-				System.out.println("RECIPE " + recipe);
 				UserDTO user = AuthController.getUser(auth); // user in token
 				int ownerId = UsersController.getUserId(id); // id of owner of the recipe
 

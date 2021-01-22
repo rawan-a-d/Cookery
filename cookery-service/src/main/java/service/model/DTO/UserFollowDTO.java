@@ -7,6 +7,9 @@ public class UserFollowDTO {
     private UserBase user;
     private String image;
 
+    public UserFollowDTO() {
+    }
+
     public UserFollowDTO(int followId, UserBase user, String image) {
         this.followId = followId;
         this.user = user;

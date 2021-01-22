@@ -242,6 +242,50 @@ public class RecipesResourcesTest extends JerseyTest {
     }
 
 
+    @Test
+    public void addRecipe_duplicateIngredient_returnsBadRequest() {
+        String token = AuthController.generateAuthToken(new UserDTO( 4, "Raneem", "raneem@gmail.com", Role.user));
+
+        Recipe newRecipe = new Recipe(5, "fifth recipe", "recipe 5 image", "recipe 5 desc",
+                Arrays.asList(
+                        new Ingredient(5, "onion", 4),
+                        new Ingredient(6, "courgette", 2),
+                        new Ingredient(7, "onion", 3)
+
+                ), 4);
+        Entity<Recipe> recipeEntity = Entity.entity(newRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .post(recipeEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void addRecipe_invalidName_returnsBadRequest() {
+        String token = AuthController.generateAuthToken(new UserDTO( 4, "Raneem", "raneem@gmail.com", Role.user));
+
+        Recipe newRecipe = new Recipe(5, "fifth recipe 5", "recipe 5 image", "recipe 5 desc",
+                Arrays.asList(
+                        new Ingredient(5, "onion", 4),
+                        new Ingredient(6, "courgette", 2),
+                        new Ingredient(7, "onion", 3)
+
+                ), 4);
+        Entity<Recipe> recipeEntity = Entity.entity(newRecipe, MediaType.APPLICATION_JSON);
+
+        Response response = target("recipes")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .post(recipeEntity);
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+
 //    @Test
 //    public void addRecipe_notLoggedIn_unAuthorized() {
 //        Recipe newRecipe = new Recipe(5, "fifth recipe", "recipe 5 image", "recipe 5 desc",

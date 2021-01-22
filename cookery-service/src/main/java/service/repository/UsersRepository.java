@@ -106,7 +106,6 @@ public class UsersRepository extends JDBCRepository{
 				UserBase user = new UserBase(userId, name, email);
 				ProfileDTO profile = new ProfileDTO(user, image, recipesNr, followersNr, followeesNr);
 
-				System.out.println("Profile " + profile);
 				return profile;
 			}
 
@@ -179,6 +178,7 @@ public class UsersRepository extends JDBCRepository{
 		String deleteFavouritesSql = "DELETE FROM user_favourite_recipe WHERE user_id = ?";
 		String deleteFavouritesByOtherSql = "DELETE FROM user_favourite_recipe WHERE recipe_id = ?";
 		String recipesSql = "SELECT id, user_id FROM recipe WHERE user_id = ?";
+		String deleteFollow = "DELETE FROM follow WHERE follower_id = ? OR followee_id = ?";
 
 		try (Connection connection = jdbcRepository.getDatabaseConnection();
 			 PreparedStatement statement = connection.prepareStatement(sql);
@@ -186,6 +186,7 @@ public class UsersRepository extends JDBCRepository{
 			PreparedStatement deleteIngredientsStatement = connection.prepareStatement(deleteIngredientsSql);
 			PreparedStatement deleteFavouritesStatement = connection.prepareStatement(deleteFavouritesSql);
 			PreparedStatement deleteFavouritesByOtherStatement = connection.prepareStatement(deleteFavouritesByOtherSql);
+			PreparedStatement deleteFollowStatement = connection.prepareStatement(deleteFollow);
 			 PreparedStatement recipesStatement = connection.prepareStatement(recipesSql);) {
 
 
@@ -212,9 +213,16 @@ public class UsersRepository extends JDBCRepository{
 				deleteRecipesStatement.executeUpdate();
 			}
 
+			// delete follow
+			deleteFollowStatement.setInt(1, id);
+			deleteFollowStatement.setInt(2, id);
+			deleteFollowStatement.executeUpdate();
+
 			// delete user
 			statement.setInt(1, id);
 			statement.executeUpdate();
+
+			System.out.println("DELETED");
 
 			connection.commit();
 

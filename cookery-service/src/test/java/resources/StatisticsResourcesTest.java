@@ -58,7 +58,6 @@ public class StatisticsResourcesTest extends JerseyTest {
         enable(TestProperties.DUMP_ENTITY);
         return new ResourceConfig(StatisticsResources.class)
                 .register(MultiPartFeature.class);
-//                .register(AuthenticationFilter.class);
     }
 
 

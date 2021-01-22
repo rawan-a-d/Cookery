@@ -124,10 +124,6 @@ public class RecipesController {
         boolean result = false;
         try {
             result = recipesRepository.createRecipe(recipe);
-
-            if(result) {
-                System.out.println("Recipe added success");
-            }
         }
         catch (CookeryDatabaseException ex) {
             LOGGER.info(ex.getMessage()); // Compliant
