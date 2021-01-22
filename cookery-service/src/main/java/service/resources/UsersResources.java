@@ -273,10 +273,7 @@ public class UsersResources {
             int read = 0;
             byte[] bytes = new byte[1024];
             String completePath = file.toString(); //+id;
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(completePath);
-
+            try (OutputStream out = new FileOutputStream(completePath)) {
                 while ((read = fileInputStream.read(bytes)) != -1)
                 {
                     out.write(bytes, 0, read);
@@ -293,11 +290,6 @@ public class UsersResources {
                 }
             } catch (NullPointerException | FileNotFoundException e) {
                 e.printStackTrace();
-            }
-            finally {
-                if(fileInputStream != null) {
-                    fileInputStream.close();
-                }
             }
 
             return Response.noContent().build();
