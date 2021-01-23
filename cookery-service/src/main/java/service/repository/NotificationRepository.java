@@ -26,7 +26,8 @@ public class NotificationRepository {
         NotificationDTO notificationDTO = null;
 
         String  sql = "SELECT n.*, un.is_seen, (SELECT COUNT(*) FROM user_notification WHERE user_notification.user_id = ? AND user_notification.is_seen = false) AS new_notifications_nr FROM notification AS n " +
-                "LEFT JOIN user_notification AS un ON un.notification_id = n.id AND un.user_id = ? " +
+                "LEFT JOIN user_notification AS un ON un.notification_id = n.id " +
+                "WHERE un.user_id = ? " +
                 "ORDER BY n.id DESC";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
