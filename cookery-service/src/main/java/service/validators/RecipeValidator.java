@@ -4,7 +4,6 @@ import cyclops.control.Validated;
 import service.model.Recipe;
 
 public class RecipeValidator {
-    // 	public Recipe(String name, String image, String description, int userId, List<Ingredient> ingredients) {
     public static Validated<Error,String> validName(Recipe recipe){
         if(recipe.getName() == null) { // null
             return Validated.invalid(Error.NULL);
@@ -34,15 +33,17 @@ public class RecipeValidator {
         }
 
         // duplicate
+        int counter = 1;
         for(int i = 0; i < recipe.getIngredients().size(); i++) {
             String ingredient = recipe.getIngredients().get(i).getIngredient();
-            for(int j = 1; j < recipe.getIngredients().size() - 1; j++) {
+            for(int j = counter; j < recipe.getIngredients().size(); j++) {
                 String ingredient2 = recipe.getIngredients().get(j).getIngredient();
 
                 if(ingredient.equals(ingredient2)) {
                     return Validated.invalid(Error.DUPLICATE);
                 }
             }
+            counter++;
         }
 
         return Validated.valid("Valid ingredients");

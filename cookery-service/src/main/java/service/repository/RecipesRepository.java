@@ -369,6 +369,7 @@ public class RecipesRepository {
                         "LEFT JOIN user_favourite_recipe ufr " +
                         "ON recipe.id = ufr.recipe_id AND ufr.user_id = ? " +
                         "WHERE ingredient IN (";
+//                        "WHERE ingredient REGEXP ";
 
         for (int i = 0; i < ingredients.size(); i++) {
             // last ingredient
@@ -377,10 +378,13 @@ public class RecipesRepository {
                 break;
             }
             sql += "?, ";
+//            sql += "? | ";
+
         }
 
         sql += ") " +
-        "GROUP BY recipe.id " +
+//        sql += " " +
+                "GROUP BY recipe.id " +
                 "HAVING COUNT(*) = ?";
 
         try (Connection connection = jdbcRepository.getDatabaseConnection();
